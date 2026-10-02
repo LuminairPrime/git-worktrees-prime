@@ -1,0 +1,3 @@
+# Preserve the research inputs covered by the SHA-256 manifest.
+/vendors/** -text whitespace=-blank-at-eol
+/skills/prototype1-astra/SKILL.md -text
