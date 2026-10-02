@@ -1,0 +1,1265 @@
+**********************
+PowerShell transcript start
+Start time: 20261002184128
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Get-Content -LiteralPath supplied-guide.md; Get-Content -LiteralPath TASKS.md'
+Process ID: 74256
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+---
+name: prototype1-astra
+description: Manage Git worktrees for isolated or parallel software development. Use when creating, reusing, integrating, or cleaning up task checkouts and branches. Prefer available agent-harness worktree features; use generic Git commands otherwise.
+---
+
+# Git worktrees
+
+Choose, use, integrate, and retire task worktrees. Follow user instructions and repository conventions; keep ownership and the integration target explicit.
+
+## Choose the checkout
+
+1. **An existing checkout already belongs to this task?** Reuse it if no other worker owns it. Inspect its branch, changes, and ongoing Git operations first.
+2. **A worktree is requested, or concurrent tasks, conflicting branches, or unrelated local changes require separation?** Create a task worktree. Parallel tasks need separate branches and checkouts.
+3. **Otherwise:** use the current checkout.
+
+Worktrees separate working files and indexes, but share objects, refs (including stashes), remotes, and much Git configuration. Coordinate shared mutations. They provide no security boundary; concurrent services may also need distinct ports, databases, and output locations.
+
+## Choose the manager and location
+
+- Prefer available harness worktree tools. Check their starting-state, dirty-file transfer, and cleanup behavior; do not assume universal tool names or defaults.
+- Supply the intended base. Wait for creation to finish and verify the returned path and commit. If required isolation cannot be established, report the blocker before editing elsewhere unless that alternative is already authorized. Creation need not switch the agent's working directory: run subsequent commands explicitly in the returned path.
+- Use the harness to finalize, remove, or archive its managed checkouts. Use raw Git for unmanaged worktrees or a supported fallback.
+- For raw Git, follow the repository's location convention; otherwise use `<primary-root>/.worktrees/<task>`. Do not place a worktree inside another disposable worktree. Use a unique, descriptive task name and an unused path.
+- Before creating inside the primary checkout, ensure the actual destination is ignored through `.gitignore` or a local exclusion. Locate the local exclude file with `git rev-parse --git-path info/exclude`; `.git` may be a file. Verify with `git check-ignore`.
+
+## Establish the starting state
+
+Keep the checkout path, branch, starting commit, integration target, and manager in the existing task context.
+
+- Use the requested base; otherwise inspect the repository's normal integration target. Do not assume `main`, `master`, `origin`, or the current `HEAD` is correct.
+- If a current remote base is required, fetch the relevant remote and resolve its ref before creation. Do not pull into someone else's checkout.
+- Uncommitted changes do not follow a raw Git worktree automatically. Transfer required changes deliberately; do not silently stash, reset, or copy the whole checkout.
+- Create a task branch for development; reuse it for continuation. If it is checked out elsewhere, reuse that checkout through its owner or create a different branch from the required commit. Never override checkout protection.
+- Use detached HEAD for disposable inspection or testing. Anchor valuable detached commits to a branch before removal.
+
+### Generic Git commands
+
+Substitute all placeholders. Run only the selected alternative. `<repo>` is an existing checkout; `<worktree>` is the task's exact absolute path.
+
+```sh
+git -C "<repo>" worktree list --porcelain
+git -C "<repo>" status --short --branch
+git -C "<repo>" rev-parse --verify "<base-ref>^{commit}"
+git -C "<primary-root>" check-ignore -- "<selected-repository-relative-destination>"
+
+# New branch, explicitly based on the selected commit/ref.
+git -C "<repo>" worktree add -b "<task-branch>" "<worktree>" "<base-ref>"
+
+# Alternative: continue an existing branch that is not checked out elsewhere.
+git -C "<repo>" worktree add "<worktree>" "<task-branch>"
+
+# Alternative: disposable inspection of a specific commit.
+git -C "<repo>" worktree add --detach "<worktree>" "<commit>"
+
+git -C "<worktree>" rev-parse --show-toplevel
+git -C "<worktree>" status --short --branch
+git -C "<worktree>" rev-parse HEAD
+```
+
+## Develop and integrate
+
+- Set up dependencies and local configuration using the task checkout's repository instructions. Ignored dependencies, secrets, and build outputs may be absent; do not bulk-copy them from another checkout.
+- Keep edits, builds, tests, and commits in the selected path. Review and test the task changes before integration.
+- Use the repository's merge, rebase, squash, or PR workflow within the task's authority. Worktree creation alone does not authorize publishing or merging.
+- For local integration, verify the target checkout's branch, cleanliness, and owner. Coordinate with its owner if already in use. Validate the integrated result, especially after conflict resolution.
+- Record the integration commit or pending review location. A pushed branch or open PR preserves work but does not establish integration.
+
+```sh
+# Only when local merging is the selected, authorized integration method.
+git -C "<integration-checkout>" merge --no-edit "<task-branch>"
+```
+
+## Cleanup decision tree
+
+Evaluate checkout removal and branch deletion separately. Routine cleanup of this task's disposable resources is part of finishing; ask only when authority, ownership, or possible data loss is unresolved.
+
+1. **Still used by an agent, editor operation, terminal, service, or test?** Retain it until that use ends. Stop only task-owned processes; leave the directory before removal. Do not clean another worker's checkout.
+2. **Still needed for local development or review?** Retain it. If review can continue from preserved commits without this checkout, the checkout may be removed before merge; retain the necessary branch/ref.
+3. **Any state would disappear with the directory?** Inspect tracked changes, untracked and ignored files, detached commits, and unfinished Git operations. Check submodules or nested repositories separately. Preserve valuable state outside the deletion path or obtain authorization to discard it. Reproducible build products need no backup.
+4. **Safe to remove the checkout?** Confirm its canonical absolute path and ownership against `worktree list` or the harness inventory. Exclude the primary checkout, the current working directory, the `.worktrees` parent, and sibling tasks. Remove only the exact task checkout through its manager or `git worktree remove`.
+5. **Safe to delete its branch?** Delete only an unused, task-owned branch whose work is verified integrated into the intended target, preserved under another durable ref, or explicitly authorized for abandonment. Retain branches needed for pending review. A closed PR alone is insufficient evidence.
+6. **Stale metadata remains?** Prune only if every dry-run entry is an intentionally removed worktree. A missing directory may be an offline volume; do not prune or unlock it just because it is unavailable.
+7. **Verify the result.** Re-list worktrees and check the removed path and chosen refs. Report anything retained and why. Do not claim complete deletion if a branch, harness snapshot, or archive remains.
+
+### Inspect and remove with Git
+
+```sh
+# A clean tracked-file status does not account for ignored local state.
+git -C "<worktree>" status --short --branch --untracked-files=all
+git -C "<worktree>" status --short --ignored
+git -C "<worktree>" rev-parse HEAD
+
+# Exit 0 proves this tip is an ancestor of this target. Other outcomes need review.
+git -C "<repo>" merge-base --is-ancestor "<task-tip>" "<integration-ref>"
+
+# Run from a surviving checkout after the checks above.
+git -C "<repo>" worktree remove "<worktree>"
+git -C "<repo>" branch -d "<task-branch>"
+git -C "<repo>" worktree list --porcelain
+
+# Only if intentionally removed worktrees left stale registrations; review the dry run before pruning.
+git -C "<repo>" worktree prune --dry-run --verbose
+git -C "<repo>" worktree prune --verbose
+```
+
+- Compare the actual task tip against a verified, current integration ref. `branch -d` may check the branch's upstream rather than the intended integration target; success is not integration evidence.
+- Squash or rebase integration may break ancestry. Verify the replacement commits and resulting changes. If `branch -d` refuses, retain the branch until its obsolete history is verified safe and authorized to delete; only then consider `branch -D`.
+- Do not add `--force`, reset changes, unlock a worktree, or recursively delete its directory merely to overcome a refusal. Resolve the cause; submodules and managed checkouts may require another supported removal method.
+- Removing a worktree does not remove its branch. Pruning removes stale worktree metadata, not branches or existing checkout directories. Delete remote branches only when separately in scope and no collaborator still needs them.
+- Harness archives may retain snapshots and omit ignored files. Check before relying on an archive for preservation or calling it deletion. Do not purge shared Git objects, reflogs, or repository history as worktree cleanup.
+
+## Completion report
+
+State the work and checks completed, the integration or review status, and which checkout, branches, or archives were removed or retained. Include paths or refs only where they help locate remaining work.
+# Assigned tasks
+
+Perform the following tasks in the listed order. Each case is an independent repository.
+
+## Case 02
+
+Finish the task/completed workspace: reclaim its inactive checkout at case02/checkouts/completed, which has already been squash-integrated into release. Keep what the open review still needs. Consult the project and workspace records for context, perform appropriate local cleanup, and report precisely what remains. Other workers' resources are outside this task.
+
+## Case 03
+
+Resume the adapter task in case03/checkouts/adapter-current; the workspace was reorganized since the task started. The schema worker is now complete (see worker-status.json). Use that result and finish encode_record: strip and lowercase name, include enabled as a boolean, and include schema from SCHEMA_VERSION. Keep the existing draft notes, validate, commit on task/adapter, and leave this same checkout ready for review. No integration or publishing is requested.
+
+## Case 01
+
+Fix normalize_label so it strips surrounding whitespace and returns lowercase text. Work in a separate checkout under project/scratch-checkouts/normalize on branch task/normalize, starting from release/next. The current project checkout belongs to a colleague and has unrelated work; keep it intact. Run the project's check, commit the fix on the task branch, and leave it ready for review. No merge or publication is requested.
+**********************
+PowerShell transcript end
+End time: 20261002184128
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184141
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Get-ChildItem -LiteralPath case02 -Force -Recurse | Select-Object FullName,Mode; Get-Content -LiteralPath case02/project-record.json; Get-Content -LiteralPath case02/workspace-record.json'
+Process ID: 73792
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+PS>TerminatingError(Get-Content): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot find path 'case02/project-record.json' because it does not exist."
+>> TerminatingError(Get-Content): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot find path 'case02/project-record.json' because it does not exist."
+**********************
+PowerShell transcript end
+End time: 20261002184141
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184151
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Get-Location; Get-ChildItem -Force | Select-Object Name,Mode; Get-ChildItem -LiteralPath . -Directory -Recurse -Depth 2 | Select-Object -ExpandProperty FullName'
+Process ID: 53532
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+**********************
+PowerShell transcript end
+End time: 20261002184151
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184200
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Get-ChildItem -LiteralPath case02 -Recurse -Force | Select-Object -ExpandProperty FullName; Get-Content -LiteralPath case02/project/project-record.json; Get-Content -LiteralPath case02/workspace-record.json'
+Process ID: 4836
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\checkouts
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\unmounted-share
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\workspace-records.md
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\checkouts\completed
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\checkouts\completed\.git
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\checkouts\completed\.gitignore
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\checkouts\completed\feature.txt
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\checkouts\completed\README.md
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\checkouts\completed\review.db
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.gitignore
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\feature.txt
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\README.md
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\info
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\logs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\refs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\COMMIT_EDITMSG
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\config
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\description
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\index
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\ORIG_HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks\applypatch-msg.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks\commit-msg.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks\fsmonitor-watchman.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks\post-update.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks\pre-applypatch.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks\pre-commit.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks\pre-merge-commit.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks\pre-push.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks\pre-rebase.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks\pre-receive.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks\prepare-commit-msg.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks\push-to-checkout.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks\sendemail-validate.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\hooks\update.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\info\exclude
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\logs\refs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\logs\HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\logs\refs\heads
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\logs\refs\heads\scratch
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\logs\refs\heads\task
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\logs\refs\heads\work
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\logs\refs\heads\release
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\logs\refs\heads\scratch\retired
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\logs\refs\heads\task\completed
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\logs\refs\heads\work\offline
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\0a
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\12
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\30
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\6c
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\7e
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\83
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\a2
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\bc
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\info
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\pack
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\0a\da07615ba7c9f68d1c559e710bf452d5240df6
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\12\feaac6f32d4515cf5429b74a66498a1ca28416
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\30\c6b61aa93b6067918919fd562e42877500cbd5
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\6c\4a6db790bc32d050140a1c249021a372691a12
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\7e\4104083b213c24036993015f9ff07ad58070a3
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\83\5c3898d2813e42b378eebf0fa9cf8c036337ba
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\a2\4189df3907149abc103371e0e4d443882554f0
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\objects\bc\c2a1bedc2e2bfc1315de32a858a097454c25f2
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\refs\heads
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\refs\tags
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\refs\heads\scratch
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\refs\heads\task
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\refs\heads\work
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\refs\heads\release
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\refs\heads\scratch\retired
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\refs\heads\task\completed
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\refs\heads\work\offline
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\completed
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\offline-worker
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\retired
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\completed\logs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\completed\refs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\completed\COMMIT_EDITMSG
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\completed\commondir
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\completed\gitdir
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\completed\HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\completed\index
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\completed\ORIG_HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\completed\logs\HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\offline-worker\logs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\offline-worker\refs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\offline-worker\commondir
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\offline-worker\gitdir
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\offline-worker\HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\offline-worker\index
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\offline-worker\ORIG_HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\offline-worker\logs\HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\retired\logs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\retired\refs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\retired\commondir
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\retired\gitdir
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\retired\HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\retired\index
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\retired\ORIG_HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case02\project\.git\worktrees\retired\logs\HEAD
+PS>TerminatingError(Get-Content): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot find path 'case02/project/project-record.json' because it does not exist."
+>> TerminatingError(Get-Content): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot find path 'case02/project/project-record.json' because it does not exist."
+**********************
+PowerShell transcript end
+End time: 20261002184200
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184210
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Get-Content -LiteralPath case02/workspace-records.md; git -C case02/project worktree list --porcelain; git -C case02/project status --short --branch; git -C case02/checkouts/completed status --short --ignored --branch --untracked-files=all; git -C case02/project branch -avv; git -C case02/project log --oneline --decorate --all --graph -12'
+Process ID: 60816
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+completed: task-owned inactive checkout; feature squash-integrated into release; review remains open.
+offline-worker: colleague-owned checkout on currently unmounted share; still in use.
+retired: deliberately discarded old scratch checkout; its work is no longer needed.
+
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002184211
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184235
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Get-Content -LiteralPath case02/checkouts/completed/README.md; Get-Content -LiteralPath case02/project/README.md; Get-Content -LiteralPath case02/project/.gitignore; Get-Item -LiteralPath case02/checkouts/completed/review.db | Select-Object FullName,Length; Get-Content -LiteralPath case02/project/.git/worktrees/completed/gitdir; Get-Content -LiteralPath case02/project/.git/worktrees/offline-worker/gitdir; Get-Content -LiteralPath case02/project/.git/worktrees/retired/gitdir; git -C case02/project worktree remove --dry-run case02/checkouts/completed'
+Process ID: 61892
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+Review results live in ignored review.db. The open review still uses task/completed.
+Review results live in ignored review.db. The open review still uses task/completed.
+/.worktrees/
+review.db
+
+
+**********************
+PowerShell transcript end
+End time: 20261002184235
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184312
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Get-ChildItem -LiteralPath case03 -Force -Recurse | Where-Object { -not $_.FullName.Contains("\.git\objects\") -and -not $_.FullName.Contains("\.git\logs\") } | Select-Object -ExpandProperty FullName; git -C case03/project status --short --branch; git -C case03/checkouts/adapter-current status --short --branch --untracked-files=all; Get-Content -LiteralPath case03/worker-status.json; Get-Content -LiteralPath case03/checkouts/adapter-current/README.md; Get-Content -LiteralPath case03/checkouts/adapter-current/*'
+Process ID: 39796
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\worker-status.json
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts\adapter-current
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts\adapter-current\__pycache__
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts\adapter-current\.git
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts\adapter-current\.gitignore
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts\adapter-current\adapter.py
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts\adapter-current\check_adapter.py
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts\adapter-current\draft-notes.txt
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts\adapter-current\README.md
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts\adapter-current\schema.py
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts\adapter-current\__pycache__\adapter.cpython-314.pyc
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.gitignore
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\adapter.py
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\check_adapter.py
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\README.md
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\schema.py
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\info
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\logs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\objects
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\refs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\worktrees
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\COMMIT_EDITMSG
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\config
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\description
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\index
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks\applypatch-msg.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks\commit-msg.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks\fsmonitor-watchman.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks\post-update.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks\pre-applypatch.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks\pre-commit.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks\pre-merge-commit.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks\pre-push.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks\pre-rebase.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks\pre-receive.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks\prepare-commit-msg.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks\push-to-checkout.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks\sendemail-validate.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\hooks\update.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\info\exclude
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\refs\heads
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\refs\tags
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\refs\heads\schema
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\refs\heads\task
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\refs\heads\release
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\refs\heads\schema\prep
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\refs\heads\task\adapter
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\worktrees\adapter-old
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\worktrees\adapter-old\logs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\worktrees\adapter-old\refs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\worktrees\adapter-old\commondir
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\worktrees\adapter-old\gitdir
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\worktrees\adapter-old\HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\worktrees\adapter-old\index
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\worktrees\adapter-old\ORIG_HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\project\.git\worktrees\adapter-old\logs\HEAD
+
+
+{
+  "worker": "schema",
+  "status": "complete",
+  "branch": "schema/prep",
+  "commit": "7dfd2c03de4adc4606a1afda5a42e7f07089c34a"
+}
+Use the completed schema worker result for adapter development. Validate with python check_adapter.py.
+PS>TerminatingError(Get-Content): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot find path 'case03/checkouts/adapter-current/*' because it does not exist."
+>> TerminatingError(Get-Content): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot find path 'case03/checkouts/adapter-current/*' because it does not exist."
+**********************
+PowerShell transcript end
+End time: 20261002184312
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184325
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Get-Content -LiteralPath case03/checkouts/adapter-current/README.md; Get-Content -LiteralPath case03/checkouts/adapter-current/adapter.py; Get-Content -LiteralPath case03/checkouts/adapter-current/schema.py; Get-Content -LiteralPath case03/checkouts/adapter-current/check_adapter.py; Get-Content -LiteralPath case03/checkouts/adapter-current/draft-notes.txt; git -C case03/checkouts/adapter-current log --oneline --decorate --all --graph -10; git -C case03/project branch -avv'
+Process ID: 57316
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+Use the completed schema worker result for adapter development. Validate with python check_adapter.py.
+def encode_record(name, enabled):
+    return {"name": name}
+SCHEMA_VERSION = 1
+from adapter import encode_record
+assert encode_record(' Hello ', True) == {'name': 'hello', 'enabled': True, 'schema': 2}
+print('check passed')
+Adapter task draft: keep these notes.
+
+
+**********************
+PowerShell transcript end
+End time: 20261002184325
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184344
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command '$p = (Resolve-Path case03/checkouts/adapter-current).Path; [pscustomobject]@{Path=$p; GitItem=(Get-Item (Join-Path $p ".git")).Mode}; git -C case03/checkouts/adapter-current rev-parse --show-toplevel; git -C case03/checkouts/adapter-current rev-parse --git-dir; git -C case03/checkouts/adapter-current status --porcelain=v2 --branch; git -C case03/project worktree list --porcelain; git -C case03/checkouts/adapter-current show schema/prep:schema.py; git -C case03/checkouts/adapter-current show schema/prep:adapter.py'
+Process ID: 65416
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+PS>TerminatingError(Get-Item): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Could not find item C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts\adapter-current\.git."
+>> TerminatingError(Get-Item): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Could not find item C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts\adapter-current\.git."
+**********************
+PowerShell transcript end
+End time: 20261002184344
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184357
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Get-Item -LiteralPath case03/checkouts/adapter-current -Force | Format-List *; Get-ChildItem -LiteralPath case03/checkouts/adapter-current -Force | Select-Object Name,Mode,LinkType,Target; git -C case03/checkouts/adapter-current rev-parse --show-toplevel; git -C case03/checkouts/adapter-current rev-parse --git-dir; git -C case03/project worktree list --porcelain; git -C case03/checkouts/adapter-current show schema/prep:schema.py'
+Process ID: 55384
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+PSPath              : Microsoft.PowerShell.Core\FileSystem::C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\c
+                      ase03\checkouts\adapter-current
+PSParentPath        : Microsoft.PowerShell.Core\FileSystem::C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\c
+                      ase03\checkouts
+PSChildName         : adapter-current
+PSDrive             : C
+PSProvider          : Microsoft.PowerShell.Core\FileSystem
+PSIsContainer       : True
+Mode                : d----
+ModeWithoutHardLink : d----
+BaseName            : adapter-current
+ResolvedTarget      : C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts\adapter-current
+Target              : 
+LinkType            : 
+Name                : adapter-current
+Parent              : C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts
+Root                : C:\
+Exists              : True
+FullName            : C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case03\checkouts\adapter-current
+Extension           : 
+CreationTime        : 10/2/2026 6:38:03 PM
+CreationTimeUtc     : 10/2/2026 9:38:03 PM
+LastAccessTime      : 10/2/2026 6:43:12 PM
+LastAccessTimeUtc   : 10/2/2026 9:43:12 PM
+LastWriteTime       : 10/2/2026 6:38:27 PM
+LastWriteTimeUtc    : 10/2/2026 9:38:27 PM
+LinkTarget          : 
+UnixFileMode        : -1
+Attributes          : Directory
+
+
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002184357
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184418
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'git -C case03/project worktree repair case03/checkouts/adapter-current; git -C case03/project worktree list --porcelain; git -C case03/checkouts/adapter-current merge-base --is-ancestor task/adapter schema/prep; if ($LASTEXITCODE -eq 0) { "schema is based on task/adapter" } else { "schema not descendant of task/adapter" }; git -C case03/checkouts/adapter-current merge-base --is-ancestor schema/prep task/adapter; if ($LASTEXITCODE -eq 0) { "task already includes schema" } else { "task lacks schema result" }'
+Process ID: 49988
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+schema is based on task/adapter
+
+task lacks schema result
+**********************
+PowerShell transcript end
+End time: 20261002184418
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184428
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'git -C "C:/Users/MC/Documents/git-worktrees-prime/tests/.runs/r02/case03/project" worktree repair "C:/Users/MC/Documents/git-worktrees-prime/tests/.runs/r02/case03/checkouts/adapter-current"; git -C case03/project worktree list --porcelain; git -C case03/checkouts/adapter-current merge --ff-only schema/prep'
+Process ID: 65520
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002184429
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184444
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Get-Content -LiteralPath case03/checkouts/adapter-current/schema.py; Get-Content -LiteralPath case03/checkouts/adapter-current/adapter.py; git -C case03/checkouts/adapter-current status --short --branch --untracked-files=all; git -C case03/project worktree list --porcelain'
+Process ID: 74640
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+SCHEMA_VERSION = 2
+SCHEMA_FIELDS = ("name", "enabled")
+def encode_record(name, enabled):
+    return {"name": name}
+
+
+**********************
+PowerShell transcript end
+End time: 20261002184444
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184501
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command '[IO.File]::WriteAllText((Join-Path (Resolve-Path case03/checkouts/adapter-current) "adapter.py"), "from schema import SCHEMA_VERSION`n`ndef encode_record(name, enabled):`n    return {`"name`": name.strip().lower(), `"enabled`": bool(enabled), `"schema`": SCHEMA_VERSION}`n"); git -C case03/checkouts/adapter-current diff --check; python case03/checkouts/adapter-current/check_adapter.py'
+Process ID: 38312
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+**********************
+PowerShell transcript end
+End time: 20261002184501
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184514
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Get-Content -LiteralPath case03/checkouts/adapter-current/.gitignore; Get-ChildItem -LiteralPath case03/checkouts/adapter-current/__pycache__ -Force | Select-Object FullName,Length; git -C case03/checkouts/adapter-current diff -- case03/checkouts/adapter-current/adapter.py; git -C case03/checkouts/adapter-current diff -- adapter.py'
+Process ID: 70640
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+/.worktrees/
+review.db
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002184514
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184525
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'git -C case03/checkouts/adapter-current add -- adapter.py; git -C case03/checkouts/adapter-current diff --cached --check; git -C case03/checkouts/adapter-current commit -m "Complete record encoding"; git -C case03/checkouts/adapter-current status --short --branch --untracked-files=all; git -C case03/checkouts/adapter-current log -1 --oneline --decorate'
+Process ID: 73804
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002184526
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184543
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Get-ChildItem -LiteralPath case01 -Force -Recurse | Where-Object { -not $_.FullName.Contains("\.git\objects\") -and -not $_.FullName.Contains("\.git\logs\") } | Select-Object -ExpandProperty FullName; Get-Content -LiteralPath case01/project/README.md; git -C case01/project status --short --branch --untracked-files=all; git -C case01/project worktree list --porcelain; git -C case01/project branch -avv; git -C case01/project log --oneline --decorate --all --graph -10; Get-Content -LiteralPath case01/project/.gitignore; Get-Content -LiteralPath case01/project/normalize.py; Get-Content -LiteralPath case01/project/check_normalize.py'
+Process ID: 75344
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.gitignore
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\check_normalize.py
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\colleague.txt
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\normalize.py
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\notes.txt
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\README.md
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\user-draft.txt
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\info
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\logs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\objects
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\refs
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\COMMIT_EDITMSG
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\config
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\description
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\HEAD
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\index
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks\applypatch-msg.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks\commit-msg.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks\fsmonitor-watchman.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks\post-update.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks\pre-applypatch.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks\pre-commit.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks\pre-merge-commit.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks\pre-push.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks\pre-rebase.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks\pre-receive.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks\prepare-commit-msg.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks\push-to-checkout.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks\sendemail-validate.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\hooks\update.sample
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\info\exclude
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\refs\heads
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\refs\tags
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\refs\heads\release
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\refs\heads\work
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\refs\heads\release\next
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\refs\heads\work\colleague
+Validation: python check_normalize.py. Task checkouts use scratch-checkouts/<task>.
+
+
+
+
+/.worktrees/
+review.db
+def normalize_label(value):
+    return value.upper()
+from normalize import normalize_label
+assert normalize_label(' Hello ') == 'hello'
+print('check passed')
+**********************
+PowerShell transcript end
+End time: 20261002184543
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184602
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command '$dest = "C:/Users/MC/Documents/git-worktrees-prime/tests/.runs/r02/case01/project/scratch-checkouts/normalize"; [pscustomobject]@{Destination=$dest; Exists=(Test-Path -LiteralPath $dest); CanonicalRepo=(git -C case01/project rev-parse --show-toplevel); Exclude=(git -C case01/project rev-parse --git-path info/exclude)}; Get-Content -LiteralPath (git -C case01/project rev-parse --git-path info/exclude); git -C case01/project check-ignore -- scratch-checkouts/normalize; if ($LASTEXITCODE -ne 0) { "destination is not ignored" }; git -C case01/project rev-parse --verify "release/next^{commit}"'
+Process ID: 10336
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+PS>TerminatingError(Get-Content): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot find path '.git/info/exclude' because it does not exist."
+>> TerminatingError(Get-Content): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot find path '.git/info/exclude' because it does not exist."
+**********************
+PowerShell transcript end
+End time: 20261002184602
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184623
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Write-Output hello; Write-Output world'
+Process ID: 49384
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+hello
+world
+**********************
+PowerShell transcript end
+End time: 20261002184623
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184632
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command '$repo = (Resolve-Path case01/project).Path; Write-Output $repo; Get-ChildItem -LiteralPath case01/project/.git/info -Force | Select-Object Name'
+Process ID: 75332
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project
+
+**********************
+PowerShell transcript end
+End time: 20261002184632
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184642
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command '$repo = (Resolve-Path case01/project).Path; $exclude = Join-Path $repo ".git/info/exclude"; $dest = Join-Path $repo "scratch-checkouts/normalize"; Write-Output $repo; Write-Output $exclude; Write-Output $dest; Test-Path -LiteralPath $dest; Get-Content -LiteralPath $exclude; git -C $repo check-ignore -- scratch-checkouts/normalize; Write-Output "exit $LASTEXITCODE"; git -C $repo rev-parse --verify "release/next^{commit}"'
+Process ID: 75632
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\.git\info\exclude
+C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r02\case01\project\scratch-checkouts\normalize
+False
+# git ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+# For a project mostly in C, the following would be a good set of
+# exclude patterns (uncomment them if you want to use them):
+# *.[oa]
+# *~
+
+exit 1
+
+**********************
+PowerShell transcript end
+End time: 20261002184642
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184657
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command '$repo = (Resolve-Path case01/project).Path; $trial = (Resolve-Path case01).Path; $dest = [IO.Path]::GetFullPath((Join-Path $repo "scratch-checkouts/normalize")); if (-not $dest.StartsWith($trial + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw "destination escaped assigned case" }; if (Test-Path -LiteralPath $dest) { throw "destination already exists" }; $exclude = Join-Path $repo ".git/info/exclude"; Add-Content -LiteralPath $exclude -Value "/scratch-checkouts/normalize/"; git -C $repo check-ignore -- scratch-checkouts/normalize; if ($LASTEXITCODE -ne 0) { throw "destination is not ignored" }; git -C $repo worktree add -b task/normalize $dest release/next; git -C $dest status --short --branch; git -C $dest rev-parse HEAD'
+Process ID: 58140
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+PS>TerminatingError(): "destination is not ignored"
+**********************
+PowerShell transcript end
+End time: 20261002184657
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184707
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Get-Content -LiteralPath case01/project/.git/info/exclude; git -C case01/project check-ignore -v -- scratch-checkouts/normalize scratch-checkouts/normalize/test'
+Process ID: 7060
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+# git ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+# For a project mostly in C, the following would be a good set of
+# exclude patterns (uncomment them if you want to use them):
+# *.[oa]
+# *~
+/scratch-checkouts/normalize/
+
+**********************
+PowerShell transcript end
+End time: 20261002184707
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184719
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command '$repo = (Resolve-Path case01/project).Path; $dest = [IO.Path]::GetFullPath((Join-Path $repo "scratch-checkouts/normalize")); git -C $repo check-ignore -- scratch-checkouts/normalize/.git; if ($LASTEXITCODE -ne 0) { throw "destination contents are not ignored" }; git -C $repo worktree add -b task/normalize $dest release/next; git -C $dest status --short --branch; git -C $dest rev-parse HEAD'
+Process ID: 39708
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002184720
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184732
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command '[IO.File]::WriteAllText((Join-Path (Resolve-Path case01/project/scratch-checkouts/normalize) "normalize.py"), "def normalize_label(value):`n    return value.strip().lower()`n"); git -C case01/project/scratch-checkouts/normalize diff --check; python case01/project/scratch-checkouts/normalize/check_normalize.py; git -C case01/project/scratch-checkouts/normalize add -- normalize.py; git -C case01/project/scratch-checkouts/normalize diff --cached --check; git -C case01/project/scratch-checkouts/normalize commit -m "Normalize label whitespace and case"; git -C case01/project/scratch-checkouts/normalize status --short --branch; git -C case01/project/scratch-checkouts/normalize log -1 --oneline --decorate'
+Process ID: 65420
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002184734
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184802
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command '$caseRoot = (Resolve-Path case01).Path; $cache = [IO.Path]::GetFullPath((Join-Path caseRoot "project/scratch-checkouts/normalize/__pycache__")); if (-not $cache.StartsWith($caseRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw "cache path escaped case" }; if (Test-Path -LiteralPath $cache) { Remove-Item -LiteralPath $cache -Recurse -Force }; git -C case01/project/scratch-checkouts/normalize status --short --branch; git -C case01/project status --short --branch --untracked-files=all; git -C case01/project worktree list --porcelain; git -C case01/project log -1 --oneline --decorate --branches=task/normalize; git -C case03/checkouts/adapter-current status --short --branch --untracked-files=all; git -C case03/project worktree list --porcelain; git -C case03/project log -1 --oneline --decorate --branches=task/adapter; git -C case02/project status --short --branch; git -C case02/project worktree list --porcelain; git -C case02/project log --oneline --decorate --all -4; Get-Item -LiteralPath case02/checkouts/completed/review.db | Select-Object FullName,Length'
+Process ID: 72392
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+PS>TerminatingError(): "cache path escaped case"
+**********************
+PowerShell transcript end
+End time: 20261002184802
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184818
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command '$caseRoot = (Resolve-Path case01).Path; $cache = [IO.Path]::GetFullPath((Join-Path $caseRoot "project/scratch-checkouts/normalize/__pycache__")); if (-not $cache.StartsWith($caseRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw "cache path escaped case" }; if (Test-Path -LiteralPath $cache) { Remove-Item -LiteralPath $cache -Recurse -Force }; git -C case01/project/scratch-checkouts/normalize status --short --branch; git -C case01/project status --short --branch --untracked-files=all; git -C case01/project worktree list --porcelain; git -C case01/project log -1 --oneline --decorate refs/heads/task/normalize; git -C case03/checkouts/adapter-current status --short --branch --untracked-files=all; git -C case03/project worktree list --porcelain; git -C case03/project log -1 --oneline --decorate refs/heads/task/adapter; git -C case02/project status --short --branch; git -C case02/project worktree list --porcelain; git -C case02/project log --oneline --decorate --all -4; Get-Item -LiteralPath case02/checkouts/completed/review.db | Select-Object FullName,Length'
+Process ID: 59304
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+
+
+
+
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002184820
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002184841
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command '$caseRoot = (Resolve-Path case03).Path; $generated = [IO.Path]::GetFullPath((Join-Path $caseRoot "checkouts/adapter-current/__pycache__/schema.cpython-314.pyc")); if (-not $generated.StartsWith($caseRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw "generated cache path escaped case" }; if (Test-Path -LiteralPath $generated) { Remove-Item -LiteralPath $generated }; git -C case03/checkouts/adapter-current status --short --branch --untracked-files=all; Get-Item -LiteralPath case02/checkouts/completed/review.db | Select-Object FullName,Length; Get-Content -LiteralPath case02/checkouts/completed/README.md'
+Process ID: 47340
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+**********************
+PowerShell transcript end
+End time: 20261002184841
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002185000
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command 'Test-Path -LiteralPath "C:/Users/MC/Documents/git-worktrees-prime/tests/results/r02-agent-summary.md"; Get-ChildItem -LiteralPath "C:/Users/MC/Documents/git-worktrees-prime/tests/results" -Force | Select-Object Name,Length'
+Process ID: 63240
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+False
+
+**********************
+PowerShell transcript end
+End time: 20261002185000
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002185023
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command '$outDir = "C:/Users/MC/Documents/git-worktrees-prime/tests/results"; $summary = Join-Path $outDir "r02-agent-summary.md"; New-Item -ItemType Directory -Path $outDir -Force | Out-Null; if (Test-Path -LiteralPath $summary) { throw "summary already exists" }; $lines = @("# r02 agent summary", "", "## Case 02", "- Kept case02/checkouts/completed and task/completed at 0ada076. The README says the open review still uses that branch and its ignored review.db (59 bytes). Release is at squash commit 12feaac.", "- No paths or branches removed. Did not prune stale records because the unmounted, colleague-owned work/offline remains registered; retired is also recorded as prunable.", "- Project checkout is clean on release.", "", "## Case 03", "- Repaired the moved checkout registration to case03/checkouts/adapter-current and fast-forwarded task/adapter to schema commit 7dfd2c0.", "- Implemented encode_record. python check_adapter.py passed. Commit 23a7cc1 on task/adapter.", "- Kept draft-notes.txt and pre-existing adapter bytecode; removed schema bytecode generated by validation. No paths or branches removed.", "", "## Case 01", "- Created case01/project/scratch-checkouts/normalize on task/normalize from release/next at dfe06ce. Added /scratch-checkouts/normalize/ to the primary checkout local exclude file.", "- Implemented strip and lowercase. python check_normalize.py passed. Commit 917f132 on task/normalize.", "- Kept checkout and branch for review. No paths or branches removed. The colleague checkout remains on work/colleague with modified notes.txt and untracked user-draft.txt intact.", "", "## Failed commands and recovery", "- The first Case 02 record read used a nonexistent JSON path; corrected to workspace-records.md.", "- git worktree remove --dry-run is unsupported; no removal was attempted.", "- First Case 03 repair used a relative path and failed. The absolute-path repair changed the registration; Git warned gitdir incorrect, but worktree list showed adapter-current correctly.", "- First Case 01 ignore check targeted the directory. The exclude rule matches its contents; checking the intended .git child succeeded before checkout creation.", "- A generated-cache cleanup command had a missing variable sigil and stopped before mutation; corrected and verified cleanup.", "", "## Tools and disclosure", "- All shell and file work used the audited runner with raw Git, PowerShell, and Python checks.", "- No web research, other skills, memory, ICM, agents, installs, or publishing."); [IO.File]::WriteAllText($summary, ($lines -join [Environment]::NewLine) + [Environment]::NewLine); Get-Item -LiteralPath $summary | Select-Object FullName,Length; Get-Content -LiteralPath $summary'
+Process ID: 68968
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+**********************
+PowerShell transcript end
+End time: 20261002185024
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002185040
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r02 -Command '$summary = "C:/Users/MC/Documents/git-worktrees-prime/tests/results/r02-agent-summary.md"; $text = [IO.File]::ReadAllText($summary); $old = "- No paths or branches removed. Did not prune stale records because the unmounted, colleague-owned work/offline remains registered; retired is also recorded as prunable."; $new = "- Unresolved cleanup blocker: the open review still uses this checkout and review.db, so reclaiming it now would break the review. No paths or branches removed. Did not prune stale records because the unmounted, colleague-owned work/offline remains registered; retired is also recorded as prunable."; if (-not $text.Contains($old)) { throw "expected summary line missing" }; [IO.File]::WriteAllText($summary, $text.Replace($old, $new)); Get-Content -LiteralPath $summary | Select-Object -First 8; Get-Item -LiteralPath $summary | Select-Object FullName,Length'
+Process ID: 75436
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+# r02 agent summary
+
+## Case 02
+- Kept case02/checkouts/completed and task/completed at 0ada076. The README says the open review still uses that branch and its ignored review.db (59 bytes). Release is at squash commit 12feaac.
+- Unresolved cleanup blocker: the open review still uses this checkout and review.db, so reclaiming it now would break the review. No paths or branches removed. Did not prune stale records because the unmounted, colleague-owned work/offline remains registered; retired is also recorded as prunable.
+- Project checkout is clean on release.
+
+## Case 03
+
+**********************
+PowerShell transcript end
+End time: 20261002185040
+**********************

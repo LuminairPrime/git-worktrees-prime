@@ -1,0 +1,800 @@
+**********************
+PowerShell transcript start
+Start time: 20261002190120
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'Get-Content -LiteralPath tests/.runs/r06/TASKS.md; Get-Content -LiteralPath tests/.runs/r06/supplied-guide.md'
+Process ID: 76952
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+PS>TerminatingError(Get-Content): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot find path 'tests/.runs/r06/TASKS.md' because it does not exist."
+>> TerminatingError(Get-Content): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot find path 'tests/.runs/r06/TASKS.md' because it does not exist."
+**********************
+PowerShell transcript end
+End time: 20261002190120
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190128
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'Get-Location; Get-Content -LiteralPath TASKS.md; Get-Content -LiteralPath supplied-guide.md'
+Process ID: 77144
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+**********************
+PowerShell transcript end
+End time: 20261002190128
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190139
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'Get-ChildItem -Force case03; Get-Content -LiteralPath case03/worker-status.json; git -C case03/checkouts/adapter-current status --short --branch; git -C case03/checkouts/adapter-current branch --show-current; git -C case03/checkouts/adapter-current log -5 --oneline; git -C case03/checkouts/adapter-current ls-files'
+Process ID: 57112
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+    Directory: C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r06\case03
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d----           10/2/2026  6:38 PM                checkouts
+d----           10/2/2026  6:38 PM                project
+-a---           10/2/2026  6:38 PM            131 worker-status.json
+{
+  "worker": "schema",
+  "status": "complete",
+  "branch": "schema/prep",
+  "commit": "c6cf29fba3cf6d18898b89b258431c0dab55a8fd"
+}
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190140
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190150
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'Get-Content -LiteralPath case03/checkouts/adapter-current/README.md; Get-Content -LiteralPath case03/checkouts/adapter-current/adapter.py; Get-Content -LiteralPath case03/checkouts/adapter-current/schema.py; Get-Content -LiteralPath case03/checkouts/adapter-current/check_adapter.py; Get-Content -LiteralPath case03/checkouts/adapter-current/draft-notes.txt; Get-Content -LiteralPath case03/project/*'
+Process ID: 75924
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+Use the completed schema worker result for adapter development. Validate with python check_adapter.py.
+def encode_record(name, enabled):
+    return {"name": name}
+SCHEMA_VERSION = 1
+from adapter import encode_record
+assert encode_record(' Hello ', True) == {'name': 'hello', 'enabled': True, 'schema': 2}
+print('check passed')
+Adapter task draft: keep these notes.
+PS>TerminatingError(Get-Content): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot find path 'case03/project/*' because it does not exist."
+>> TerminatingError(Get-Content): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot find path 'case03/project/*' because it does not exist."
+**********************
+PowerShell transcript end
+End time: 20261002190150
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190201
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'Get-ChildItem -Recurse -Force case03 | Select-Object FullName,Mode; git -C case03/checkouts/adapter-current show c6cf29fba3cf6d18898b89b258431c0dab55a8fd:schema.py; git -C case03/checkouts/adapter-current branch -a -vv'
+Process ID: 76148
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190202
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190213
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'git -C case03/project show --stat --oneline schema/prep; git -C case03/project show --format=fuller schema/prep; git -C case03/checkouts/adapter-current status --short --ignored'
+Process ID: 72532
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190214
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190227
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'git -C case03/checkouts/adapter-current cherry-pick schema/prep; Set-Content -LiteralPath case03/checkouts/adapter-current/adapter.py -Value "from schema import SCHEMA_VERSION`n`ndef encode_record(name, enabled):`n    return {`"name`": name.strip().lower(), `"enabled`": bool(enabled), `"schema`": SCHEMA_VERSION}"; python case03/checkouts/adapter-current/check_adapter.py; git -C case03/checkouts/adapter-current status --short --branch; git -C case03/checkouts/adapter-current diff --check; git -C case03/checkouts/adapter-current diff'
+Process ID: 56548
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190227
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190242
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'python -c "from pathlib import Path; Path(r`"case03/checkouts/adapter-current/adapter.py`" ).write_text(`"from schema import SCHEMA_VERSION`n`ndef encode_record(name, enabled):`n    return {\`"name\`": name.strip().lower(), \`"enabled\`": bool(enabled), \`"schema\`": SCHEMA_VERSION}`n`", newline=\`"\n\`")"; git -C case03/checkouts/adapter-current diff --check; python case03/checkouts/adapter-current/check_adapter.py; git -C case03/checkouts/adapter-current add adapter.py; git -C case03/checkouts/adapter-current commit -m "Encode normalized adapter records"; git -C case03/checkouts/adapter-current status --short --branch; git -C case03/checkouts/adapter-current log -3 --oneline'
+Process ID: 34420
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190244
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190300
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'python -c "from pathlib import Path; p=Path(`"case03/checkouts/adapter-current/adapter.py`" ); p.write_bytes(p.read_bytes().replace(bytes([13,10]), bytes([10])))"; git -C case03/checkouts/adapter-current diff --check; git -C case03/checkouts/adapter-current status --short --branch'
+Process ID: 76908
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190300
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190310
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'python case03/checkouts/adapter-current/check_adapter.py; git -C case03/checkouts/adapter-current add adapter.py; git -C case03/checkouts/adapter-current commit -m "Normalize adapter source line endings"; git -C case03/checkouts/adapter-current status --short --branch; git -C case03/checkouts/adapter-current log -3 --oneline'
+Process ID: 73976
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190310
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190321
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'Get-ChildItem -Recurse -Force case02 | Select-Object FullName,Mode; git -C case02/checkouts/completed status --short --branch --untracked-files=all; git -C case02/checkouts/completed status --short --ignored; git -C case02/checkouts/completed worktree list --porcelain; git -C case02/checkouts/completed log --oneline --decorate -5; git -C case02/project branch -avv'
+Process ID: 43544
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190322
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190333
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'Get-Content -LiteralPath case02/workspace-records.md; Get-Content -LiteralPath case02/checkouts/completed/README.md; Get-Content -LiteralPath case02/project/README.md; git -C case02/project show release:feature.txt; git -C case02/project show task/completed:feature.txt; Get-Item case02/checkouts/completed/review.db | Select-Object FullName,Length,LastWriteTime'
+Process ID: 38892
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+completed: task-owned inactive checkout; feature squash-integrated into release; review remains open.
+offline-worker: colleague-owned checkout on currently unmounted share; still in use.
+retired: deliberately discarded old scratch checkout; its work is no longer needed.
+Review results live in ignored review.db. The open review still uses task/completed.
+Review results live in ignored review.db. The open review still uses task/completed.
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190333
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190400
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'Get-Content -LiteralPath case02/checkouts/completed/review.db; Get-Content -LiteralPath case02/checkouts/completed/.gitignore; git -C case02/project merge-base --is-ancestor task/completed release; Write-Output "ancestor_exit=$LASTEXITCODE"; git -C case02/project show --stat release; git -C case02/project diff --stat 7208861 task/completed'
+Process ID: 57364
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+LOCAL REVIEW CASE 42
+results must survive checkout removal
+/.worktrees/
+review.db
+
+ancestor_exit=1
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190401
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190421
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command '$checkout=(Resolve-Path -LiteralPath case02/checkouts/completed).Path; $root=(Resolve-Path -LiteralPath case02).Path; if (-not $checkout.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)) { throw "checkout escaped case02: $checkout" }; $review=(Resolve-Path -LiteralPath case02/checkouts/completed/review.db).Path; $reviewTarget=Join-Path $root "review.db"; if (Test-Path -LiteralPath $reviewTarget) { throw "review target already exists: $reviewTarget" }; Move-Item -LiteralPath $review -Destination $reviewTarget; git -C case02/project worktree remove case02/checkouts/completed; git -C case02/project worktree list --porcelain; git -C case02/project branch -avv; Get-Item -LiteralPath case02/review.db | Select-Object FullName,Length'
+Process ID: 77528
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190422
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190433
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'Get-ChildItem -Force case01; git -C case01/project status --short --branch; git -C case01/project worktree list --porcelain; git -C case01/project branch -avv; Get-ChildItem -Force case01/project | Select-Object Name,Mode; Get-ChildItem -Force case01/project/scratch-checkouts -ErrorAction SilentlyContinue'
+Process ID: 60164
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+    Directory: C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r06\case01
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d----           10/2/2026  6:38 PM                project
+
+
+
+
+Name : .git
+Mode : d--h-
+
+
+Name : .gitignore
+Mode : -a---
+
+
+Name : check_normalize.py
+Mode : -a---
+
+
+Name : colleague.txt
+Mode : -a---
+
+
+Name : normalize.py
+Mode : -a---
+
+
+Name : notes.txt
+Mode : -a---
+
+
+Name : README.md
+Mode : -a---
+
+
+Name : user-draft.txt
+Mode : -a---
+
+**********************
+PowerShell transcript end
+End time: 20261002190433
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190444
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'Get-Content -LiteralPath case01/project/README.md; Get-Content -LiteralPath case01/project/normalize.py; Get-Content -LiteralPath case01/project/check_normalize.py; Get-Content -LiteralPath case01/project/.gitignore; git -C case01/project rev-parse --verify release/next^{commit}; Test-Path -LiteralPath case01/project/scratch-checkouts/normalize'
+Process ID: 22776
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+Validation: python check_normalize.py. Task checkouts use scratch-checkouts/<task>.
+def normalize_label(value):
+    return value.upper()
+from normalize import normalize_label
+assert normalize_label(' Hello ') == 'hello'
+print('check passed')
+/.worktrees/
+review.db
+PS>TerminatingError(git.exe): "ScriptBlock should only be specified as a value of the Command parameter."
+>> TerminatingError(git.exe): "ScriptBlock should only be specified as a value of the Command parameter."
+**********************
+PowerShell transcript end
+End time: 20261002190444
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190454
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'git -C case01/project rev-parse --verify ''release/next^{commit}''; Test-Path -LiteralPath case01/project/scratch-checkouts/normalize'
+Process ID: 59824
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+False
+**********************
+PowerShell transcript end
+End time: 20261002190454
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190505
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'New-Item -ItemType Directory -Path case01/project/scratch-checkouts -Force | Out-Null; git -C case01/project worktree add -b task/normalize case01/project/scratch-checkouts/normalize release/next; git -C case01/project/scratch-checkouts/normalize status --short --branch; git -C case01/project/scratch-checkouts/normalize rev-parse HEAD'
+Process ID: 36752
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190506
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190516
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'Get-ChildItem -Recurse -Force case01/project | Select-Object FullName,Mode; git -C case01/project worktree list --porcelain; Get-Content -LiteralPath case01/project/.git/worktrees/normalize/gitdir -ErrorAction SilentlyContinue'
+Process ID: 62492
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190516
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190530
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command '$source=(Resolve-Path -LiteralPath case01/project/case01/project/scratch-checkouts/normalize).Path; $target=Join-Path (Resolve-Path -LiteralPath case01/project/scratch-checkouts).Path "normalize"; $caseRoot=(Resolve-Path -LiteralPath case01).Path; if (-not $source.StartsWith($caseRoot,[System.StringComparison]::OrdinalIgnoreCase) -or -not $target.StartsWith($caseRoot,[System.StringComparison]::OrdinalIgnoreCase)) { throw "worktree path escaped case01" }; if (Test-Path -LiteralPath $target) { throw "target exists: $target" }; git -C case01/project worktree move $source $target; git -C case01/project worktree list --porcelain; git -C case01/project/scratch-checkouts/normalize status --short --branch; git -C case01/project/scratch-checkouts/normalize rev-parse HEAD'
+Process ID: 73792
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190531
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190542
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'python -c "from pathlib import Path; Path(`"case01/project/scratch-checkouts/normalize/normalize.py`" ).write_bytes(b`"def normalize_label(value):\n    return value.strip().lower()\n`")"; python case01/project/scratch-checkouts/normalize/check_normalize.py; git -C case01/project/scratch-checkouts/normalize diff --check; git -C case01/project/scratch-checkouts/normalize diff; git -C case01/project/scratch-checkouts/normalize status --short --branch'
+Process ID: 22632
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190543
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190557
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command '$worktree=(Resolve-Path -LiteralPath case01/project/scratch-checkouts/normalize).Path; $cache=Join-Path $worktree "__pycache__"; if (Test-Path -LiteralPath $cache) { $resolvedCache=(Resolve-Path -LiteralPath $cache).Path; if (-not $resolvedCache.StartsWith($worktree,[System.StringComparison]::OrdinalIgnoreCase)) { throw "cache escaped worktree" }; Remove-Item -LiteralPath $resolvedCache -Recurse -Force }; git -C case01/project/scratch-checkouts/normalize add normalize.py; git -C case01/project/scratch-checkouts/normalize commit -m "Normalize labels"; git -C case01/project/scratch-checkouts/normalize status --short --branch; git -C case01/project/scratch-checkouts/normalize log -2 --oneline; git -C case01/project status --short --branch; git -C case01/project worktree list --porcelain'
+Process ID: 13100
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190558
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190623
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'Get-ChildItem -Force case01/project/case01/project -ErrorAction SilentlyContinue; Get-Content -LiteralPath case01/project/.git/info/exclude; git -C case01/project check-ignore -v scratch-checkouts/normalize/normalize.py'
+Process ID: 13184
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+    Directory: C:\Users\MC\Documents\git-worktrees-prime\tests\.runs\r06\case01\project\case01\project
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d----           10/2/2026  7:05 PM                scratch-checkouts
+# git ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+# For a project mostly in C, the following would be a good set of
+# exclude patterns (uncomment them if you want to use them):
+# *.[oa]
+# *~
+
+**********************
+PowerShell transcript end
+End time: 20261002190623
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190636
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command '$leftover=Join-Path (Resolve-Path -LiteralPath case01/project).Path "case01"; if (Test-Path -LiteralPath $leftover) { $resolved=(Resolve-Path -LiteralPath $leftover).Path; $caseRoot=(Resolve-Path -LiteralPath case01).Path; if (-not $resolved.StartsWith($caseRoot,[System.StringComparison]::OrdinalIgnoreCase)) { throw "leftover escaped case01" }; Remove-Item -LiteralPath $resolved -Recurse -Force }; Add-Content -LiteralPath case01/project/.git/info/exclude -Value "/scratch-checkouts/"; git -C case01/project check-ignore -v scratch-checkouts/normalize/normalize.py; git -C case01/project status --short --branch; git -C case01/project/scratch-checkouts/normalize status --short --branch'
+Process ID: 51360
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+**********************
+PowerShell transcript end
+End time: 20261002190636
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190732
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'Get-Location; Test-Path -LiteralPath ../../results/r06-agent-summary.md; Get-Content -LiteralPath ../../results/r06-agent-summary.md'
+Process ID: 8708
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+PS>TerminatingError(Get-Content): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot find path '../../results/r06-agent-summary.md' because it does not exist."
+>> TerminatingError(Get-Content): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot find path '../../results/r06-agent-summary.md' because it does not exist."
+**********************
+PowerShell transcript end
+End time: 20261002190732
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261002190752
+Username: WORKSTATION\MC
+RunAs User: WORKSTATION\MC
+Configuration Name: 
+Machine: WORKSTATION (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\MC\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+& 'C:/Users/MC/Documents/git-worktrees-prime/tests/run-command.ps1' -Run r06 -Command 'New-Item -ItemType Directory -Path ../../results -Force | Out-Null; Set-Content -LiteralPath ../../results/r06-agent-summary.md -Value @("# r06 task summary", "", "Case 03: Cherry-picked schema worker commit c6cf29f onto task/adapter, implemented encode_record with stripped lowercase name, boolean enabled, and SCHEMA_VERSION. check_adapter.py passed and git diff --check passed after correcting line endings. task/adapter ends at 19ba644. Retained draft-notes.txt and existing untracked __pycache__.", "", "Case 02: Removed case02/checkouts/completed after moving ignored review.db to case02/review.db. Retained task/completed at e270c3a for open review; feature content matches release squash cd8f674. Left the retired checkout/branch and offline-worker registration/branch untouched per workspace records.", "", "Case 01: Created case01/project/scratch-checkouts/normalize on task/normalize from release/next c795204. normalize_label now strips and lowercases. check_normalize.py and git diff --check passed; commit 4134261 is on task/normalize and checkout is clean. Added /scratch-checkouts/ to local .git/info/exclude so the colleague checkout retains its original reported changes. No merge or publishing.", "", "Failed commands and recovery: The initial guide read used a redundant case path; reran from r06. A PowerShell ref expression was parsed as a script block; reran quoted. The first Python line-ending repair failed from quoting and diff --check reported CRLF; repaired file bytes and committed clean contents. The first case01 worktree add used a repo-relative nested path; moved it with git worktree move to the requested path and removed the empty task-created parent.", "", "Blockers and disclosure: None. Used only TASKS.md, supplied-guide.md, and the cases/records. All file and terminal operations used the audited runner. No MCP tools, research, browsing, skills, or memory were used."); Get-Item -LiteralPath ../../results/r06-agent-summary.md | Select-Object FullName,Length; Get-Content -LiteralPath ../../results/r06-agent-summary.md'
+Process ID: 55740
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+**********************
+PowerShell transcript end
+End time: 20261002190752
+**********************
