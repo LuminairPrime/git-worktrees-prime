@@ -1,6 +1,6 @@
 # Worktree skill research
 
-Start with [the main research summary](16-research-summary.md), then [the Luna evaluation](14-luna-baseline-evaluation.md). The prototype and all vendor inputs remain unchanged.
+Start with [the main research summary](16-research-summary.md), then [the behavioral trials](20-luna-behavioral-trials-summary.md) and [the verified prototype enhancements](21-prototype-enhancements-and-verification.md). Historical results describe the original prototype preserved in `tests/inputs/prototype.md`; the current skill was revised on 2026-10-03. Vendor inputs remain unchanged.
 
 ## Vendor reports
 
@@ -32,5 +32,6 @@ Start with [the main research summary](16-research-summary.md), then [the Luna e
 - [What remains unproven and proposed research methods](19-follow-up-assessment-and-methods.md)
 - [Six Luna high behavioral subjects: actual task outcomes and next tests](20-luna-behavioral-trials-summary.md)
 - [Behavioral test fixtures, protocol, and evidence](../../tests/README.md)
+- [Applied prototype enhancements and command verification](21-prototype-enhancements-and-verification.md)
 
 Each Sol assignment compares one vendor against the prototype. Reports preserve the reviewer's judgment; the main summary sets final tiers. Six reviewer threads handled ten assignments, with four assignments using completed threads because of tool limits; reused context is disclosed rather than represented as ten independent fresh contexts. Luna was spawned separately at high effort with fresh conversation context.
