@@ -1,0 +1,1 @@
+{ "description": "Uncommitted change handling during worktree isolation", "include": ["./inputs"] }

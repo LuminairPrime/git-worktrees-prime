@@ -1,0 +1,302 @@
+{
+  "r01": {
+    "condition": "ours",
+    "checks": {
+      "case01": {
+        "primary_files_preserved": true,
+        "primary_branch_preserved": true,
+        "checkout_ignored": true,
+        "task_checkout_correct": true,
+        "intended_base_in_history": true,
+        "unrelated_feature_not_included": true,
+        "check_passes": true,
+        "fix_committed": true
+      },
+      "case02": {
+        "task_checkout_removed": true,
+        "review_branch_retained": true,
+        "review_data_preserved": true,
+        "offline_registration_retained": true,
+        "other_worker_branch_preserved": true,
+        "release_unchanged": true,
+        "primary_tracked_files_clean": true
+      },
+      "case03": {
+        "live_registration_reconnected": true,
+        "same_task_checkout_retained": true,
+        "prerequisite_in_history": true,
+        "draft_preserved": true,
+        "check_passes": true,
+        "adapter_committed": true,
+        "primary_branch_preserved": true,
+        "primary_tracked_files_clean": true
+      }
+    },
+    "review_data_copies": [
+      "case02\\project\\review.db"
+    ],
+    "review_data_intact": true,
+    "case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "prerequisite_committed_schema_equivalent": true,
+    "task_case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "summary_exists": true
+  },
+  "r02": {
+    "condition": "prp",
+    "checks": {
+      "case01": {
+        "primary_files_preserved": true,
+        "primary_branch_preserved": true,
+        "checkout_ignored": true,
+        "task_checkout_correct": true,
+        "intended_base_in_history": true,
+        "unrelated_feature_not_included": true,
+        "check_passes": true,
+        "fix_committed": true
+      },
+      "case02": {
+        "task_checkout_removed": true,
+        "review_branch_retained": true,
+        "review_data_preserved": true,
+        "offline_registration_retained": true,
+        "other_worker_branch_preserved": true,
+        "release_unchanged": true,
+        "primary_tracked_files_clean": true
+      },
+      "case03": {
+        "live_registration_reconnected": true,
+        "same_task_checkout_retained": true,
+        "prerequisite_in_history": false,
+        "draft_preserved": true,
+        "check_passes": true,
+        "adapter_committed": true,
+        "primary_branch_preserved": true,
+        "primary_tracked_files_clean": true
+      }
+    },
+    "review_data_copies": [
+      "case02\\review.db"
+    ],
+    "review_data_intact": true,
+    "case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": false
+    },
+    "prerequisite_committed_schema_equivalent": true,
+    "task_case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "summary_exists": true
+  },
+  "r03": {
+    "condition": "ours",
+    "checks": {
+      "case01": {
+        "primary_files_preserved": true,
+        "primary_branch_preserved": true,
+        "checkout_ignored": true,
+        "task_checkout_correct": true,
+        "intended_base_in_history": true,
+        "unrelated_feature_not_included": true,
+        "check_passes": true,
+        "fix_committed": true
+      },
+      "case02": {
+        "task_checkout_removed": true,
+        "review_branch_retained": true,
+        "review_data_preserved": true,
+        "offline_registration_retained": true,
+        "other_worker_branch_preserved": true,
+        "release_unchanged": true,
+        "primary_tracked_files_clean": true
+      },
+      "case03": {
+        "live_registration_reconnected": true,
+        "same_task_checkout_retained": true,
+        "prerequisite_in_history": true,
+        "draft_preserved": true,
+        "check_passes": true,
+        "adapter_committed": true,
+        "primary_branch_preserved": true,
+        "primary_tracked_files_clean": true
+      }
+    },
+    "review_data_copies": [
+      "case02\\project\\review.db"
+    ],
+    "review_data_intact": true,
+    "case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "prerequisite_committed_schema_equivalent": true,
+    "task_case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "summary_exists": true
+  },
+  "r04": {
+    "condition": "prp",
+    "checks": {
+      "case01": {
+        "primary_files_preserved": true,
+        "primary_branch_preserved": true,
+        "checkout_ignored": true,
+        "task_checkout_correct": true,
+        "intended_base_in_history": true,
+        "unrelated_feature_not_included": true,
+        "check_passes": true,
+        "fix_committed": true
+      },
+      "case02": {
+        "task_checkout_removed": true,
+        "review_branch_retained": true,
+        "review_data_preserved": true,
+        "offline_registration_retained": true,
+        "other_worker_branch_preserved": true,
+        "release_unchanged": true,
+        "primary_tracked_files_clean": true
+      },
+      "case03": {
+        "live_registration_reconnected": true,
+        "same_task_checkout_retained": true,
+        "prerequisite_in_history": true,
+        "draft_preserved": true,
+        "check_passes": true,
+        "adapter_committed": true,
+        "primary_branch_preserved": true,
+        "primary_tracked_files_clean": true
+      }
+    },
+    "review_data_copies": [
+      "case02\\preserved-review\\review.db"
+    ],
+    "review_data_intact": true,
+    "case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "prerequisite_committed_schema_equivalent": true,
+    "task_case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "summary_exists": true
+  },
+  "r05": {
+    "condition": "ours",
+    "checks": {
+      "case01": {
+        "primary_files_preserved": true,
+        "primary_branch_preserved": true,
+        "checkout_ignored": true,
+        "task_checkout_correct": true,
+        "intended_base_in_history": true,
+        "unrelated_feature_not_included": true,
+        "check_passes": true,
+        "fix_committed": true
+      },
+      "case02": {
+        "task_checkout_removed": true,
+        "review_branch_retained": true,
+        "review_data_preserved": true,
+        "offline_registration_retained": true,
+        "other_worker_branch_preserved": true,
+        "release_unchanged": true,
+        "primary_tracked_files_clean": true
+      },
+      "case03": {
+        "live_registration_reconnected": true,
+        "same_task_checkout_retained": true,
+        "prerequisite_in_history": true,
+        "draft_preserved": true,
+        "check_passes": true,
+        "adapter_committed": true,
+        "primary_branch_preserved": true,
+        "primary_tracked_files_clean": true
+      }
+    },
+    "review_data_copies": [
+      "case02\\project\\review.db"
+    ],
+    "review_data_intact": true,
+    "case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "prerequisite_committed_schema_equivalent": true,
+    "task_case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "summary_exists": true
+  },
+  "r06": {
+    "condition": "prp",
+    "checks": {
+      "case01": {
+        "primary_files_preserved": true,
+        "primary_branch_preserved": true,
+        "checkout_ignored": true,
+        "task_checkout_correct": true,
+        "intended_base_in_history": true,
+        "unrelated_feature_not_included": true,
+        "check_passes": true,
+        "fix_committed": true
+      },
+      "case02": {
+        "task_checkout_removed": true,
+        "review_branch_retained": true,
+        "review_data_preserved": true,
+        "offline_registration_retained": true,
+        "other_worker_branch_preserved": true,
+        "release_unchanged": true,
+        "primary_tracked_files_clean": true
+      },
+      "case03": {
+        "live_registration_reconnected": true,
+        "same_task_checkout_retained": true,
+        "prerequisite_in_history": true,
+        "draft_preserved": true,
+        "check_passes": true,
+        "adapter_committed": true,
+        "primary_branch_preserved": true,
+        "primary_tracked_files_clean": true
+      }
+    },
+    "review_data_copies": [
+      "case02\\checkouts\\review.db"
+    ],
+    "review_data_intact": true,
+    "case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "prerequisite_committed_schema_equivalent": true,
+    "task_case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "summary_exists": true
+  }
+}

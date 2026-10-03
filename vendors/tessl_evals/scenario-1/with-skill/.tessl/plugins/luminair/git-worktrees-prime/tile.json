@@ -1,0 +1,11 @@
+{
+  "name": "luminair/git-worktrees-prime",
+  "version": "0.1.0",
+  "summary": "Manage Git worktrees for isolated or parallel software development. Use when creating, reusing, integrating, or cleaning up task checkouts and branches. Use when experimental or parallel agent work must be done without stepping on others' toes.",
+  "private": true,
+  "skills": {
+    "git-worktrees-prime": {
+      "path": "SKILL.md"
+    }
+  }
+}

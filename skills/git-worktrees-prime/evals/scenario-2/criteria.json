@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent correctly verifies gitignore coverage before creating a nested worktree, uses the correct commands (git rev-parse for the exclude file, git check-ignore -q with trailing slash), follows the .worktrees/<task> location convention, creates a task branch, and produces a completion report with pre- and post-creation verification steps.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Locate exclude file",
+      "description": "nested-worktree-setup.md shows `git rev-parse --git-path info/exclude` (with or without `--path-format=absolute`) was run to locate the repository's local exclude file",
+      "max_score": 10
+    },
+    {
+      "name": "Ignore rule added",
+      "description": "`.gitignore` or the repo's info/exclude file contains an entry covering `.worktrees/` or `.worktrees/audit-pass` (either format) before the worktree creation command is issued",
+      "max_score": 10
+    },
+    {
+      "name": "git check-ignore command",
+      "description": "nested-worktree-setup.md shows `git check-ignore -q` (or `git check-ignore --quiet`) was run against the destination path to confirm the ignore rule is in effect",
+      "max_score": 15
+    },
+    {
+      "name": "Trailing slash in ignore check",
+      "description": "The `git check-ignore` invocation in nested-worktree-setup.md includes a trailing `/` on the destination path (e.g. `.worktrees/audit-pass/` not `.worktrees/audit-pass`)",
+      "max_score": 10
+    },
+    {
+      "name": "Pre-creation ignore check",
+      "description": "In nested-worktree-setup.md, the ignore verification (git check-ignore or equivalent) appears in the log before the `git worktree add` command is issued",
+      "max_score": 10
+    },
+    {
+      "name": "Location convention",
+      "description": "Worktree is created under a `.worktrees/` directory at the repository root (path matches `.worktrees/audit-pass`), not at an arbitrary or sibling path",
+      "max_score": 5
+    },
+    {
+      "name": "Task branch created",
+      "description": "The worktree is created with a named task branch (not in detached HEAD state); the branch name appears in the worktree list or log",
+      "max_score": 10
+    },
+    {
+      "name": "Post-creation ignore verify",
+      "description": "nested-worktree-setup.md shows the ignore check is run a second time AFTER `git worktree add` completes, confirming coverage is still in effect",
+      "max_score": 10
+    },
+    {
+      "name": "Post-creation registration check",
+      "description": "nested-worktree-setup.md shows `git worktree list` (or `git worktree list --porcelain`) run after creation to confirm the new worktree appears in the registry",
+      "max_score": 10
+    },
+    {
+      "name": "Completion report with path and branch",
+      "description": "nested-worktree-setup.md contains a summary or completion section that states the worktree's absolute path and the branch name it was created on",
+      "max_score": 10
+    }
+  ]
+}

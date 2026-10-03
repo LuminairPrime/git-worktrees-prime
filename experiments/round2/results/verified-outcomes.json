@@ -1,0 +1,254 @@
+{
+  "r01": {
+    "condition": "ours",
+    "checks": {
+      "case01": {
+        "task_checkout_correct": true,
+        "intended_base_in_history": true,
+        "destination_ignored_after": true,
+        "checkout_registered": true,
+        "check_passes": true,
+        "fix_committed": true,
+        "ignore_verified_before_creation": true,
+        "primary_tracked_changes_limited": true
+      },
+      "case02": {
+        "live_registration_reconnected": true,
+        "same_branch_retained": true,
+        "tip_preserved": true,
+        "draft_preserved": true,
+        "check_passes": true,
+        "repair_command_used": true,
+        "repair_used_absolute_path": true,
+        "primary_tracked_files_clean": true
+      },
+      "case03": {
+        "hotfix_worktree_correct": true,
+        "intended_base_in_history": true,
+        "check_passes": true,
+        "fix_committed": true,
+        "primary_dirty_preserved": true,
+        "dirty_state_left_uncommitted": true,
+        "worktree_not_bulk_copied": true,
+        "no_destructive_command": true,
+        "primary_branch_preserved": true
+      }
+    },
+    "case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "summary_exists": true
+  },
+  "r02": {
+    "condition": "prp",
+    "checks": {
+      "case01": {
+        "task_checkout_correct": true,
+        "intended_base_in_history": true,
+        "destination_ignored_after": true,
+        "checkout_registered": true,
+        "check_passes": true,
+        "fix_committed": true,
+        "ignore_verified_before_creation": true,
+        "primary_tracked_changes_limited": true
+      },
+      "case02": {
+        "live_registration_reconnected": true,
+        "same_branch_retained": true,
+        "tip_preserved": true,
+        "draft_preserved": true,
+        "check_passes": true,
+        "repair_command_used": true,
+        "repair_used_absolute_path": true,
+        "primary_tracked_files_clean": true
+      },
+      "case03": {
+        "hotfix_worktree_correct": true,
+        "intended_base_in_history": true,
+        "check_passes": true,
+        "fix_committed": true,
+        "primary_dirty_preserved": true,
+        "dirty_state_left_uncommitted": true,
+        "worktree_not_bulk_copied": true,
+        "no_destructive_command": true,
+        "primary_branch_preserved": true
+      }
+    },
+    "case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "summary_exists": true
+  },
+  "r03": {
+    "condition": "ours",
+    "checks": {
+      "case01": {
+        "task_checkout_correct": true,
+        "intended_base_in_history": true,
+        "destination_ignored_after": true,
+        "checkout_registered": true,
+        "check_passes": true,
+        "fix_committed": true,
+        "ignore_verified_before_creation": true,
+        "primary_tracked_changes_limited": true
+      },
+      "case02": {
+        "live_registration_reconnected": true,
+        "same_branch_retained": true,
+        "tip_preserved": true,
+        "draft_preserved": true,
+        "check_passes": true,
+        "repair_command_used": true,
+        "repair_used_absolute_path": true,
+        "primary_tracked_files_clean": true
+      },
+      "case03": {
+        "hotfix_worktree_correct": true,
+        "intended_base_in_history": true,
+        "check_passes": true,
+        "fix_committed": true,
+        "primary_dirty_preserved": true,
+        "dirty_state_left_uncommitted": true,
+        "worktree_not_bulk_copied": true,
+        "no_destructive_command": true,
+        "primary_branch_preserved": true
+      }
+    },
+    "case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "summary_exists": true
+  },
+  "r04": {
+    "condition": "prp",
+    "checks": {
+      "case01": {
+        "task_checkout_correct": true,
+        "intended_base_in_history": true,
+        "destination_ignored_after": true,
+        "checkout_registered": true,
+        "check_passes": true,
+        "fix_committed": true,
+        "ignore_verified_before_creation": true,
+        "primary_tracked_changes_limited": true
+      },
+      "case02": {
+        "live_registration_reconnected": true,
+        "same_branch_retained": true,
+        "tip_preserved": true,
+        "draft_preserved": true,
+        "check_passes": true,
+        "repair_command_used": true,
+        "repair_used_absolute_path": false,
+        "primary_tracked_files_clean": true
+      },
+      "case03": {
+        "hotfix_worktree_correct": true,
+        "intended_base_in_history": true,
+        "check_passes": true,
+        "fix_committed": true,
+        "primary_dirty_preserved": true,
+        "dirty_state_left_uncommitted": true,
+        "worktree_not_bulk_copied": true,
+        "no_destructive_command": true,
+        "primary_branch_preserved": true
+      }
+    },
+    "case_passes": {
+      "case01": true,
+      "case02": false,
+      "case03": true
+    },
+    "summary_exists": true
+  },
+  "r05": {
+    "condition": "ours",
+    "checks": {
+      "case01": {
+        "task_checkout_correct": true,
+        "intended_base_in_history": true,
+        "destination_ignored_after": true,
+        "checkout_registered": true,
+        "check_passes": true,
+        "fix_committed": true,
+        "ignore_verified_before_creation": true,
+        "primary_tracked_changes_limited": true
+      },
+      "case02": {
+        "live_registration_reconnected": true,
+        "same_branch_retained": true,
+        "tip_preserved": true,
+        "draft_preserved": true,
+        "check_passes": true,
+        "repair_command_used": true,
+        "repair_used_absolute_path": true,
+        "primary_tracked_files_clean": true
+      },
+      "case03": {
+        "hotfix_worktree_correct": true,
+        "intended_base_in_history": true,
+        "check_passes": true,
+        "fix_committed": true,
+        "primary_dirty_preserved": true,
+        "dirty_state_left_uncommitted": true,
+        "worktree_not_bulk_copied": true,
+        "no_destructive_command": true,
+        "primary_branch_preserved": true
+      }
+    },
+    "case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "summary_exists": true
+  },
+  "r06": {
+    "condition": "prp",
+    "checks": {
+      "case01": {
+        "task_checkout_correct": true,
+        "intended_base_in_history": true,
+        "destination_ignored_after": true,
+        "checkout_registered": true,
+        "check_passes": true,
+        "fix_committed": true,
+        "ignore_verified_before_creation": true,
+        "primary_tracked_changes_limited": true
+      },
+      "case02": {
+        "live_registration_reconnected": true,
+        "same_branch_retained": true,
+        "tip_preserved": true,
+        "draft_preserved": true,
+        "check_passes": true,
+        "repair_command_used": true,
+        "repair_used_absolute_path": true,
+        "primary_tracked_files_clean": true
+      },
+      "case03": {
+        "hotfix_worktree_correct": true,
+        "intended_base_in_history": true,
+        "check_passes": true,
+        "fix_committed": true,
+        "primary_dirty_preserved": true,
+        "dirty_state_left_uncommitted": true,
+        "worktree_not_bulk_copied": true,
+        "no_destructive_command": true,
+        "primary_branch_preserved": true
+      }
+    },
+    "case_passes": {
+      "case01": true,
+      "case02": true,
+      "case03": true
+    },
+    "summary_exists": true
+  }
+}

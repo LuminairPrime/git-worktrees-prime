@@ -1,0 +1,56 @@
+{
+  "context": "The agent must investigate a worktree for a squash-merged branch, verify integration without relying solely on git ancestry, avoid blind force-deletion, and document the full cleanup process in cleanup-report.md. The scenario tests careful branch lifecycle management under a squash-merge workflow.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Ancestry check performed",
+      "description": "cleanup-report.md shows a `git merge-base --is-ancestor` command (or equivalent ancestry/reachability check) was run comparing the feature branch tip against the develop branch",
+      "max_score": 15
+    },
+    {
+      "name": "Squash impact identified",
+      "description": "cleanup-report.md explicitly notes that `git branch -d` failed or that the branch tip is not a direct ancestor of develop, attributing this to the squash merge workflow",
+      "max_score": 15
+    },
+    {
+      "name": "No blind force-delete",
+      "description": "cleanup-report.md does NOT show a bare `git branch -D` immediately following `branch -d` failure with no intervening verification steps — some documented investigation must appear between the refusal and any forced deletion",
+      "max_score": 15
+    },
+    {
+      "name": "Work presence verified",
+      "description": "cleanup-report.md documents that the feature's changes are confirmed present in develop (via diff comparison, git log inspection, or content check) before authorizing deletion",
+      "max_score": 10
+    },
+    {
+      "name": "Worktree state inspected",
+      "description": "cleanup-report.md documents inspection of the worktree for uncommitted changes, untracked files, or unfinished Git operations before removal",
+      "max_score": 10
+    },
+    {
+      "name": "Safe removal method used",
+      "description": "cleanup-report.md shows the worktree was removed using `git worktree remove` rather than `rm -rf` or equivalent recursive directory deletion",
+      "max_score": 10
+    },
+    {
+      "name": "Post-cleanup verification",
+      "description": "cleanup-report.md includes output or results from `git worktree list` (or equivalent) run after the cleanup to confirm the worktree was removed",
+      "max_score": 10
+    },
+    {
+      "name": "Branch disposition reported",
+      "description": "cleanup-report.md explicitly states the final disposition of the branch (deleted or retained) and gives a justification based on the investigation findings",
+      "max_score": 5
+    },
+    {
+      "name": "Prune handling documented",
+      "description": "cleanup-report.md either shows a `git worktree prune --dry-run` step before any pruning, OR explicitly notes that pruning removes only stale metadata and not branches or checkout directories",
+      "max_score": 5
+    },
+    {
+      "name": "No false completion claim",
+      "description": "cleanup-report.md does not claim full deletion or complete cleanup if the branch or worktree was retained for any reason — the report accurately reflects the final state",
+      "max_score": 5
+    }
+  ]
+}

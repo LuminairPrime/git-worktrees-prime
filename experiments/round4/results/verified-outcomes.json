@@ -1,0 +1,72 @@
+{
+  "r01": {
+    "condition": "ours",
+    "checks": {
+      "case01": {
+        "live_registration_reconnected": true,
+        "repair_command_used": true,
+        "repair_used_absolute_path": true,
+        "same_branch_retained": true,
+        "old_tip_in_history": true,
+        "draft_preserved": true,
+        "check_passes": true,
+        "fix_committed": true,
+        "primary_dirty_preserved": true,
+        "dirty_state_uncommitted": true,
+        "stash_preserved": true,
+        "no_stash_mutation": true,
+        "offline_registration_retained": true,
+        "other_worker_branch_preserved": true,
+        "no_unsafe_prune": true,
+        "prune_disciplined": true,
+        "no_destructive": true,
+        "primary_branch_preserved": true
+      }
+    },
+    "telemetry": {
+      "script_create": false,
+      "script_remove": false,
+      "repair_cmds": 1,
+      "prune_cmds": 2
+    },
+    "case_passes": {
+      "case01": true
+    },
+    "summary_exists": true
+  },
+  "r02": {
+    "condition": "prp",
+    "checks": {
+      "case01": {
+        "live_registration_reconnected": true,
+        "repair_command_used": true,
+        "repair_used_absolute_path": true,
+        "same_branch_retained": true,
+        "old_tip_in_history": true,
+        "draft_preserved": true,
+        "check_passes": true,
+        "fix_committed": true,
+        "primary_dirty_preserved": true,
+        "dirty_state_uncommitted": true,
+        "stash_preserved": true,
+        "no_stash_mutation": true,
+        "offline_registration_retained": true,
+        "other_worker_branch_preserved": true,
+        "no_unsafe_prune": true,
+        "prune_disciplined": true,
+        "no_destructive": true,
+        "primary_branch_preserved": true
+      }
+    },
+    "telemetry": {
+      "script_create": false,
+      "script_remove": false,
+      "repair_cmds": 2,
+      "prune_cmds": 1
+    },
+    "case_passes": {
+      "case01": true
+    },
+    "summary_exists": true
+  }
+}

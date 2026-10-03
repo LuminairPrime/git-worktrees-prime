@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent correctly handles uncommitted changes when isolating work to a new Git worktree: explicitly acknowledging dirty state before acting, documenting a deliberate decision about what to do with those changes, using a named task branch, verifying the new worktree, and avoiding anti-patterns such as silently stashing, resetting, or bulk-copying the entire checkout directory.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Dirty state acknowledged",
+      "description": "repo/isolation-plan.md explicitly notes that uncommitted changes exist in the working directory before any worktree creation step (references lib/parser.py and/or config/defaults.yaml, or describes modified/dirty files in the current checkout)",
+      "max_score": 12
+    },
+    {
+      "name": "Transfer decision documented",
+      "description": "repo/isolation-plan.md contains an explicit decision about what will happen to the uncommitted changes (e.g., leave them in the main checkout, carry them selectively, create a WIP commit, etc.) and provides reasoning for that choice",
+      "max_score": 12
+    },
+    {
+      "name": "No bulk checkout copy",
+      "description": "repo/isolation-plan.md does NOT show or describe copying the entire repository directory (e.g., cp -r, rsync, or similar wholesale copy of the checkout) as the method for establishing the isolated workspace",
+      "max_score": 12
+    },
+    {
+      "name": "Named task branch",
+      "description": "The new worktree is created on a named branch (hotfix/null-check or similar descriptive name, not detached HEAD), as shown by the commands or output in repo/isolation-plan.md",
+      "max_score": 10
+    },
+    {
+      "name": "Worktree verified",
+      "description": "repo/isolation-plan.md shows verification of the new worktree after creation (e.g., output of git worktree list, git status run inside the new worktree, or git rev-parse confirming the correct commit and path)",
+      "max_score": 10
+    },
+    {
+      "name": "Worktree location convention",
+      "description": "The new worktree path follows the <repo>/.worktrees/<task-name> convention (e.g., repo/.worktrees/hotfix-null-check), visible in the commands or paths shown in repo/isolation-plan.md",
+      "max_score": 10
+    },
+    {
+      "name": "Git commands shown",
+      "description": "repo/isolation-plan.md includes the actual git worktree add command (or equivalent harness command) used to create the isolated workspace — not just a prose description of what was done",
+      "max_score": 8
+    },
+    {
+      "name": "Selective transfer if applied",
+      "description": "If any uncommitted changes are carried to the new worktree, repo/isolation-plan.md shows a deliberate, selective method (e.g., git diff > patch.diff and patch application, cherry-pick from a WIP commit, or explicit copy of named files) rather than wholesale directory duplication",
+      "max_score": 8
+    },
+    {
+      "name": "Hotfix work isolated to worktree",
+      "description": "repo/isolation-plan.md states or clearly implies that subsequent hotfix commits and work will proceed inside the new worktree path, keeping them separate from the in-progress changes remaining in the main checkout",
+      "max_score": 10
+    },
+    {
+      "name": "No undocumented destructive operation",
+      "description": "repo/isolation-plan.md does NOT show git reset --hard, git checkout ., git restore ., or git stash used silently (without prior acknowledgment of the uncommitted changes and a documented decision to discard or set them aside)",
+      "max_score": 8
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent uses `git worktree repair` (not prune or recreate) to reconnect a relocated worktree, verifies the registration by re-listing, and produces a completion report that captures the before/after state with paths and branch information.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Worktree repair command",
+      "description": "repair-report.md documents that `git worktree repair` was the command used to restore the broken registration (not `git worktree prune`, not removing and re-adding the worktree)",
+      "max_score": 20
+    },
+    {
+      "name": "Registration preserved",
+      "description": "The after-state in repair-report.md shows the same number of worktrees as the before-state (the feature worktree registration was repaired, not deleted by prune)",
+      "max_score": 15
+    },
+    {
+      "name": "Absolute path in repair command",
+      "description": "The repair command shown in repair-report.md uses an absolute path (starting with `/`) to the worktree, not a relative path like `./`",
+      "max_score": 10
+    },
+    {
+      "name": "Targets pipeline-v2 location",
+      "description": "The repair command in repair-report.md references `pipeline-v2` as the worktree path (the current/new location, not the old `data-pipeline` location)",
+      "max_score": 10
+    },
+    {
+      "name": "Before-state documented",
+      "description": "repair-report.md includes output from `git worktree list` (or `--porcelain`) taken BEFORE the repair, showing the old or broken registration state",
+      "max_score": 10
+    },
+    {
+      "name": "After-state documented",
+      "description": "repair-report.md includes output from `git worktree list` (or `--porcelain`) taken AFTER the repair was performed",
+      "max_score": 10
+    },
+    {
+      "name": "Correct path in after-state",
+      "description": "The after-state worktree listing in repair-report.md shows `pipeline-v2` (not `data-pipeline`) as the registered path for the feature worktree",
+      "max_score": 10
+    },
+    {
+      "name": "Branch identified in report",
+      "description": "repair-report.md identifies the branch name (`feature/data-pipeline`) of the repaired worktree checkout",
+      "max_score": 5
+    },
+    {
+      "name": "Registration confirmed",
+      "description": "repair-report.md explicitly states that the worktree registration was verified as correct or valid after the repair",
+      "max_score": 5
+    },
+    {
+      "name": "Re-list used for verification",
+      "description": "repair-report.md includes `git worktree list` output run after the repair (not just the before-state), demonstrating the agent re-listed to verify the new registration",
+      "max_score": 5
+    }
+  ]
+}

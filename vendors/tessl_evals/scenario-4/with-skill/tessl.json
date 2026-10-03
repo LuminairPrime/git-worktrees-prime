@@ -1,0 +1,9 @@
+{
+  "name": "eval-solution",
+  "mode": "vendored",
+  "dependencies": {
+    "luminair/git-worktrees-prime": {
+      "source": "file:../_fixture-staging/context"
+    }
+  }
+}

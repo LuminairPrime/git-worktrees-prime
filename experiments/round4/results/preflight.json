@@ -1,0 +1,8 @@
+{
+  "runs_checked": [
+    "r01",
+    "r02"
+  ],
+  "fixture_preconditions": "pass",
+  "git_version": "git version 2.53.0.windows.1"
+}

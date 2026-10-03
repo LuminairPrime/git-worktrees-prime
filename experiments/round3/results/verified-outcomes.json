@@ -1,0 +1,218 @@
+{
+  "r01": {
+    "condition": "ours",
+    "checks": {
+      "case01": {
+        "checkout_removed": true,
+        "branch_audit_retained": true,
+        "audit_derived_from_main": true,
+        "legacy_not_in_audit": true,
+        "audit_committed_normalized_app": true,
+        "main_unchanged": true,
+        "dev_unchanged": true,
+        "no_branch_deletion_attempted": true
+      },
+      "case02": {
+        "hotfix_checkout_registered": true,
+        "branch_hotfix_exists": true,
+        "branch_from_main": true,
+        "guard_committed": true,
+        "primary_dirty_preserved": true,
+        "dirty_state_uncommitted": true,
+        "stash_preserved": true,
+        "no_stash_push_or_drop": true,
+        "primary_branch_preserved": true
+      }
+    },
+    "telemetry": {
+      "script_create": false,
+      "script_list": false,
+      "script_remove": false
+    },
+    "case_passes": {
+      "case01": true,
+      "case02": true
+    },
+    "summary_exists": true
+  },
+  "r02": {
+    "condition": "prp",
+    "checks": {
+      "case01": {
+        "checkout_removed": true,
+        "branch_audit_retained": true,
+        "audit_derived_from_main": true,
+        "legacy_not_in_audit": true,
+        "audit_committed_normalized_app": true,
+        "main_unchanged": true,
+        "dev_unchanged": true,
+        "no_branch_deletion_attempted": true
+      },
+      "case02": {
+        "hotfix_checkout_registered": true,
+        "branch_hotfix_exists": true,
+        "branch_from_main": true,
+        "guard_committed": true,
+        "primary_dirty_preserved": true,
+        "dirty_state_uncommitted": true,
+        "stash_preserved": true,
+        "no_stash_push_or_drop": true,
+        "primary_branch_preserved": true
+      }
+    },
+    "telemetry": {
+      "script_create": true,
+      "script_list": true,
+      "script_remove": true
+    },
+    "case_passes": {
+      "case01": true,
+      "case02": true
+    },
+    "summary_exists": true
+  },
+  "r03": {
+    "condition": "ours",
+    "checks": {
+      "case01": {
+        "checkout_removed": true,
+        "branch_audit_retained": true,
+        "audit_derived_from_main": true,
+        "legacy_not_in_audit": true,
+        "audit_committed_normalized_app": true,
+        "main_unchanged": true,
+        "dev_unchanged": true,
+        "no_branch_deletion_attempted": true
+      },
+      "case02": {
+        "hotfix_checkout_registered": true,
+        "branch_hotfix_exists": true,
+        "branch_from_main": true,
+        "guard_committed": true,
+        "primary_dirty_preserved": true,
+        "dirty_state_uncommitted": true,
+        "stash_preserved": true,
+        "no_stash_push_or_drop": true,
+        "primary_branch_preserved": true
+      }
+    },
+    "telemetry": {
+      "script_create": false,
+      "script_list": false,
+      "script_remove": false
+    },
+    "case_passes": {
+      "case01": true,
+      "case02": true
+    },
+    "summary_exists": true
+  },
+  "r04": {
+    "condition": "prp",
+    "checks": {
+      "case01": {
+        "checkout_removed": true,
+        "branch_audit_retained": true,
+        "audit_derived_from_main": true,
+        "legacy_not_in_audit": true,
+        "audit_committed_normalized_app": true,
+        "main_unchanged": true,
+        "dev_unchanged": true,
+        "no_branch_deletion_attempted": true
+      },
+      "case02": {
+        "hotfix_checkout_registered": true,
+        "branch_hotfix_exists": true,
+        "branch_from_main": true,
+        "guard_committed": true,
+        "primary_dirty_preserved": true,
+        "dirty_state_uncommitted": true,
+        "stash_preserved": true,
+        "no_stash_push_or_drop": true,
+        "primary_branch_preserved": true
+      }
+    },
+    "telemetry": {
+      "script_create": true,
+      "script_list": true,
+      "script_remove": true
+    },
+    "case_passes": {
+      "case01": true,
+      "case02": true
+    },
+    "summary_exists": true
+  },
+  "r05": {
+    "condition": "ours",
+    "checks": {
+      "case01": {
+        "checkout_removed": false,
+        "branch_audit_retained": true,
+        "audit_derived_from_main": false,
+        "legacy_not_in_audit": true,
+        "audit_committed_normalized_app": false,
+        "main_unchanged": true,
+        "dev_unchanged": true,
+        "no_branch_deletion_attempted": true
+      },
+      "case02": {
+        "hotfix_checkout_registered": true,
+        "branch_hotfix_exists": true,
+        "branch_from_main": false,
+        "guard_committed": false,
+        "primary_dirty_preserved": true,
+        "dirty_state_uncommitted": true,
+        "stash_preserved": true,
+        "no_stash_push_or_drop": true,
+        "primary_branch_preserved": true
+      }
+    },
+    "telemetry": {
+      "script_create": false,
+      "script_list": false,
+      "script_remove": false
+    },
+    "case_passes": {
+      "case01": false,
+      "case02": false
+    },
+    "summary_exists": true
+  },
+  "r06": {
+    "condition": "prp",
+    "checks": {
+      "case01": {
+        "checkout_removed": true,
+        "branch_audit_retained": true,
+        "audit_derived_from_main": true,
+        "legacy_not_in_audit": true,
+        "audit_committed_normalized_app": true,
+        "main_unchanged": true,
+        "dev_unchanged": true,
+        "no_branch_deletion_attempted": true
+      },
+      "case02": {
+        "hotfix_checkout_registered": true,
+        "branch_hotfix_exists": true,
+        "branch_from_main": true,
+        "guard_committed": true,
+        "primary_dirty_preserved": true,
+        "dirty_state_uncommitted": true,
+        "stash_preserved": true,
+        "no_stash_push_or_drop": true,
+        "primary_branch_preserved": true
+      }
+    },
+    "telemetry": {
+      "script_create": true,
+      "script_list": true,
+      "script_remove": true
+    },
+    "case_passes": {
+      "case01": true,
+      "case02": true
+    },
+    "summary_exists": true
+  }
+}

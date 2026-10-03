@@ -1,0 +1,46 @@
+{
+  "context": "Tests whether the agent creates a Git worktree using the correct naming convention, discovers the repository's real integration target rather than assuming main or master, creates a named task branch, verifies the setup post-creation, and produces a completion report with the required fields.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Correct worktree location",
+      "description": "The worktree is created at a path matching `myproject/.worktrees/add-config-validation` — i.e., follows the `<primary-root>/.worktrees/<task>` convention with the task name as the final segment",
+      "max_score": 20
+    },
+    {
+      "name": "Correct base branch",
+      "description": "The task branch or worktree is rooted from `develop`, NOT from `main` or `master` — verifiable from the `worktree-setup.md` report or from the worktree's git history",
+      "max_score": 20
+    },
+    {
+      "name": "Task branch created",
+      "description": "A named task branch (not a detached HEAD) is created in the worktree for development work — the branch name is visible in `worktree-setup.md`",
+      "max_score": 15
+    },
+    {
+      "name": "Post-creation worktree list",
+      "description": "`worktree-setup.md` includes output from `git worktree list` (or `--porcelain`) run after the worktree was created, showing the new checkout is registered",
+      "max_score": 15
+    },
+    {
+      "name": "HEAD commit verified",
+      "description": "`worktree-setup.md` includes the output of `git rev-parse HEAD` or the literal HEAD commit hash of the new worktree, confirming the commit was verified after creation",
+      "max_score": 10
+    },
+    {
+      "name": "Report: absolute path",
+      "description": "`worktree-setup.md` includes the absolute path of the created worktree (not a relative path)",
+      "max_score": 10
+    },
+    {
+      "name": "Report: branch name",
+      "description": "`worktree-setup.md` explicitly names the task branch that is checked out in the worktree",
+      "max_score": 5
+    },
+    {
+      "name": "Report: registration confirmed",
+      "description": "`worktree-setup.md` states that the worktree registration was confirmed (e.g. by referencing `git worktree list` output or explicitly noting the worktree is registered)",
+      "max_score": 5
+    }
+  ]
+}
