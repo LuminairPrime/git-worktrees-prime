@@ -1,6 +1,6 @@
 ---
 name: git-worktrees-prime
-description: Manage Git worktrees for isolated or parallel software development. Use when creating, reusing, integrating, or cleaning up task checkouts and branches. Use when experimental or parallel agent work must be done without stepping on others' toes.
+description: Manage Git worktrees for isolated or parallel software development. Use when creating, reusing, integrating, or cleaning up task checkouts and branches. Use when the user asks to "create a worktree", "work on this in a separate checkout", "spin up an isolated checkout", "list worktrees", "clean up / remove a worktree", "repair a moved checkout", or "prune stale worktrees". Use when experimental or parallel agent work must be done without stepping on others' toes.
 ---
 
 # Git worktrees
@@ -72,6 +72,15 @@ git -C "<repo>" worktree add --detach "<worktree>" "<commit>"
 git -C "<worktree>" rev-parse --show-toplevel
 git -C "<worktree>" status --short --branch
 git -C "<worktree>" rev-parse HEAD
+```
+
+Worked example: create an `audit` checkout from `main`, confirm it, then retire it.
+
+```sh
+git -C "<repo>" worktree add -b "audit" "<primary-root>/.worktrees/audit" "main"
+git -C "<primary-root>/.worktrees/audit" rev-parse HEAD
+git -C "<repo>" worktree remove "<primary-root>/.worktrees/audit"
+git -C "<repo>" worktree list --porcelain
 ```
 
 ## Develop and integrate
