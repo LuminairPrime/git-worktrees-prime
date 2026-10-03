@@ -1,0 +1,1 @@
+Cooked up a new git worktree skill for a friend real quick! It's a conglomeration of all the best docs. Written by Astra 6 (max).
