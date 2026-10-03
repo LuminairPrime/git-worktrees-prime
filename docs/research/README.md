@@ -33,5 +33,6 @@ Start with [the main research summary](16-research-summary.md), then [the behavi
 - [Six Luna high behavioral subjects: actual task outcomes and next tests](20-luna-behavioral-trials-summary.md)
 - [Behavioral test fixtures, protocol, and evidence](../../tests/README.md)
 - [Applied prototype enhancements and command verification](21-prototype-enhancements-and-verification.md)
+- [Publication review of the Tessl-inspired edits](22-publication-review.md)
 
 Each Sol assignment compares one vendor against the prototype. Reports preserve the reviewer's judgment; the main summary sets final tiers. Six reviewer threads handled ten assignments, with four assignments using completed threads because of tool limits; reused context is disclosed rather than represented as ten independent fresh contexts. Luna was spawned separately at high effort with fresh conversation context.
