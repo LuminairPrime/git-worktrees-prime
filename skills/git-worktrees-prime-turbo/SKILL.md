@@ -1,5 +1,5 @@
 ---
-name: git-worktrees-prime
+name: git-worktrees-prime-turbo
 description: Manage Git worktrees for isolated or parallel development. Use when creating, listing, reusing, or removing worktrees; working in a separate checkout; integrating task branches; repairing moved checkouts; or pruning stale worktree registrations.
 ---
 
