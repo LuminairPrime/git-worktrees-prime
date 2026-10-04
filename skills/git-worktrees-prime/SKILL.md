@@ -7,7 +7,7 @@ description: Manage Git worktrees for isolated or parallel development. Use when
 
 Follow user instructions and repository conventions; keep ownership and the integration target explicit.
 
-## Terms used here
+## Glossary
 
 | Term | Meaning |
 |---|---|
