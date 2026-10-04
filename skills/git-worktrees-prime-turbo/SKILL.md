@@ -1,6 +1,6 @@
 ---
 name: git-worktrees-prime-turbo
-description: Manage Git worktrees for isolated or parallel development. Use when creating, listing, reusing, or removing worktrees; working in a separate checkout; integrating task branches; repairing moved checkouts; or pruning stale worktree registrations.
+description: "Manage Git worktrees: create, list, reuse, repair, or remove linked checkouts; integrate their task branches; prune stale registrations. Use when tasks need separate working directories sharing one repository."
 ---
 
 # Git worktrees
@@ -11,12 +11,9 @@ Follow user instructions and repository conventions; keep ownership and the inte
 
 | Term | Meaning |
 |---|---|
-| Repository | The shared commit history and named references used by its worktrees. |
 | Worktree / checkout | A directory of checked-out files with its own `HEAD` and index (staging area). Here, the noun **checkout** means this workspace. |
-| Branch | A named reference to the latest commit in a line of development. A commit records a project snapshot and its history links. A branch can exist without a checkout. |
-| `HEAD` / detached HEAD | Each worktree's `HEAD` normally names its checked-out branch. A detached `HEAD` points directly to a commit, so new commits do not advance a branch. |
-| Main (primary) / linked worktree | The main worktree is the repository's original checkout; additional worktrees are linked worktrees. `<primary-root>` means the main worktree's directory, regardless of its branch name. A bare repository has no main worktree. |
-| Base / integration target | The base is the commit or ref used to start the task. The integration target is the branch intended to receive the result. They may differ. |
+| Main (primary) / linked worktree | The main worktree is the original checkout; all others are linked. `<primary-root>` is the main worktree's directory regardless of branch name. A bare repository has no main worktree. |
+| Base / integration target | The commit or ref a task starts from, versus the branch intended to receive it; they may differ. |
 | Registration | Git's administrative record connecting a linked worktree's path to the repository. Repair reconnects a live checkout; prune removes obsolete registrations. |
 
 Removing a worktree leaves its branch. Name the checkout path and branch/ref separately when communicating about them.
@@ -48,34 +45,7 @@ Keep the checkout path, branch, starting commit, integration target, and manager
 - Create a task branch for development; reuse it for continuation. If it is checked out elsewhere, reuse that checkout through its owner or create a different branch from the required commit. Never override checkout protection.
 - Use detached HEAD for disposable inspection or testing. Anchor valuable detached commits to a branch before removal.
 
-### Generic Git commands
-
-Substitute all placeholders. Run only the selected alternative. `<repo>` is an existing checkout or bare repository; `<worktree>` is the task's exact absolute path.
-
-```sh
-git -C "<repo>" worktree list --porcelain -z
-# Only when <repo> is a checkout, not a bare repository.
-git -C "<repo>" status --short --branch
-git -C "<repo>" rev-parse --verify "<base-ref>^{commit}"
-
-# Only for a destination inside another checkout; require exit 0 before creation.
-git -C "<enclosing-checkout>" check-ignore -q -- "<selected-relative-path>/"
-
-# New branch, explicitly based on the selected commit/ref.
-git -C "<repo>" worktree add -b "<task-branch>" "<worktree>" "<base-ref>"
-
-# Alternative: continue an existing branch that is not checked out elsewhere.
-# Require exit 0; do not let a missing local branch resolve to a remote branch.
-git -C "<repo>" show-ref --verify --quiet "refs/heads/<task-branch>"
-git -C "<repo>" worktree add "<worktree>" "<task-branch>"
-
-# Alternative: disposable inspection of a specific commit.
-git -C "<repo>" worktree add --detach "<worktree>" "<commit>"
-
-git -C "<worktree>" rev-parse --show-toplevel
-git -C "<worktree>" status --short --branch
-git -C "<worktree>" rev-parse HEAD
-```
+Before creating a worktree with raw Git, read [Creation commands](references/raw-git-commands.md#creation). `<repo>` denotes an existing checkout or bare repository; `<worktree>` is the task's exact absolute path.
 
 ## Develop and integrate
 
@@ -97,26 +67,7 @@ Evaluate checkout removal and branch deletion separately. Routine cleanup of thi
 6. **Stale metadata remains?** Prune only if every dry-run entry is an intentionally removed worktree. A missing directory may be an offline volume; do not prune or unlock it just because it is unavailable.
 7. **Verify the result.** Re-list worktrees and check the removed path and chosen refs. Report anything retained and why. Do not claim complete deletion if a branch, harness snapshot, or archive remains.
 
-### Inspect and remove with Git
-
-```sh
-# Clean status does not establish preservation of ignored files or detached commits.
-git -C "<worktree>" status --short --branch --untracked-files=all
-git -C "<worktree>" status --short --ignored
-git -C "<worktree>" rev-parse HEAD
-
-# Exit 0 proves this tip is an ancestor of this target. Other outcomes need review.
-git -C "<repo>" merge-base --is-ancestor "<task-tip>" "<integration-ref>"
-
-# Run from a surviving checkout or bare repository after the checks above.
-git -C "<repo>" worktree remove "<worktree>"
-git -C "<repo>" branch -d "<task-branch>"
-git -C "<repo>" worktree list --porcelain -z
-
-# Only for intentionally removed worktrees; review every dry-run entry before pruning.
-git -C "<repo>" worktree prune --dry-run --verbose
-git -C "<repo>" worktree prune --verbose
-```
+Before raw Git worktree removal, task-branch deletion, or registration pruning, read [Cleanup commands](references/raw-git-commands.md#cleanup). Apply the decision tree above to each requested operation.
 
 - Compare the actual task tip against a verified, current integration ref. `branch -d` may check the branch's upstream rather than the intended integration target; success is not integration evidence.
 - Squash or rebase integration may break ancestry. Verify the replacement commits and resulting changes. If `branch -d` refuses, retain the branch until its obsolete history is verified safe and authorized to delete; only then consider `branch -D`.

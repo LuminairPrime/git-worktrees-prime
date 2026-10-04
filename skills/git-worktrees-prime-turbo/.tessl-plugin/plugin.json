@@ -1,0 +1,9 @@
+{
+  "name": "luminair/git-worktrees-prime-turbo",
+  "description": "Manage Git worktrees: create, list, reuse, repair, or remove linked checkouts; integrate their task branches; prune stale registrations. Use when tasks need separate working directories sharing one repository.",
+  "private": true,
+  "skills": [
+    "."
+  ],
+  "version": "0.1.0"
+}
