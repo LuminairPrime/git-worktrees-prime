@@ -8,7 +8,7 @@ Keep in `SKILL.md` everything that acts as a decision gate: the Glossary, the ch
 
 Why it matters: the live `SKILL.md` is 140 lines / 1,863 words and already fits the Agent Skills guideline (<500 lines, <5000-token body), so the benefit is not raw size — it is expected loaded context on the most common paths. Creation-with-harness-tools and listing-only drop from ~1,863 to ~1,450 words (~22%) because the raw-Git command prose and exceptions are read on demand. Safety routing improves because every prerequisite gate stays at its decision point; the bottom safety section stays inline as the non-circular backstop.
 
-Expected impact: modeled, not measured — routine harness-managed paths save roughly 390 words of entrypoint context; a raw-Git path pays one extra tool call (~420 words) to read `references/raw-git-commands.md`; advanced paths pay one more read (~300 words). Total bundle grows ~15% due to trigger paragraphs and anchors. Distinctiveness/conciseness rubric items (4/5 findings) should hold or improve modestly; no score is promised.
+Expected impact: modeled, not measured — routine harness-managed paths save roughly 390 words of entrypoint context; a raw-Git path pays one extra tool call (~420 words) to read `references/raw-git-commands.md`; advanced paths pay one more read (~300 words). Total bundle grows ~18% due to trigger paragraphs and anchors. Distinctiveness/conciseness rubric items (4/5 findings) should hold or improve modestly; no score is promised.
 
 Principal risk: a conditional-link trigger that an agent cannot recognize without having read the target file (circular routing), or a packaged evaluation copy that omits `references/`. Both are checkable before implementation by dry-walking the routing table below against a vendored copy.
 
@@ -18,7 +18,7 @@ Confidence: medium-high on structure, low on runtime token savings. **Defer impl
 
 **Live revision (verified 2026-10-04):**
 
-- HEAD: `a2117395a18fb0db7608796a65c514ee528eb426` ("before research starts"). Handoff expected `73d21c77…`; newer commit exists no longer because of a skill edit — `git log` shows `d839d62 changed terms to glossary`, `73d21c7 moving docs around`, `a211739 before research starts`, and the skill file is untouched by `a211739`.
+- HEAD: `f088f99862f0a1fbebe6953c4bc6c4e5c1c4d251` ("Add five skill-enhancement investigation reports"). At investigation time HEAD was `a2117395a18fb0db7608796a65c514ee528eb426` ("before research starts"); the handoff expected `73d21c77…`. `git log` shows `d839d62 changed terms to glossary`, `73d21c7 moving docs around`, `a211739 before research starts`, `f088f99 Add five skill-enhancement investigation reports`. Both newer commits touched only research reports, not the skill file, so the handoff's skill facts still hold.
 - `skills/git-worktrees-prime/SKILL.md` SHA-256: `01d156fd90c69091875e4311cb2ef89d34d5e362c0b71a014e3d34440d451744` — matches the handoff value. 140 lines, 1,863 whitespace-delimited words (Python `str.split()`; matches handoff).
 - `SAFETY.md` exists at repository root (15 lines, 13 constraints, lines 3–15), not inside the skill directory. `SAFETY0.md` is an older draft.
 
@@ -27,10 +27,10 @@ Confidence: medium-high on structure, low on runtime token savings. **Defer impl
 - `SAFETY.md` (root): thirteen constraints; wording differs slightly from the skill's bottom section.
 - `docs/plans/integrate-safety-constraints.md` (verified present, 18,994 bytes) — earlier patch and coverage reasoning; treated as evidence, not a mandate.
 - `docs/research/1.0-development/21-prototype-enhancements-and-verification.md`: path/ignore/repair instructions were added after observed failures in preserved trial repos (custom destinations unignored in r01/r03/r04/r05; moved adapter checkouts still registered at old paths in r03/r04/r06). This is why those gates must remain visible at the decision point.
-- `skills/git-worktrees-prime/evals/scenario-0..4/` and `vendors/tessl_evals/scenario-*/with-skill/`: captured Tessl artifacts. The vendored `SKILL.md` copies there are 128 lines, 0 occurrences of "Safety constraints" — i.e., the **pre-safety skill version**. Therefore the user-reported review ratings (conciseness 4/5, progressive disclosure 4/5, the under-50-line top-score mention) characterize an older revision, not the live bytes. The ~26% token increase is unattributed to any specific section; no causal explanation exists in the artifacts.
-- `tessl.json`: `{"name": "luminair/git-worktrees-prime", "mode": "vendored"}`. Vendored skill at `.tessl/plugins/luminair/git-worktrees-prime/` contains `SKILL.md`, `.tessl-plugin/plugin.json`, `tessl-package.json`, `tile.json`. `tile.json` names only `"git-worktrees-prime": {"path": "SKILL.md"}`, but the whole plugin directory is copied. Highest-probability interpretation: a `references/` directory inside the skill directory is vendored alongside `SKILL.md`, so relative one-level-deep links resolve. This is not verified by a fixture containing `references/` — it is the first thing to falsify.
-- Agent Rules files (`AGENTS.md`, `.tessl/RULES.md`, `CLAUDE.md`) contain only generic "follow instructions" pointers; they do not inline the skill body, so activation loads `SKILL.md` in full.
-- `tests/README.md`, `tests/results/`, `experiments/`, `tests/behavioral_trials.py`: historical GPT-6 Luna trials with frozen outcome criteria; setup script `tests/behavioral_trials.py setup` reads the *current* skill, so re-running would not reproduce the original guide treatment. Not used for scoring.
+- `skills/git-worktrees-prime/evals/scenario-0..4/` and `vendors/tessl_evals/scenario-{0,1,3,4}/with-skill/`: captured Tessl artifacts. The vendored `SKILL.md` copies there are 128 lines, 0 occurrences of "Safety constraints" — i.e., the **pre-safety skill version**. Therefore the user-reported review ratings (conciseness 4/5, progressive disclosure 4/5, the under-50-line top-score mention) characterize an older revision, not the live bytes. The ~26% token increase is unattributed to any specific section; no causal explanation exists in the artifacts.
+- `tessl.json`: `{"name": "luminair/git-worktrees-prime", "mode": "vendored", "dependencies": {}}`. Vendored skill copies live only under `vendors/tessl_evals/scenario-{0,1,3,4}/with-skill/.tessl/plugins/luminair/git-worktrees-prime/` (scenario-2 has no `with-skill` copy — `vendors/tessl_evals/scenario-2/` exists but is an empty directory: no inputs, no artifacts, no `.tessl/` tree; no `.tessl/` tree exists at the repo root). Each contains `SKILL.md`, `.tessl-plugin/plugin.json`, `tessl-package.json`, and `tile.json`; `tile.json` names only `"git-worktrees-prime": {"path": "SKILL.md"}` under its `skills` key, but the whole plugin directory is copied. Highest-probability interpretation: a `references/` directory inside the skill directory is vendored alongside `SKILL.md`, so relative one-level-deep links resolve. This is not verified by a fixture containing `references/` — it is the first thing to falsify.
+- Agent Rules files (`AGENTS.md`, `.tessl/RULES.md`, `CLAUDE.md`) — present only inside the vendored scenario `with-skill/` copies, not at the repo root — contain only generic "follow instructions" pointers; they do not inline the skill body, so activation loads `SKILL.md` in full.
+- `tests/README.md`, `tests/results/`, `experiments/`, `tests/behavioral_trials.py`: historical GPT-6 Luna trials with frozen outcome criteria; `setup()` in `tests/behavioral_trials.py` (line ~158) hardcodes a read of `skills/prototype1-astra/SKILL.md`, a path that no longer exists (`skills/` contains only `git-worktrees-prime`), so re-running would fail outright with `FileNotFoundError` rather than reproduce any guide treatment. Not used for scoring.
 
 **Specification facts (https://agentskills.io/specification, fetched 2026-10-04):**
 
@@ -44,7 +44,7 @@ Confidence: medium-high on structure, low on runtime token savings. **Defer impl
 
 ### Option A — No change (baseline)
 
-Everything stays in one 140-line file. Raw-Git blocks and advanced exceptions remain loaded by every activation. Zero implementation risk, zero packaging risk. Reviewer already rated conciseness 4/5 and progressive disclosure 4/5 with specific, actionable complaints: generic command blocks and some cleanup exceptions "might suit included reference files." Expected value: the 2019-style trade — maximal determinism, maximal standing context cost.
+Everything stays in one 140-line file. Raw-Git blocks and advanced exceptions remain loaded by every activation. Zero implementation risk, zero packaging risk. Reviewer already rated conciseness 4/5 and progressive disclosure 4/5 with specific, actionable complaints: generic command blocks and some cleanup exceptions "might suit included reference files." Expected value: the classic determinism-versus-context trade — maximal determinism, maximal standing context cost.
 
 ### Option B — Minimal two-reference split (recommended)
 
@@ -133,7 +133,7 @@ Dependencies on investigation 01 (glossary/shared vocabulary): if it trims the G
 
 **Already performed:**
 
-- Verified live HEAD, git blob hash, SHA-256, line count, word count of SKILL.md against the handoff: all match except HEAD (advanced by one docs-only commit).
+- Verified live HEAD, git blob hash, SHA-256, line count, word count of SKILL.md against the handoff: all match except HEAD, which has since the handoff advanced by two docs-only commits (`a211739`, `f088f99`, both touching only research reports).
 - Confirmed the captured Tessl artifacts contain a pre-safety skill copy (128 lines, no safety section) — used to qualify which revision the reported rubric scores describe.
 - Confirmed vendored packaging layout, `tile.json`/`tessl-package.json`/`plugin.json` contents, and that `references/` would travel with the vendored plugin directory copy.
 - Fetched the current Agent Skills spec; confirmed `references/` one level deep and <500-line guidance.
@@ -142,7 +142,7 @@ Dependencies on investigation 01 (glossary/shared vocabulary): if it trims the G
 
 **Proposed, not performed (do not run as part of this investigation):**
 
-1. **Packaging check:** copy `skills/git-worktrees-prime` to a scratch dir, add the two reference files, run the project's skill validator, and inspect a vendored install layout to confirm `references/…` survives. Success: files present and links resolve from a fresh-clone-equivalent path.
+1. **Packaging check:** copy `skills/git-worktrees-prime` to a scratch dir, add the two reference files, and inspect a vendored install layout to confirm `references/…` survives. (No skill-validator script exists in the repo as of this HEAD, so validate frontmatter and relative-link resolution manually.) Success: files present and links resolve from a fresh-clone-equivalent path.
 2. **Routing dry-run (no model):** tabulate the mandated task paths — listing-only; creation with harness tools; creation with raw Git; detached inspection; reuse of existing checkout; ordinary removal; squash/rebase cleanup; harness archive; moved-checkout repair; offline storage; `git config --worktree` change — and for each, mark the last inline gate and exactly one read-trigger before any mutation. Success: every path has a trigger that fires before mutation; no trigger requires text from the reference to be recognized.
 3. **Behavioral A/B (separate task, paid evals not authorized here):** vendor the restructured bundle into a *copy* of one Tessl scenario workspace (do not modify `vendors/` or `skills/`), run one model, count tool calls and input-token totals; success criterion: raw-Git and repair/config paths show identical safety checks with no missed gate; stop/revert criterion: any missed ignore/repair/prune gate, or creation path with zero word-count reduction, or token use ≥ baseline on all paths → revert to Option A.
 

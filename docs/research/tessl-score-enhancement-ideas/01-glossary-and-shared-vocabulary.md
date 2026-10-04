@@ -4,7 +4,7 @@ Report path (override): `docs/research/tessl-score-enhancement-ideas/01-glossary
 
 ---
 
-## 1. Decision summary (292 words)
+## 1. Decision summary (291 words)
 
 **Recommendation: implement Option C — keep the `## Glossary` section in `SKILL.md` and keep all seven *topics* it covers, but delete the three rows that are ordinary Git reference material (Repository, Branch, `HEAD` / detached HEAD) and tighten the two loosest remaining rows (Main/linked, Base/integration target). The section drops from 226 to 132 whitespace-delimited words (−94 words, −5.0% of the skill's 1,863 words). No other line of the skill changes.**
 
@@ -28,27 +28,27 @@ Action: **test first.** Implement only after the user accepts reversing part of 
 |---|---|
 | `git rev-parse HEAD` (first call) | `73d21c776ab51515ad3fb434292b22bec93823e0` (matches handoff) |
 | `git rev-parse HEAD` (later in same investigation) | `a2117395a18fb0db7608796a65c514ee528eb426` — "before research starts" |
+| `git rev-parse HEAD` (this review) | `f088f99862f0a1fbebe6953c4bc6c4e5c1c4d251` — "Add five skill-enhancement investigation reports" |
 | `SKILL.md` SHA-256 | `01D156FD90C69091875E4311CB2EF89D34D5E362C0B71A014E3D34440D451744` |
 | Bytes / lines / whitespace-delimited words | 12,802 / 140 / **1,863** |
 | Glossary block (`SKILL.md` lines 10–22) | **226 words**, 1,368 characters |
 | Rest of file | 1,637 words |
 | Safety bullets in skill | 9 (SAFETY.md has 13 constraints) |
 
-HEAD advanced during the investigation: a concurrent commit (`a211739`) added `docs/prompts/` only.
-`git diff --stat 73d21c7 a211739` shows six files added under `docs/prompts/skill-enhancement-investigations/` and no skill change; `SKILL.md` hashes identically at `d839d62`, `73d21c7`, and `a211739`. Working tree was clean at both observations. No identifier was "reset to" — the handoff identifiers still match the live bytes.
+HEAD advanced twice after the report was started: `a211739` added six files under `docs/prompts/skill-enhancement-investigations/`, and `f088f99` (current HEAD) added this report and its four siblings under `docs/research/tessl-score-enhancement-ideas/`. `git diff --stat 73d21c7 a211739` shows only those six added files and no skill change; the `SKILL.md` blob is byte-identical at `d839d62`, `73d21c7`, `a211739`, and `f088f99` (object `a2984ec`), and the live SHA-256 still matches the handoff value. No identifier was "reset to" — the handoff identifiers still match the live bytes.
 
 ### 2.2 Which skill the evaluation actually exercised — important attribution finding
 
-`vendors/tessl_evals/` contains five scenarios with `with-skill` / `without-skill` artifacts. Every `with-skill/.tessl/plugins/luminair/git-worktrees-prime/SKILL.md` copy is **11,276 bytes**, SHA-256 `2A9FA731C0D01521A12901E80D3F00AC62EEDD044E8FF3BFE2978AECBC76BD68`.
+`vendors/tessl_evals/` tracks four of the five scenarios (0, 1, 3, 4) with `with-skill` / `without-skill` artifacts; `scenario-2` has no tracked vendored copy. Every `with-skill/.tessl/plugins/luminair/git-worktrees-prime/SKILL.md` copy is **11,276 bytes**, SHA-256 `2A9FA731C0D01521A12901E80D3F00AC62EEDD044E8FF3BFE2978AECBC76BD68`.
 
-A line-by-line comparison against `git show 9d4be20:skills/git-worktrees-prime/SKILL.md` (1,667 words, pre-safety) shows **exactly one differing line: the frontmatter `description`**. The body is byte-identical to `9d4be20`.
+A line-by-line comparison against `git show 9d4be20:skills/git-worktrees-prime/SKILL.md` (1,667 words, pre-safety) shows **exactly one differing line: the frontmatter `description`**. The body is byte-identical to `9d4be20`. Stronger pin: the vendored file is byte-identical in full (128 lines, 0 differing lines) to `git show 8d8e544:skills/git-worktrees-prime/SKILL.md` — i.e. the evaluated skill predates the `f7665c7` ("just new frontmatter description") change, so its `description` ("isolated or parallel software development… stepping on others' toes") is the older one, not the current live one.
 
 Consequences:
 
 - The evaluated skill has heading **`## Terms used here`**, not `## Glossary` (the rename landed at `d839d62` "changed terms to glossary").
 - The evaluated skill has **no `## Safety constraints` section** (its section list ends at `## Completion report`, line 124 of 128).
-- **The seven-row terms table the reviewer commented on is identical in content to the live table.** Therefore the conciseness remark ("mixed already-known Git basics with valuable skill-specific conventions") transfers to the live skill, but **no captured run exercised the live 12,802-byte skill**. Any score quoted from these artifacts is a score for `9d4be20` + current description, not for `01D156…`.
-- `tests/`, `experiments/` runs carry `supplied-guide.md` of 11,276 bytes (ours) and 3,090/3,309 bytes (the `prp-worktree` comparator) — same version family, same conclusion.
+- **The seven-row terms table the reviewer commented on is identical in content to the live table.** Therefore the conciseness remark ("mixed already-known Git basics with valuable skill-specific conventions") transfers to the live skill, but **no captured run exercised the live 12,802-byte skill**. Any score quoted from these artifacts is a score for the `8d8e544`-era skill (old description, pre-safety body), not for `01D156…`.
+- `experiments/` runs carry their guide as `roundN/inputs/ours.md` (11,276 bytes, all four rounds) with the `prp-worktree` comparator at `inputs/prp.md` (3,090 bytes in rounds 1–2; 3,309 bytes in rounds 3–4) — same version family, same conclusion. (There is no `supplied-guide.md` under `experiments/`; that filename exists only under `tests/`.) `tests/` runs carry an older family instead: 9,183/9,406-byte `supplied-guide.md` files with the older `prototype1-astra` name/description, plus 56-byte "no guide supplied" placeholders (`# Task context` / `No supplemental worktree guide supplied.`).
 
 ### 2.3 The glossary was a user request
 
@@ -62,19 +62,19 @@ Line 50 adds: "it has not undergone a new model trial."
 
 ### 2.4 Evaluation criteria do not depend on glossary text
 
-Read all five `skills/git-worktrees-prime/evals/scenario-*/criteria.json` (weighted checklists, 8–10 items each). Every item is an observable artifact or command: `<primary-root>/.worktrees/<task>` path (scenario-0, 20 pts), base branch = `develop` not `main` (20), named task branch not detached HEAD (15), `git worktree list` before/after (15/10), `rev-parse HEAD` (10), `merge-base --is-ancestor` (scenario-1, 15), `check-ignore -q` with trailing `/` (scenario-2, 15), no bulk copy (scenario-3), `git worktree repair` with absolute path (scenario-4, 20), registration confirmed (scenarios 0/2/4). **No criterion credits the presence of a definition.** The words `registration`, `branch`, `HEAD`, `<primary-root>` appear in criteria as *outcomes*, and all remain instructed in the body.
+Read all five `skills/git-worktrees-prime/evals/scenario-*/criteria.json` (weighted checklists, 8–10 items each). Every item is an observable artifact or command: `<primary-root>/.worktrees/<task>` path (scenario-0, 20 pts), base branch = `develop` not `main` (20), named task branch not detached HEAD (15), `git worktree list` before/after (15/10), `rev-parse HEAD` (10), `merge-base --is-ancestor` (scenario-1, 15), `check-ignore -q` (scenario-2, 15) plus the trailing `/` on the destination path (a separate 10-pt item), no bulk copy (scenario-3), `git worktree repair` with absolute path (scenario-4, 20), registration confirmed (scenarios 0/2/4). **No criterion credits the presence of a definition.** The words `registration`, `branch`, `HEAD`, `<primary-root>` appear in criteria as *outcomes*, and all remain instructed in the body.
 
-### 2.5 Term usage map (glossary block excluded, lines 23–140)
+### 2.5 Term usage map (glossary block excluded, lines 23–140; frontmatter/lead lines 3 and 8 noted where a term also appears there)
 
 | Glossary term | Body lines using it | Does the point of use carry its own meaning? |
 |---|---|---|
 | Repository | 8, 38, 45, 79, 81, 91, 122, 133, 135 | Yes — ordinary Git noun; shared-state meaning restated operationally at line 30 |
-| Worktree / checkout | worktree 41 lines; checkout 29 lines (24, 26–28, 36–39, 43, 46–48, 53, 60–61, 79, 82, 87, 89–90, 92, 108, 120–121, 126, 128, 132, 136, 138) | **No** — "checkout" is used as a noun throughout and the skill contains **zero** `git checkout` / `git switch` / `git restore` commands (grep: no matches). The noun definition is load-bearing for user communication. |
+| Worktree / checkout | worktree 38 lines; checkout 28 lines (24, 26–28, 36–37, 39, 43, 46–48, 53, 60–61, 79, 82, 87, 89–90, 92, 108, 120–121, 126, 128, 132, 136, 138) | **No** — "checkout" is used as a noun throughout and the skill contains **zero** `git checkout` / `git switch` / `git restore` commands (grep: no matches). The noun definition is load-bearing for user communication. |
 | Branch | 3, 26–27, 43, 48–49, 57, 63–64, 66–67, 73, 82–83, 87, 90, 93, 95, 101, 110, 118–119, 121, 126, 128, 132–134 | Yes — "branch can exist without a checkout" is restated at line 22 and line 121 |
 | `HEAD` / detached HEAD | `HEAD` 45, 49, 74, 103, 133; `detached` 49, 91, 126, 133 | Mostly — every use is a standard Git use; the actions (anchor, verify detached state) are imperative at 49/91/126/133 |
 | Main (primary) / linked worktree | `primary-root` **once** (38); `primary` 38, 92; `linked` **once** (135); `main` 45, 135, 138; `bare` 135, 138 | **No** — three of these are unique symbols/placeholders that appear nowhere else; without the row they are undefined |
-| Base / integration target | base 35, 45, 46, 58, 64, 106; "integration target" 8, 43, 45, 118 | **No** — line 118 (`branch -d` may check upstream, not the intended target) only makes sense with "they may differ" |
-| Registration | 3, 37, 126 (+ `repair` 37, `prune` 37, 94, 114, 115, 137) | Partly — line 37 and line 94 state the operational distinction; the glossary supplies the noun-to-object mapping |
+| Base / integration target | base 35, 45, 46 (plus `<base-ref>` at 58, 64 and `merge-base` at 106); "integration target" 8, 43, 45, 118 | **No** — line 118 (`branch -d` may check upstream, not the intended target) only makes sense with "they may differ" |
+| Registration | 3, 37, 126 (+ `repair` 37, 135, `prune` 37, 94, 114, 115, 137) | Partly — line 37 and line 94 state the operational distinction; the glossary supplies the noun-to-object mapping |
 | Manager (not in glossary) | 26, 32, 37, 43, 92 | Defined by contrast at line 36 ("raw Git for **unmanaged** worktrees") and by the section heading; see §3 Option notes |
 
 ### 2.6 Missing / mismatched evidence
@@ -247,12 +247,12 @@ Removing the `HEAD` / detached HEAD row deletes the skill's only explanation tha
 | Check | Result |
 |---|---|
 | Live `SKILL.md` SHA-256 / words / lines vs handoff | `01D156FD…D451744` / 1,863 / 140 — matches handoff exactly |
-| HEAD at start vs handoff | `73d21c7…` matches; later advanced to `a211739` by a concurrent `docs/prompts/` commit; skill bytes identical across `d839d62`, `73d21c7`, `a211739` |
+| HEAD at start vs handoff | `73d21c7…` matches; advanced to `a211739` by a concurrent `docs/prompts/` commit, then to `f088f99` (current) which added these five reports. Skill blob identical at `d839d62`, `73d21c7`, `a211739`, `f088f99` |
 | Glossary block word count (same method as file) | 226 of 1,863 (12.1%); per-row counts recorded |
 | Term→line map for every glossary term | Computed (§2.5), glossary block excluded |
-| Vendored Tessl skill vs git history | Body identical to `9d4be20` (1,667-word pre-safety version); only frontmatter `description` differs; heading is `## Terms used here`; no safety section |
-| All five `with-skill` plugin copies byte size | 11,276 each (same version) |
-| Eval criteria read (5 scenarios, 46 checklist items) | No item depends on glossary presence; all items map to retained body instructions |
+| Vendored Tessl skill vs git history | Body identical to `9d4be20` (1,667-word pre-safety version); only frontmatter `description` differs; heading is `## Terms used here`; no safety section; full file byte-identical to `8d8e544` (128 lines, 0 diffs), so the evaluated `description` predates the current one |
+| All vendored `with-skill` plugin copies byte size | 11,276 each, four copies (scenario-2 not tracked) |
+| Eval criteria read (5 scenarios, 48 checklist items) | No item depends on glossary presence; all items map to retained body instructions |
 | `git checkout` / `switch` / `restore` occurrences in skill | **0** — "checkout" is exclusively a noun here |
 | Safety bullet count in skill vs SAFETY.md | 9 bullets vs 13 constraints; §5.1 accounts for the 8 affected/unaffected split |
 | Candidate wording word counts | 132 (Option C), 178 (Option B), computed with the identical split method |
@@ -269,7 +269,7 @@ Applying the three variant blocks to the seven required cases produced identical
 **Design:** one-factor A/B — same harness, same five scenarios in `skills/git-worktrees-prime/evals/`, same model; treatment = `SKILL.md` with only the §4 hunk applied; control = current `01D156…`. Record the SHA-256 of the guide actually supplied to the agent (doc21:44 warns the setup script reads the *current* skill, so a stale run would silently mix versions).
 
 **Success criteria (all required):**
-1. Every checklist item that scored with the control still scores with the treatment, in all five scenarios (primary gate — 46 items).
+1. Every checklist item that scored with the control still scores with the treatment, in all five scenarios (primary gate — 48 items).
 2. Re-review shows the glossary criticism gone and conciseness ≥ 4/5, with completeness and specificity still 5/5.
 3. In any completion report, path, branch, and registration remain stated separately (the one communication behavior the glossary directly enforces).
 
@@ -286,7 +286,7 @@ Applying the three variant blocks to the seven required cases produced identical
 ## 7. Dependencies, boundaries, and limitations
 
 **Interactions with the other investigations**
-- **02 (activation/description):** the evaluated skill already carried the *current* frontmatter description with an older body (§2.2). If investigation 02 changes `description`, that change and this one must be attributed separately in any future score comparison.
+- **02 (activation/description):** the evaluated skill carries the *pre-`f7665c7`* frontmatter description with an `8d8e544`-era body (§2.2) — i.e. description effects are entirely uncontrolled in the captured runs, not already-current. If investigation 02 changes `description`, that change and this one must be attributed separately in any future score comparison.
 - **03 (progressive disclosure/references):** **dependency, not redesigned here.** My recommendation assumes the glossary stays inside `SKILL.md`. If investigation 03 moves it to `references/`, the lookup argument in §3 Option D changes and Option C's advantage shrinks — please treat "glossary stays inline" as my stated boundary.
 - **04 (phases/execution):** cleanup-tree and develop/integrate wording are untouched; if investigation 04 restructures those sections, re-check that lines 22, 49, 91, 94, 118, 121 still exist somewhere, since Option C relies on them as the retained carriers.
 - **05 (token attribution):** **flagged explicitly.** A 94-word glossary trim cannot explain or offset a ~200,000-token (26%) overhead. Do not cite this proposal as an efficiency fix.
