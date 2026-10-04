@@ -5,7 +5,7 @@ description: Manage Git worktrees for isolated or parallel development. Use when
 
 # Git worktrees
 
-Create, choose, use, integrate, and retire task worktrees. Follow user instructions and repository conventions; keep ownership and the integration target explicit.
+Follow user instructions and repository conventions; keep ownership and the integration target explicit.
 
 ## Terms used here
 
@@ -19,7 +19,7 @@ Create, choose, use, integrate, and retire task worktrees. Follow user instructi
 | Base / integration target | The base is the commit or ref used to start the task. The integration target is the branch intended to receive the result. They may differ. |
 | Registration | Git's administrative record connecting a linked worktree's path to the repository. Repair reconnects a live checkout; prune removes obsolete registrations. |
 
-One repository can have several worktrees on different branches or detached commits. Removing a worktree leaves its branch. Name the checkout path and branch/ref separately when communicating about them.
+Removing a worktree leaves its branch. Name the checkout path and branch/ref separately when communicating about them.
 
 ## Choose the checkout
 
@@ -117,7 +117,7 @@ git -C "<repo>" worktree prune --verbose
 
 - Compare the actual task tip against a verified, current integration ref. `branch -d` may check the branch's upstream rather than the intended integration target; success is not integration evidence.
 - Squash or rebase integration may break ancestry. Verify the replacement commits and resulting changes. If `branch -d` refuses, retain the branch until its obsolete history is verified safe and authorized to delete; only then consider `branch -D`.
-- Do not add `--force`, reset changes, unlock a worktree, or recursively delete its directory merely to overcome a refusal. Resolve the cause; submodules and managed checkouts may require another supported removal method.
+- Submodules and managed checkouts may require another supported removal method.
 - Pruning removes stale worktree metadata, not branches or existing checkout directories. Delete remote branches only when separately in scope and no collaborator still needs them.
 - Harness archives may retain snapshots and omit ignored files. Check before relying on an archive for preservation or calling it deletion. Do not purge shared Git objects, reflogs, or repository history as worktree cleanup.
 
@@ -125,4 +125,16 @@ git -C "<repo>" worktree prune --verbose
 
 Before reporting a retained task checkout ready, verify its absolute path, branch (or intended detached commit), current registration, and any required ignore coverage.
 
-State the work and checks completed, the integration or review status, and which checkout, branches, or archives were removed or retained. Include paths or refs only where they help locate remaining work.
+Report completed work and checks, integration/review status, and removed or retained checkouts, branches, or archives. Include paths/refs useful for locating remaining work.
+
+## Safety constraints
+
+- DON'T discard work or bypass safeguards without user authorization for the target and consequence; tool access and agent-written plans confer none. Resolve safeguard causes before using force flags, resets, unlocking, or filesystem operations. Read lock reasons. Never override branch checkout protection.
+- DON'T remove or relocate worktrees, hard-reset, or clean files without verifying the repository, absolute path, branch name (or detached state), and HEAD commit. Scripts must parse `git worktree list --porcelain -z`.
+- DON'T use `git worktree add -B` unless resetting the named branch to the selected commit is authorized; use `-b` for creation.
+- DON'T relocate through filesystem tools without preserving `.git` and contents, repairing from the current main/bare repository with new absolute linked-worktree paths, and verifying inventory. `git worktree move` cannot move main or submodule-containing worktrees.
+- DON'T create or relocate superproject worktrees without checking submodule limitations; multiple superproject checkouts are discouraged.
+- DON'T prune with different expiry options from the reviewed dry run. Lock worktrees on intermittently mounted storage before it goes offline.
+- DON'T expect `git config --worktree` isolation unless `extensions.worktreeConfig` is enabled. Before enabling it, migrate existing `core.worktree` and `core.bare` to the main worktree's `config.worktree`; never share `core.worktree` or `core.bare=true`, and share `core.sparseCheckout` only when all worktrees use sparse checkout.
+- DON'T enable `extensions.worktreeConfig` or relative worktree paths unless all required Git installations support the resulting extensions.
+- DON'T edit refs or worktree metadata as files; use Git commands and resolve paths with `git rev-parse --git-path` from the target worktree.
