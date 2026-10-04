@@ -23,11 +23,11 @@ Removing a worktree leaves its branch. Name the checkout path and branch/ref sep
 
 ## Choose the checkout
 
-1. **An existing checkout already belongs to this task?** Reuse it if no other worker owns it. Confirm its current absolute path and branch against the manager's inventory or `git worktree list --porcelain`; inspect changes and ongoing Git operations.
+1. **An existing checkout already belongs to this task?** Reuse it if no other worker owns it. Confirm its current absolute path and branch against the manager's inventory or `git worktree list --porcelain -z`; inspect changes and ongoing Git operations.
 2. **A worktree is requested, or concurrent tasks, conflicting branches, or unrelated local changes require separation?** Create a task worktree. Parallel tasks need separate branches and checkouts.
 3. **Otherwise:** use the current checkout.
 
-Worktrees separate working files and indexes, but share objects, refs, remotes, and much Git configuration. Coordinate shared mutations. They provide no security boundary; concurrent services may also need distinct ports, databases, and output locations.
+Worktrees separate working files and indexes, but share objects, most refs, remotes, and much Git configuration. `HEAD`, `refs/bisect/*`, `refs/worktree/*`, and `refs/rewritten/*` are per-worktree. Coordinate shared mutations. They provide no security boundary; concurrent services may also need distinct ports, databases, and output locations.
 
 ## Choose the manager and location
 
@@ -35,7 +35,7 @@ Worktrees separate working files and indexes, but share objects, refs, remotes, 
 - Supply the intended base. Wait for creation to finish and verify the returned path and commit. Creation need not switch the agent's working directory: run subsequent commands explicitly in the returned path.
 - Use the harness to finalize, remove, or archive its managed checkouts. Use raw Git for unmanaged worktrees or a supported fallback.
 - If a live checkout was relocated, reconnect it through its manager or, for raw Git, `git -C "<repo>" worktree repair "<worktree>"` using its current absolute path. Re-list worktrees to verify the new registration. Do not prune the live checkout's registration.
-- For raw Git, follow the repository's location convention; otherwise use `<primary-root>/.worktrees/<task>`. Do not place a worktree inside another disposable worktree. Use a unique, descriptive task name and an unused path.
+- For raw Git, follow the repository's location convention; otherwise use `<primary-root>/.worktrees/<task>`, or a sibling of the repository directory for a bare repository. Do not place a worktree inside another disposable worktree. Use a unique, descriptive task name and an unused path.
 - Before creating inside another checkout, ensure the actual selected destination is ignored through `.gitignore` or a local exclusion. Locate the exclude file with `git rev-parse --path-format=absolute --git-path info/exclude`; `.git` may be a file. Run `git check-ignore -q` from the enclosing checkout, with a trailing `/` on the destination's relative path, and require exit 0. Verify again after creation.
 
 ## Establish the starting state
@@ -50,10 +50,11 @@ Keep the checkout path, branch, starting commit, integration target, and manager
 
 ### Generic Git commands
 
-Substitute all placeholders. Run only the selected alternative. `<repo>` is an existing checkout; `<worktree>` is the task's exact absolute path.
+Substitute all placeholders. Run only the selected alternative. `<repo>` is an existing checkout or bare repository; `<worktree>` is the task's exact absolute path.
 
 ```sh
-git -C "<repo>" worktree list --porcelain
+git -C "<repo>" worktree list --porcelain -z
+# Only when <repo> is a checkout, not a bare repository.
 git -C "<repo>" status --short --branch
 git -C "<repo>" rev-parse --verify "<base-ref>^{commit}"
 
@@ -64,6 +65,8 @@ git -C "<enclosing-checkout>" check-ignore -q -- "<selected-relative-path>/"
 git -C "<repo>" worktree add -b "<task-branch>" "<worktree>" "<base-ref>"
 
 # Alternative: continue an existing branch that is not checked out elsewhere.
+# Require exit 0; do not let a missing local branch resolve to a remote branch.
+git -C "<repo>" show-ref --verify --quiet "refs/heads/<task-branch>"
 git -C "<repo>" worktree add "<worktree>" "<task-branch>"
 
 # Alternative: disposable inspection of a specific commit.
@@ -97,7 +100,7 @@ Evaluate checkout removal and branch deletion separately. Routine cleanup of thi
 ### Inspect and remove with Git
 
 ```sh
-# A clean tracked-file status does not account for ignored local state.
+# Clean status does not establish preservation of ignored files or detached commits.
 git -C "<worktree>" status --short --branch --untracked-files=all
 git -C "<worktree>" status --short --ignored
 git -C "<worktree>" rev-parse HEAD
@@ -105,10 +108,10 @@ git -C "<worktree>" rev-parse HEAD
 # Exit 0 proves this tip is an ancestor of this target. Other outcomes need review.
 git -C "<repo>" merge-base --is-ancestor "<task-tip>" "<integration-ref>"
 
-# Run from a surviving checkout after the checks above.
+# Run from a surviving checkout or bare repository after the checks above.
 git -C "<repo>" worktree remove "<worktree>"
 git -C "<repo>" branch -d "<task-branch>"
-git -C "<repo>" worktree list --porcelain
+git -C "<repo>" worktree list --porcelain -z
 
 # Only for intentionally removed worktrees; review every dry-run entry before pruning.
 git -C "<repo>" worktree prune --dry-run --verbose
@@ -129,12 +132,13 @@ Report completed work and checks, integration/review status, and removed or reta
 
 ## Safety constraints
 
-- DON'T discard work or bypass safeguards without user authorization for the target and consequence; tool access and agent-written plans confer none. Resolve safeguard causes before using force flags, resets, unlocking, or filesystem operations. Read lock reasons. Never override branch checkout protection.
+- DON'T discard work or bypass safeguards without user authorization for the target and consequence; tool access and agent-written plans confer none. Resolve safeguard causes before using force flags, resets, unlocking, or filesystem operations. Read lock reasons; an absent reason is not permission. Never override branch checkout protection.
 - DON'T remove or relocate worktrees, hard-reset, or clean files without verifying the repository, absolute path, branch name (or detached state), and HEAD commit. Scripts must parse `git worktree list --porcelain -z`.
 - DON'T use `git worktree add -B` unless resetting the named branch to the selected commit is authorized; use `-b` for creation.
-- DON'T relocate through filesystem tools without preserving `.git` and contents, repairing from the current main/bare repository with new absolute linked-worktree paths, and verifying inventory. `git worktree move` cannot move main or submodule-containing worktrees.
-- DON'T create or relocate superproject worktrees without checking submodule limitations; multiple superproject checkouts are discouraged.
-- DON'T prune with different expiry options from the reviewed dry run. Lock worktrees on intermittently mounted storage before it goes offline.
-- DON'T expect `git config --worktree` isolation unless `extensions.worktreeConfig` is enabled. Before enabling it, migrate existing `core.worktree` and `core.bare` to the main worktree's `config.worktree`; never share `core.worktree` or `core.bare=true`, and share `core.sparseCheckout` only when all worktrees use sparse checkout.
+- DON'T relocate through filesystem tools without preserving `.git` and contents. Repair from the current main/bare repository with new absolute linked-worktree paths, and verify inventory. `git worktree move` cannot move main or submodule-containing worktrees.
+- DON'T create, relocate, or remove superproject worktrees without checking submodule limitations; multiple superproject checkouts are discouraged.
+- DON'T remove worktrees by deleting directories through filesystem commands or file managers; use the worktree manager or `git worktree remove` after the cleanup checks.
+- DON'T prune with different expiry options from the reviewed dry run. Git gc can prune missing registrations automatically (`gc.worktreePruneExpire`): repair relocated worktrees promptly and lock intermittently mounted worktrees before storage goes offline.
+- DON'T expect `git config --worktree` isolation unless `extensions.worktreeConfig` is enabled. Before enabling it, migrate existing `core.worktree` and `core.bare` from shared configuration to `config.worktree`, resolved with `git rev-parse --git-path config.worktree` from the main checkout or bare repository. Never share `core.worktree` or `core.bare=true`. Share `core.sparseCheckout` only when all worktrees use sparse checkout.
 - DON'T enable `extensions.worktreeConfig` or relative worktree paths unless all required Git installations support the resulting extensions.
 - DON'T edit refs or worktree metadata as files; use Git commands and resolve paths with `git rev-parse --git-path` from the target worktree.
