@@ -7,6 +7,8 @@ description: "Manage Git worktrees: create, list, reuse, repair, or remove linke
 
 Follow user instructions and repository conventions; keep ownership and the integration target explicit.
 
+Apply only task-relevant phases and their safety checks; listing or repair alone does not require development, integration, or cleanup.
+
 ## Glossary
 
 | Term | Meaning |
@@ -21,7 +23,7 @@ Removing a worktree leaves its branch. Name the checkout path and branch/ref sep
 ## Choose the checkout
 
 1. **An existing checkout already belongs to this task?** Reuse it if no other worker owns it. Confirm its current absolute path and branch against the manager's inventory or `git worktree list --porcelain -z`; inspect changes and ongoing Git operations.
-2. **A worktree is requested, or concurrent tasks, conflicting branches, or unrelated local changes require separation?** Create a task worktree. Parallel tasks need separate branches and checkouts.
+2. **A worktree is requested, or concurrent edits, conflicting branches, or unrelated local changes require separation?** Create a task worktree.
 3. **Otherwise:** use the current checkout.
 
 Worktrees separate working files and indexes, but share objects, most refs, remotes, and much Git configuration. `HEAD`, `refs/bisect/*`, `refs/worktree/*`, and `refs/rewritten/*` are per-worktree. Coordinate shared mutations. They provide no security boundary; concurrent services may also need distinct ports, databases, and output locations.
@@ -30,7 +32,7 @@ Worktrees separate working files and indexes, but share objects, most refs, remo
 
 - Prefer available harness worktree tools. Check their starting-state, dirty-file transfer, and cleanup behavior; do not assume universal tool names or defaults.
 - Supply the intended base. Wait for creation to finish and verify the returned path and commit. Creation need not switch the agent's working directory: run subsequent commands explicitly in the returned path.
-- Use the harness to finalize, remove, or archive its managed checkouts. Use raw Git for unmanaged worktrees or a supported fallback.
+- Use the harness to finalize, remove, or archive its managed checkouts. Use raw Git for unmanaged worktrees or a supported fallback. If requested isolation cannot be established, report the blocker; do not silently work in another checkout.
 - If a live checkout was relocated, reconnect it through its manager or, for raw Git, `git -C "<repo>" worktree repair "<worktree>"` using its current absolute path. Re-list worktrees to verify the new registration. Do not prune the live checkout's registration.
 - For raw Git, follow the repository's location convention; otherwise use `<primary-root>/.worktrees/<task>`, or a sibling of the repository directory for a bare repository. Do not place a worktree inside another disposable worktree. Use a unique, descriptive task name and an unused path.
 - Before creating inside another checkout, ensure the actual selected destination is ignored through `.gitignore` or a local exclusion. Locate the exclude file with `git rev-parse --path-format=absolute --git-path info/exclude`; `.git` may be a file. Run `git check-ignore -q` from the enclosing checkout, with a trailing `/` on the destination's relative path, and require exit 0. Verify again after creation.
