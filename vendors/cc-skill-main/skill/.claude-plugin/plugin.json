@@ -1,0 +1,20 @@
+{
+  "name": "skill",
+  "version": "1.2.0",
+  "description": "Evaluate, enhance, and measure Claude Code SKILL.md files against 17 skill-authoring patterns",
+  "author": {
+    "name": "Roland Huß",
+    "email": "rhuss@redhat.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "skill-authoring",
+    "skill-check",
+    "skill-enhance",
+    "skill-measure",
+    "patterns",
+    "quality"
+  ]
+}
