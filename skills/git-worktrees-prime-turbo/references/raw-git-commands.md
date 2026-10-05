@@ -1,6 +1,6 @@
 # Raw Git commands
 
-Apply the main skill's ownership, preservation, and safety checks. Substitute all placeholders. Run only commands for the selected operation, including its prerequisite checks.
+Apply the main skill's ownership, preservation, and safety checks. Substitute all <placeholders>. Run only commands for the selected operation, including its prerequisite checks.
 
 ## Creation
 
