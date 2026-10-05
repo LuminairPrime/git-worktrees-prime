@@ -1,0 +1,1 @@
+{"type":"error","timestamp":1791179706133,"sessionID":"ses_ef55eb39dffedgm69VYBYGI6B5","error":{"type":"provider.quota","message":"Rate limit exceeded. Please try again later.","status":429,"response":{"body":"{\"type\":\"error\",\"error\":{\"type\":\"FreeUsageLimitError\",\"message\":\"Rate limit exceeded. Please try again later.\"},\"metadata\":{}}"}}}

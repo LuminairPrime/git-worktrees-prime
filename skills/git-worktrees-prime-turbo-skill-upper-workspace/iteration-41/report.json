@@ -1,0 +1,146 @@
+{
+  "skill_name": "git-worktrees-prime-turbo-skill-upper",
+  "schema_version": "v1alpha1",
+  "engine_name": "opencode",
+  "model_name": "opencode/fledge-alpha-free",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/fledge-alpha-free"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/fledge-alpha-free"
+  },
+  "observed_configuration": {
+    "version": "2.0.22"
+  },
+  "start_time": "2026-10-05T00:54:32.011526246-03:00",
+  "end_time": "2026-10-05T00:56:29.61465394-03:00",
+  "case_results": [
+    {
+      "case_id": "resume-repair-reorganized",
+      "title": "Repair moved checkout and finish on the same task branch",
+      "status": "FAIL",
+      "duration_ms": 110810,
+      "turns": 1,
+      "input_tokens": 6230,
+      "output_tokens": 6444,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": false,
+            "evidence": "output does not contain \"repair\""
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Resume the adapter task in case03/checkouts/adapter-current; the workspace was\nreorganized since the task started so the checkout moved from adapter-old.\nThe schema worker is now complete on schema/prep (see worker-status.json).\nUse that result and finish encode_record: strip and lowercase name, include\nenabled as a boolean, and include schema from SCHEMA_VERSION. Keep the\nexisting draft notes, validate with the project check, commit on task/adapter,\nand leave this same checkout ready for review. No integration or publishing.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "I would run exactly the following from the workspace root:\n\n```bash\ncd /tmp/skill-up-3322275580/case03/checkouts/adapter-current\n\npwd\ngit status --short --branch\ngit branch --show-current\ncat worker-status.json\n```\n\nConfirm:\n\n- `worker-status.json` reports the schema worker as complete on `schema/prep`.\n- The checkout is the moved adapter checkout, not `adapter-old`.\n- The current branch is `task/adapter`; if it is not, run:\n\n```bash\ngit switch task/adapter\n```\n\nLocate the adapter implementation and schema constant:\n\n```bash\ngit grep -n \"def encode_record\"\ngit grep -n \"SCHEMA_VERSION\"\n```\n\nOpen the reported adapter file:\n\n```bash\n${EDITOR:-vi} path/from/grep/to/adapter/file\n```\n\nFinish `encode_record` so that its returned record has, with existing input/field names otherwise preserved:\n\n```python\n{\n    \"name\": name.strip().lower(),\n    \"enabled\": bool(enabled),\n    \"schema\": SCHEMA_VERSION,\n}\n```\n\nDo not remove or rewrite the existing draft-note comments. If `SCHEMA_VERSION` is not already imported or defined in that module, add the existing import/reference indicated by `worker-status.json`; do not merge or publish `schema/prep`.\n\nCheck the edit:\n\n```bash\ngit diff --check\ngit diff\n```\n\nThe diff should show only the `encode_record` changes/import addition while the draft notes remain unchanged. Run the project’s designated check, for example:\n\n```bash\nif [ -x ./check.sh ]; then\n  ./check.sh\nelif [ -f Makefile ] \u0026\u0026 grep -q '^check:' Makefile; then\n  make check\nelse\n  python -m pytest -q\nfi\n```\n\nThen commit only the adapter source change:\n\n```bash\ngit add path/from/grep/to/adapter/file\ngit commit -m \"Finish adapter record encoding\"\ngit status --short --branch\ngit log --oneline -3\ngit branch --show-current\n```\n\nEnd state should be:\n\n- working tree clean or containing only unrelated pre-existing untracked files,\n- current branch `task/adapter`,\n- new commit containing only the completed `encode_record`,\n- no merge, push, integration, or publishing commands run.",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "offline-lock-gc-prune",
+      "title": "Lock intermittently mounted worktrees before storage goes offline",
+      "status": "PASS",
+      "duration_ms": 26119,
+      "turns": 1,
+      "input_tokens": 10780,
+      "output_tokens": 1166,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[lock], any:[worktree lock intermittent offline gc.worktreePruneExpire expire]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[lock], any:[worktree lock intermittent offline gc.worktreePruneExpire expire])"
+          },
+          {
+            "text": "output_contains{any:[repair do not prune unavailable missing directory unlock]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[repair do not prune unavailable missing directory unlock])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "A task worktree lives on a share that goes offline next week while the task\nis still active. I am worried git gc will drop its registration while it is\nunmounted. What should I do before the storage goes offline, and should I\nprune the registration while it is unavailable?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
+      "response": "Do **not** prune while the share is unavailable — a missing directory during an outage can look like a stale registration, and pruning would destroy the link you need when the share returns. Protect it instead by locking it before the offline window. Exact steps, in order:\n\n**1. Confirm the current registration and state**\n\n```sh\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z\ngit -C \"\u003cworktree\u003e\" status --short --branch\ngit -C \"\u003cworktree\u003e\" rev-parse HEAD\ngit -C \"\u003cworktree\u003e\" rev-parse --show-toplevel\n```\n\nCheck the output agrees: the registered path, branch, HEAD commit, and `--show-toplevel` path all match the live checkout.\n\n**2. Repair if anything drifted** (e.g., the mount path changed at some point). Only if the path no longer matches:\n\n```sh\ngit -C \"\u003crepo\u003e\" worktree repair \"\u003cworktree\u003e\"   # use the checkout's current absolute path\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z   # verify the registration now points at the right path\n```\n\n**3. Lock the worktree before the share goes offline**\n\n```sh\ngit -C \"\u003crepo\u003e\" worktree lock --reason \"offline share until \u003cdate\u003e\" \"\u003cworktree\u003e\"\n```\n\nVerify the lock took effect:\n\n```sh\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z   # expect a \"locked\" line with your reason\ngit -C \"\u003crepo\u003e\" config --get-all gc.worktreePruneExpire   # know your gc expiry setting, if set\n```\n\n**4. While offline: do nothing destructive.** Specifically, while the share is unmounted:\n\n- Do **not** run `git worktree prune` (even with `--dry-run` as a cleanup step — its real run would hit this worktree).\n- Do **not** run `git worktree unlock` — an absent directory is not permission, and it's not stale.\n- Avoid `git gc`/`git gc --auto` against the shared repository if you can; that's where `gc.worktreePruneExpire` would normally expire missing registrations. The lock from step 3 is what shields the registration, so keep the lock reason intact and don't delete the `locked` marker file.\n\n**5. When the share is back: unlock only after verifying the checkout is truly there**\n\n```sh\ngit -C \"\u003cworktree\u003e\" rev-parse --show-toplevel   # must succeed and match the registered path\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z     # confirm registered path and branch\ngit -C \"\u003crepo\u003e\" worktree unlock \"\u003cworktree\u003e\"\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z     # locked line should be gone\ngit -C \"\u003cworktree\u003e\" status --short --branch\n```\n\nOnly if step 5's checks fail should you investigate with `git worktree repair \"\u003ccurrent-path\u003e\"` — and only prune (`git worktree prune --dry-run --verbose`, review every entry, then `git worktree prune --verbose`) for worktrees you intentionally removed. A merely unavailable checkout on an offline share is never a prune candidate.\n\nSubstitute `\u003crepo\u003e` (main checkout or bare repo), `\u003cworktree\u003e` (the task checkout's absolute path on the share), and a concrete date in the lock reason.",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "move-limits-main-submodule",
+      "title": "Refuse worktree move of main or submodule-containing checkouts",
+      "status": "PASS",
+      "duration_ms": 117391,
+      "turns": 1,
+      "input_tokens": 16948,
+      "output_tokens": 4833,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "output_matches{all:[(?i)main (?i)submodule], any:[cannot move refuse do not move never move must not move not support repair]}",
+            "passed": true,
+            "evidence": "output satisfies all regex checks (all:[(?i)main (?i)submodule], any:[cannot move refuse do not move never move must not move not support repair])"
+          },
+          {
+            "text": "output_contains{any:[worktree move worktree list repair relocate]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[worktree move worktree list repair relocate])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "I am reorganizing directories. I want to run `git worktree move` on the\nmain checkout to its new location, and also move a linked task checkout\nthat contains submodules. Should I proceed with both moves? What must I\ncheck first, and what is the correct procedure for each?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
+      "response": "## Short answer: No — neither move can be done with `git worktree move`\n\nBoth of your targets are explicitly excluded from the command:\n\n- **Main checkout** → `git worktree move` refuses: the main worktree cannot be moved this way.\n- **Linked worktree containing submodules** → also refused (\"working trees containing submodules cannot be moved or removed\").\n\nBoth must instead be moved **manually with `mv` and then reconnected with `git worktree repair`**. Do not delete/recreate them, and do not run `git worktree prune` afterward thinking the registrations are stale — repair, not prune.\n\n## Checks to run first (in order)\n\n```sh\ngit --version                                   # move/repair must exist (repair is Git ≥ ~2.19; confirm with: git worktree -h)\ngit -C \"\u003cmain\u003e\" worktree list --porcelain       # identify main (first entry) vs linked, exact paths, branches, \"locked\" entries\ngit -C \"\u003cmain\u003e\" config core.worktree            # must be unset, or fix/migrate it (see extensions.worktreeConfig caveats)\ngit -C \"\u003cmain\u003e\" config core.bare                # must be unset/false\ngit -C \"\u003cmain\u003e\" status --short --branch         # no ongoing operation; also stop editors/builds/processes in the tree\ngit -C \"\u003ctask\u003e\" status --short --branch         # same for the task checkout\ngit -C \"\u003ctask\u003e\" submodule status --recursive    # enumerate submodules\ncat \"\u003ctask\u003e/\u003csubmodule\u003e/.git\"                   # check whether the gitdir: path is relative or absolute\n```\n\nAlso verify the new destination paths **do not exist yet** and are **not inside another worktree**, and note anything outside Git (hooks, IDE, CI, scripts) referencing the old absolute paths.\n\n## Procedure 1 — main checkout (manual move + repair)\n\nThe main checkout's `.git` is a real directory, so it travels with the directory; what breaks is the reverse link stored in each **linked** worktree's `.git` file, which points at the old main path. Repair rewrites those:\n\n```sh\nmv /old/main /new/main\ngit -C /new/main worktree repair                # re-points all linked worktrees back to the new main location\ngit -C /new/main worktree list --porcelain      # verify all worktrees listed correctly\n```\n\nIf the main checkout has submodules with absolute `gitdir:` paths (older clones), re-init them (`git -C /new/main submodule update --init --recursive`).\n\n## Procedure 2 — linked task worktree with submodules (manual move + repair)\n\nThe submodule gitdirs live under the main repo (`.git/modules/...` / `.git/worktrees/\u003cid\u003e/modules/...`) and each has a `core.worktree` pointing back at the **old** worktree path. Cleanest sequence is to deinit first, so no stale submodule paths survive:\n\n```sh\ngit -C /old/task submodule deinit -f --all      # recommended: avoids stale core.worktree/gitdir paths\nmv /old/task /new/task\ngit -C /new/main worktree repair /new/task      # run from the main repo, with the NEW absolute path\ngit -C /new/task submodule update --init --recursive\ngit -C /new/main worktree list --porcelain      # verify registration\ngit -C /new/task status --short --branch        # verify checkout works\ngit -C /new/task submodule status --recursive   # verify submodules\n```\n\nIf you skip the deinit, repair still reconnects the worktree itself, but you must then fix every submodule's `core.worktree` and any absolute `gitdir:` lines by hand — which is why deinit → move → repair → re-init is the safer path.\n\n## If you move both\n\nOrder doesn't matter as long as repair runs last, from the new main location:\n\n```sh\nmv /old/main /new/main\nmv /old/task /new/task\ngit -C /new/main worktree repair /new/task      # fixes both directions for the task worktree in one pass\ngit -C /new/main worktree repair                # fixes any other (unmoved) linked worktrees\ngit -C /new/main worktree list --porcelain      # final verification\n```\n\nOne nuance: repair with an explicit path is what you want for the *moved* linked worktree — bare `git worktree repair` alone can't find a worktree whose path also changed, because its recorded location is the old one.",
+      "observed_version": "2.0.22"
+    }
+  ],
+  "total_tokens": 46401,
+  "judge_tokens": 0,
+  "overall_tokens": 46401
+}

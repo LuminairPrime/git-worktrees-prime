@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "Repair moved checkout and finish on the same task branch",
+  "prompt": "Resume the adapter task in case03/checkouts/adapter-current; the workspace was\nreorganized since the task started so the checkout moved from adapter-old.\nThe schema worker is now complete on schema/prep (see worker-status.json).\nUse that result and finish encode_record: strip and lowercase name, include\nenabled as a boolean, and include schema from SCHEMA_VERSION. Keep the\nexisting draft notes, validate with the project check, commit on task/adapter,\nand leave this same checkout ready for review. No integration or publishing.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+  "assertions": [
+    "expect.must_contain",
+    "expect.must_not_contain"
+  ]
+}

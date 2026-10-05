@@ -1,0 +1,346 @@
+{
+  "skill_name": "git-worktrees-prime-turbo-skill-upper",
+  "schema_version": "v1alpha1",
+  "engine_name": "opencode",
+  "model_name": "opencode/longcat-2.5-preview-free",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/longcat-2.5-preview-free"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/longcat-2.5-preview-free"
+  },
+  "observed_configuration": {
+    "version": "2.0.22"
+  },
+  "start_time": "2026-10-05T02:22:23.177256285-03:00",
+  "end_time": "2026-10-05T02:31:41.997217877-03:00",
+  "case_results": [
+    {
+      "case_id": "cleanup-offline-prune",
+      "title": "Cleanup keeps review data and offline checkout, prunes only retired",
+      "status": "PASS",
+      "duration_ms": 121603,
+      "turns": 1,
+      "input_tokens": 6023,
+      "output_tokens": 929,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_matches{all:[prune (--dry-run|-n)], any:[review.db preserve outside the removal path review branch task/completed]}",
+            "passed": true,
+            "evidence": "output satisfies all regex checks (all:[prune (--dry-run|-n)], any:[review.db preserve outside the removal path review branch task/completed])"
+          },
+          {
+            "text": "output_contains{any:[offline unmounted retain still in use retired worktree remove worktree list], not:[prune the offline checkout delete the review branch]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[offline unmounted retain still in use retired worktree remove worktree list], not:[prune the offline checkout delete the review branch])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Finish the task/completed workspace: its checkout at case02/checkouts/completed\nwas squash-integrated into release and the review remains open on\ntask/completed. The checkout contains ignored review.db the reviewer still\nneeds. There is also an offline-worker checkout on a currently unmounted share\n(colleague-owned, still in use) and a retired scratch checkout already deleted\nfrom disk. Reclaim the completed checkout, keep what the review needs, and do\nappropriate local cleanup. Report precisely what remains.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "Here is the exact sequence of commands and checks, in order:\n\n---\n\n## Phase 1 — Inventory and verification\n\n```sh\n# List all worktrees (parse with -z for safety)\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z\n\n# Check the completed checkout's status — tracked, untracked, and ignored files\ngit -C \"case02/checkouts/completed\" status --short --branch --untracked-files=all\ngit -C \"case02/checkouts/completed\" status --short --ignored\ngit -C \"case02/checkouts/completed\" rev-parse HEAD\n\n# Verify the branch task/completed exists\ngit -C \"\u003crepo\u003e\" show-ref --verify --quiet \"refs/heads/task/completed\"\n```\n\n**What you're confirming:**\n- The completed checkout is registered and clean (no uncommitted tracked changes).\n- The ignored `review.db` is present (shown by `--ignored`).\n- The branch `task/completed` exists and points to the expected commit.\n\n---\n\n## Phase 2 — Preserve what the review needs\n\n```sh\n# Copy the ignored review.db to a safe location outside the checkout\ncp \"case02/checkouts/completed/review.db\" \"/path/to/safe/location/review.db\"\n\n# Verify the copy\nls -la \"/path/to/safe/location/review.db\"\n```\n\n**Why:** The reviewer still needs `review.db`. It is ignored, so it won't be in any commit — it will be lost when the checkout is removed. Copy it to a location outside the worktree path.\n\n---\n\n## Phase 3 — Remove the completed checkout\n\n```sh\n# Remove the worktree (no force flag — it should be clean)\ngit -C \"\u003crepo\u003e\" worktree remove \"case02/checkouts/completed\"\n\n# Verify the branch task/completed still exists (review is still open)\ngit -C \"\u003crepo\u003e\" show-ref --verify --quiet \"refs/heads/task/completed\"\n```\n\n**Why:** The work was squash-integrated into `release`, so the changes are preserved. The branch is retained because the review is still open — a closed PR alone would be insufficient evidence, and here the review is explicitly still open.\n\n---\n\n## Phase 4 — Prune stale registrations\n\n```sh\n# Dry-run prune to see what would be removed\ngit -C \"\u003crepo\u003e\" worktree prune --dry-run --verbose\n\n# Prune (only the retired scratch checkout's registration)\ngit -C \"\u003crepo\u003e\" worktree prune --verbose\n```\n\n**Why:** The retired scratch checkout was already deleted from disk, so its registration is stale. The dry-run lets you confirm that only the scratch checkout's entry is removed — the offline-worker checkout (on the unmounted share) must NOT be pruned or unlocked.\n\n---\n\n## Phase 5 — Verify and report\n\n```sh\n# Re-list worktrees to confirm final state\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z\n```\n\n---\n\n## What remains after this sequence\n\n| Item | Status |\n|---|---|\n| `case02/checkouts/completed` | **Removed** (worktree directory gone) |\n| `task/completed` branch | **Retained** (review still open) |\n| `review.db` | **Preserved** at the safe location you copied it to |\n| Offline-worker checkout | **Untouched** (colleague-owned, still in use, on unmounted share) |\n| Retired scratch checkout | **Pruned** (stale registration removed) |\n\n---\n\n## What you would NOT touch\n\n- **Offline-worker checkout:** It is on an unmounted share, colleague-owned, and still in use. Do not prune, unlock, or remove it. The `worktree prune` dry-run will show it as a missing directory — that is expected and safe to leave alone.\n- **The `task/completed` branch:** The review is still open, so the branch must be retained even though the work was squash-integrated into `release`.",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "cleanup-offline-prune",
+      "title": "Cleanup keeps review data and offline checkout, prunes only retired",
+      "status": "FAIL",
+      "duration_ms": 206634,
+      "turns": 1,
+      "input_tokens": 509,
+      "output_tokens": 614,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": false,
+            "evidence": "output does not contain \"prune -\""
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "Finish the task/completed workspace: its checkout at case02/checkouts/completed\nwas squash-integrated into release and the review remains open on\ntask/completed. The checkout contains ignored review.db the reviewer still\nneeds. There is also an offline-worker checkout on a currently unmounted share\n(colleague-owned, still in use) and a retired scratch checkout already deleted\nfrom disk. Reclaim the completed checkout, keep what the review needs, and do\nappropriate local cleanup. Report precisely what remains.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "## Sequence of Commands and Checks\n\n### Phase 1 — Pre-checks (verify state and integration)\n\n```bash\n# 1. List all worktrees to see the current state\ngit worktree list\n\n# 2. Check the status of the task/completed branch\ngit log task/completed --oneline -10\n\n# 3. Check the status of the release branch\ngit log release --oneline -10\n\n# 4. Verify the squash integration is complete\n#    If the integration is complete, this should show no differences\ngit diff task/completed release --stat\n\n# 5. Check the review status (using whatever review tool is in use)\n#    e.g. gh pr view, or the internal review system\n```\n\n### Phase 2 — Preserve `review.db`\n\n```bash\n# 6. Confirm review.db exists in the checkout\nls -la case02/checkouts/completed/review.db\n\n# 7. Copy review.db to a safe location before removing the worktree\ncp case02/checkouts/completed/review.db /path/to/backup/location/review.db\n\n# 8. Verify the copy\nls -la /path/to/backup/location/review.db\n```\n\n### Phase 3 — Remove the completed worktree\n\n```bash\n# 9. Remove the worktree\ngit worktree remove case02/checkouts/completed\n\n#    If the worktree has unmerged changes, you may need to force it:\n#    git worktree remove --force case02/checkouts/completed\n```\n\n### Phase 4 — Clean up\n\n```bash\n# 10. Prune stale worktree metadata\ngit worktree prune\n\n# 11. Delete the task/completed branch if it's fully merged\ngit branch -d task/completed\n\n#     If the branch is not fully merged, you may need to force it:\n#     git branch -D task/completed\n```\n\n### Phase 5 — Report what remains\n\n```bash\n# 12. Check the final worktree list\ngit worktree list\n\n# 13. Check the remaining branches\ngit branch -a\n\n# 14. Check the status of the release branch\ngit log release --oneline -5\n```\n\n---\n\n## Summary of what remains\n\n| Item | Status |\n|------|--------|\n| `review.db` | **Preserved** — copied to a safe location for the reviewer |\n| `case02/checkouts/completed` worktree | **Removed** |\n| Stale worktree metadata | **Pruned** |\n| `task/completed` branch | **Deleted** (if fully merged) |\n| Offline-worker checkout on unmounted share | **Untouched** — colleague-owned, still in use, share not mounted |\n| Retired scratch checkout | **Already gone** — deleted from disk before this process |",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "offline-lock-gc-prune",
+      "title": "Lock intermittently mounted worktrees before storage goes offline",
+      "status": "PASS",
+      "duration_ms": 243874,
+      "turns": 1,
+      "input_tokens": 637,
+      "output_tokens": 645,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[lock], any:[worktree lock intermittent offline gc.worktreePruneExpire expire]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[lock], any:[worktree lock intermittent offline gc.worktreePruneExpire expire])"
+          },
+          {
+            "text": "output_contains{any:[repair do not prune unavailable missing directory unlock]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[repair do not prune unavailable missing directory unlock])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "A task worktree lives on a share that goes offline next week while the task\nis still active. I am worried git gc will drop its registration while it is\nunmounted. What should I do before the storage goes offline, and should I\nprune the registration while it is unavailable?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
+      "response": "**Short answer:** No — do **not** prune while the share is offline. And `git gc` will not drop the registration; only an explicit `git worktree prune` (or `git worktree remove`) does that. `git worktree prune` removes registrations for worktrees whose path is missing/inaccessible, so running it while the share is unmounted would orphan the worktree. `git gc` is safe — it packs objects, prunes loose objects, and expires reflogs, but it never touches `.git/worktrees/`.\n\n---\n\n### Before the share goes offline (run in order)\n\n1. Commit and push everything in the worktree so no work is lost:\n   ```bash\n   git -C /path/to/worktree status\n   git -C /path/to/worktree add -A\n   git -C /path/to/worktree commit -m \"WIP: snapshot before share goes offline\"\n   git -C /path/to/worktree push\n   ```\n\n2. Confirm the worktree is registered in the main repo:\n   ```bash\n   git -C /path/to/main/repo worktree list\n   ```\n   You should see `/path/to/worktree` listed.\n\n3. Confirm the worktree's `.git` link points back into the main repo:\n   ```bash\n   cat /path/to/worktree/.git\n   ```\n   It should read `gitdir: /path/to/main/repo/.git/worktrees/\u003cname\u003e`.\n\n4. (Recommended) Lock the worktree so a stray `git worktree prune` cannot remove it:\n   ```bash\n   git -C /path/to/main/repo worktree lock /path/to/worktree --reason \"share offline until \u003cdate\u003e\"\n   ```\n   A locked worktree is skipped by `git worktree prune` even when its path is inaccessible.\n\n5. (Optional) Dry-run prune while the share is still online to confirm the worktree is healthy and not flagged:\n   ```bash\n   git -C /path/to/main/repo worktree prune --dry-run --verbose\n   ```\n   It should report nothing to prune (or only other stale entries).\n\n---\n\n### While the share is offline — do **NOT**\n\n- Run `git worktree prune` (it would remove the registration because the path is inaccessible).\n- Run `git worktree remove` on that path.\n- Worry about `git gc` — it does not prune worktree registrations.\n\n---\n\n### After the share comes back online\n\n1. Verify the registration is still there:\n   ```bash\n   git -C /path/to/main/repo worktree list\n   ```\n\n2. If the worktree is missing from the list (e.g., someone pruned it), re-establish the link:\n   ```bash\n   git -C /path/to/main/repo worktree repair /path/to/worktree\n   ```\n\n3. Unlock if you locked it (optional — a locked worktree still works normally):\n   ```bash\n   git -C /path/to/main/repo worktree unlock /path/to/worktree\n   ```",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "offline-lock-gc-prune",
+      "title": "Lock intermittently mounted worktrees before storage goes offline",
+      "status": "PASS",
+      "duration_ms": 234796,
+      "turns": 1,
+      "input_tokens": 74169,
+      "output_tokens": 1181,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[lock], any:[worktree lock intermittent offline gc.worktreePruneExpire expire]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[lock], any:[worktree lock intermittent offline gc.worktreePruneExpire expire])"
+          },
+          {
+            "text": "output_contains{any:[repair do not prune unavailable missing directory unlock]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[repair do not prune unavailable missing directory unlock])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "A task worktree lives on a share that goes offline next week while the task\nis still active. I am worried git gc will drop its registration while it is\nunmounted. What should I do before the storage goes offline, and should I\nprune the registration while it is unavailable?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
+      "response": "**Short answer: No — do not prune while the share is offline. Instead, lock the worktree before it goes offline.** `git worktree lock` is the purpose-built mechanism for exactly this situation (\"a worktree on a network share which is not always mounted\"), and a locked worktree is never pruned by `git gc` or `git worktree prune`.\n\nBackground that drives the checklist: since Git 2.31, `git gc` — including the automatic `git gc --auto` that runs after everyday operations like commit/merge — calls `git worktree prune --expire 3.months.ago`. Pruning removes registrations whose `gitdir` file points to a missing location, but only after the grace period, and never for locked worktrees.\n\n## Before the share goes offline (in order)\n\n```bash\n# 1. Confirm your git is new enough (lock needs \u003e= 2.17; gc-driven prune needs \u003e= 2.31)\ngit --version\n\n# 2. Confirm the worktree is currently registered and healthy\n#    (you should NOT see \"prunable\" next to it)\ngit worktree list --porcelain\n\n# 3. Check the grace period gc would use (default: 3.months.ago)\ngit config --get gc.worktreePruneExpire\n\n# 4. Sanity-check the worktree itself while it is still mounted\ngit -C /path/to/worktree status\n\n# 5. Lock it — this writes .git/worktrees/\u003cname\u003e/locked in the MAIN repo,\n#    so the protection lives on your local disk, not on the share\ngit worktree lock --reason \"share offline 2026-10-05 to \u003creturn-date\u003e\" /path/to/worktree\n\n# 6. Verify the lock took effect (expect a \"locked\" line, and NO \"prunable\")\ngit worktree list --porcelain\n```\n\nOptional belt-and-suspenders (repo-wide, affects all worktrees — the lock in step 5 is the targeted fix):\n\n```bash\n# Extend or suppress the gc grace period entirely\ngit config gc.worktreePruneExpire never\n```\n\n## While the share is offline\n\nDo **not** run any of these on the main repo:\n\n```bash\ngit gc            # includes gc --auto behavior; would attempt worktree pruning\ngit worktree prune\ngit maintenance run\n```\n\nWhy pruning now is the wrong move:\n\n- **Within the grace period** (default 3 months): prune would skip the worktree anyway — a pure no-op.\n- **Past the grace period**: prune would destroy the registration while you cannot re-register it (the worktree directory is unmounted), leaving you to repair it later. The registration costs a tiny directory in the main repo; there is zero benefit to removing it while offline.\n- If you followed step 5, neither case applies — locked worktrees are exempt regardless of age.\n\n## When the share comes back\n\n```bash\n# 1. Confirm the registration survived\ngit worktree list --porcelain\n\n# 2. If anything ever did go wrong, this re-registers the worktree\n#    (commits are never lost — objects live in the shared object store)\ngit worktree repair /path/to/worktree\n\n# 3. Release the lock when the share is reliably back\ngit worktree unlock /path/to/worktree\n```\n\nOne caveat: if your git is older than 2.17, `git worktree lock` doesn't exist — upgrade git, or fall back to `git config gc.worktreePruneExpire never` (which requires \u003e= 2.31) and avoid manual `git worktree prune` until the share returns.",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "move-limits-main-submodule",
+      "title": "Refuse worktree move of main or submodule-containing checkouts",
+      "status": "PASS",
+      "duration_ms": 101567,
+      "turns": 1,
+      "input_tokens": 7546,
+      "output_tokens": 960,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "output_matches{all:[(?i)main (?i)submodule], any:[cannot move refuse do not move never move must not move not support repair]}",
+            "passed": true,
+            "evidence": "output satisfies all regex checks (all:[(?i)main (?i)submodule], any:[cannot move refuse do not move never move must not move not support repair])"
+          },
+          {
+            "text": "output_contains{any:[worktree move worktree list repair relocate]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[worktree move worktree list repair relocate])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "I am reorganizing directories. I want to run `git worktree move` on the\nmain checkout to its new location, and also move a linked task checkout\nthat contains submodules. Should I proceed with both moves? What must I\ncheck first, and what is the correct procedure for each?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
+      "response": "Based on the Git worktree skill, here is the answer:\n\n## Do NOT use `git worktree move`\n\n`git worktree move` **cannot move main worktrees or submodule-containing worktrees**. Both of your checkouts fall into unsupported categories. Using it will fail or corrupt the registration.\n\n## Correct procedure: `mv` + `git worktree repair`\n\nThe supported approach is to relocate with filesystem tools (preserving `.git` and all contents), then reconnect each checkout with `git worktree repair` run from the main checkout.\n\n---\n\n### Pre-move checks (run from each worktree)\n\n```sh\n# 1. Verify clean status — must return empty\ngit -C /old/main status --porcelain\ngit -C /old/task  status --porcelain\n\n# 2. Confirm no processes (editors, shells, builds, servers) are running\n#    from inside either worktree. Stop them first.\n\n# 3. For the submodule worktree: verify submodule .git files use RELATIVE paths\n#    (not absolute). This output should start with \"gitdir: …\" containing \"../\"\ncat /old/task/\u003csubmodule\u003e/.git\n\n# 4. Confirm target directories do not exist or are empty\nls -la /new/main   # should not exist or be empty\nls -la /new/task   # should not exist or be empty\n```\n\nIf any submodule `.git` file contains an **absolute** path, `mv` will break it. You would need to convert it to a relative path before moving (or re-init the submodule after the move).\n\n---\n\n### Move commands (in order)\n\n```sh\n# 1. Move the MAIN worktree first.\n#    Its .git is a real directory, so it remains fully functional after the move.\nmv /old/main /new/main\n\n# 2. Move the LINKED worktree (with submodules).\n#    Its .git file is now broken — that is expected; repair fixes it next.\nmv /old/task /new/task\n\n# 3. Repair the linked worktree from the NEW main location.\n#    This updates .git/worktrees/\u003cname\u003e/gitdir and the worktree's .git file.\ngit -C /new/main worktree repair /new/task\n\n# 4. Verify the full inventory — both worktrees should appear with correct paths\ngit -C /new/main worktree list --porcelain -z\n\n# 5. Verify submodules still resolve in the moved linked worktree\ngit -C /new/task submodule status\n```\n\n---\n\n### Why this order\n\n| Step | Reason |\n|------|--------|\n| Move **main** first | Its `.git` is a directory, so it works immediately after `mv`. You need a functioning repo to run `repair`. |\n| Move **linked** second | Its `.git` file points to `../.git/worktrees/\u003cname\u003e/` relative to the old main location. It is broken after the move — `repair` reconnects it. |\n| **Repair** after both moves | `git worktree repair` updates the internal `gitdir` pointers and the worktree's `.git` file to the new absolute paths. |\n\n---\n\n### If a submodule `.git` file was absolute\n\nIf step 3 of the pre-move checks revealed an absolute path, either:\n\n- **Fix it before moving:**\n  ```sh\n  # Run from the submodule's parent worktree\n  git -C /old/task submodule absorbgitdirs\n  ```\n  Then re-check with `cat` to confirm it is now relative.\n\n- **Or re-init after moving:**\n  ```sh\n  git -C /new/task submodule update --init --recursive\n  ```\n\n---\n\n### Summary\n\n| | Main checkout | Linked worktree with submodules |\n|---|---|---|\n| **`git worktree move`?** | ❌ No — unsupported | ❌ No — unsupported |\n| **Correct method** | `mv` + `git worktree repair` | `mv` + `git worktree repair` |\n| **Key risk** | None if clean | Submodule `.git` files must use relative paths |",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "move-limits-main-submodule",
+      "title": "Refuse worktree move of main or submodule-containing checkouts",
+      "status": "PASS",
+      "duration_ms": 113964,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "output_matches{all:[(?i)main (?i)submodule], any:[cannot move refuse do not move never move must not move not support repair]}",
+            "passed": true,
+            "evidence": "output satisfies all regex checks (all:[(?i)main (?i)submodule], any:[cannot move refuse do not move never move must not move not support repair])"
+          },
+          {
+            "text": "output_contains{any:[worktree move worktree list repair relocate]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[worktree move worktree list repair relocate])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "I am reorganizing directories. I want to run `git worktree move` on the\nmain checkout to its new location, and also move a linked task checkout\nthat contains submodules. Should I proceed with both moves? What must I\ncheck first, and what is the correct procedure for each?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
+      "response": "# Moving the Main Checkout and a Linked Worktree with Submodules\n\nYes, proceed — but in a specific order, and with submodule pointer repair afterward. Here is the exact sequence.\n\n---\n\n## Phase 1 — Pre-flight checks (run in order)\n\n### 1. Inventory all worktrees and check for locks\n\n```bash\ngit worktree list --porcelain\n```\n\n**Check for:**\n- Any line containing `locked` — a locked worktree **cannot** be moved. Unlock with `git worktree unlock \u003cpath\u003e` first.\n- Any line containing `prunable` — a worktree whose directory is missing. Run `git worktree prune` to clean up before moving.\n- Confirm which path is the **main** checkout (the one with a `.git` *directory*, not a file).\n\n### 2. Ensure the main checkout is clean\n\n```bash\ncd /path/to/main/checkout\ngit status\n```\n\n**Must be clean:** no staged/unstaged changes, no untracked files you care about, and no in-progress operation (merge, rebase, cherry-pick, bisect, am). If any of these are present, resolve or stash them first.\n\n### 3. Ensure the linked worktree is clean\n\n```bash\ncd /path/to/linked/worktree\ngit status\n```\n\nSame requirements as above.\n\n### 4. Check submodule state in the linked worktree\n\n```bash\ngit submodule status --recursive\n```\n\n**Every submodule must be clean** (no `+` prefix meaning different commit checked out, no `-` prefix meaning uninitialized). If any submodule has local modifications, commit or stash them inside the submodule first. `git submodule update` after the move will reset dirty submodules.\n\n### 5. Verify destination paths are safe\n\n```bash\nls -la /new/main/path\nls -la /new/linked/path\n```\n\nEach destination must **not exist** or be an **empty directory**. `git worktree move` refuses to overwrite a non-empty directory.\n\n### 6. Confirm no processes are using either worktree\n\nClose any editors, IDEs, terminals, servers, or build tools that have these directories open.\n\n---\n\n## Phase 2 — The moves (in this order)\n\n### 7. Move the main checkout first\n\n```bash\ncd /path/to/main/checkout\ngit worktree move /new/main/path\n```\n\n**Why first:** This moves the `.git` directory and automatically updates the `gitdir:` pointer in **every** linked worktree's `.git` file to point to the new main location. Doing this first means the linked worktree's superproject pointer is already correct when you move it.\n\n**What it does NOT do:** It does **not** update submodule `.git` files inside linked worktrees. Those still point to the old `/old/main/path/.git/modules/...` and are now broken.\n\n### 8. Move the linked worktree\n\n```bash\ngit worktree move /path/to/linked/worktree /new/linked/path\n```\n\nThis moves the working directory. The `.git` file inside it (already updated in step 7) continues to point to the correct location in the main repo's `.git/worktrees/` directory.\n\n### 9. Repair submodule pointers in the linked worktree\n\n```bash\ncd /new/linked/path\ngit submodule update --init --recursive\n```\n\nThis rewrites each submodule's `.git` file to point to `/new/main/path/.git/modules/\u003csubmodule\u003e` and checks out the correct commits.\n\n\u003e **If the main checkout also has submodules**, run the same command there:\n\u003e ```bash\n\u003e cd /new/main/path\n\u003e git submodule update --init --recursive\n\u003e ```\n\n---\n\n## Phase 3 — Post-move verification\n\n### 10. Verify worktree list and pointers\n\n```bash\ncd /new/main/path\ngit worktree list\n```\n\nAll paths should show the new locations with no errors.\n\n### 11. Verify main checkout health\n\n```bash\ngit status\ngit submodule status --recursive   # if applicable\n```\n\n### 12. Verify linked worktree health\n\n```bash\ncd /new/linked/path\ngit status\ngit submodule status --recursive\n```\n\n### 13. Safety net — repair any remaining pointer issues\n\nIf anything still looks broken (e.g., a worktree was locked and you forced things, or a submodule pointer is still wrong):\n\n```bash\ngit worktree repair\n```\n\nThis scans all worktrees and fixes stale `gitdir` pointers.\n\n---\n\n## Summary of the critical gotchas\n\n| Gotcha | Mitigation |\n|---|---|\n| Submodule `.git` files break when the main repo moves | Run `git submodule update --init --recursive` after the move |\n| Locked worktrees refuse to move | `git worktree unlock` first |\n| Dirty submodules get reset by the repair | Ensure submodules are clean before moving |\n| Moving the main checkout breaks all linked worktrees if done with plain `mv` | Use `git worktree move`, which updates pointers automatically |\n| Destination must not exist or be empty | Verify with `ls` before moving |",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "script-porcelain-z-cleanup",
+      "title": "Script worktree cleanup with NUL-safe listing, no filesystem deletion",
+      "status": "FAIL",
+      "duration_ms": 47387,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "output_contains.all: missing [porcelain -z]",
+            "passed": false,
+            "evidence": "output does not contain required keywords: [porcelain -z]"
+          },
+          {
+            "text": "output_contains{any:[worktree remove dry-run dry run]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[worktree remove dry-run dry run])"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Write a bash snippet that finds the linked task checkouts under\n/repo/.worktrees, removes each one whose directory still exists on disk,\nand then prunes stale registrations. Task names may contain spaces.\nGive me the exact script plus the checks around it, in order.\nNo repository is attached here, so do not search the filesystem: answer\nwith the script and its checks only.\n",
+      "response": "Here is the script with its checks, in order.\n\n## Pre-flight checks\n\n1. `git` is available.\n2. `/repo` exists and is a Git repository.\n3. `/repo/.worktrees` exists.\n4. Git version supports `--porcelain` (≥ 2.7).\n\n```bash\n#!/usr/bin/env bash\nset -euo pipefail\n\nREPO=\"/repo\"\nWT_ROOT=\"${REPO}/.worktrees\"\n\n# --- Pre-flight checks ---------------------------------------------------\n\n# 1. git is available\ncommand -v git \u003e/dev/null 2\u003e\u00261 || { echo \"git not found\" \u003e\u00262; exit 1; }\n\n# 2. /repo exists and is a Git repository\n[[ -d \"${REPO}\" ]] || { echo \"${REPO} not found\" \u003e\u00262; exit 1; }\ngit -C \"${REPO}\" rev-parse --git-dir \u003e/dev/null 2\u003e\u00261 || {\n  echo \"${REPO} is not a git repository\" \u003e\u00262\n  exit 1\n}\n\n# 3. /repo/.worktrees exists\n[[ -d \"${WT_ROOT}\" ]] || { echo \"${WT_ROOT} not found\" \u003e\u00262; exit 1; }\n\n# 4. git supports --porcelain (2.7+)\ngit -C \"${REPO}\" worktree list --porcelain \u003e/dev/null 2\u003e\u00261 || {\n  echo \"git too old; --porcelain unsupported\" \u003e\u00262\n  exit 1\n}\n\n# --- Main script ----------------------------------------------------------\n\n# 1. Find linked task checkouts under /repo/.worktrees\n#    and remove each one whose directory still exists on disk.\n#    Task names may contain spaces, so parse --porcelain output\n#    line-by-line with IFS= read -r and prefix matching.\ngit -C \"${REPO}\" worktree list --porcelain |\nwhile IFS= read -r line; do\n  case \"$line\" in\n    \"worktree \"*)\n      wt_path=\"${line#worktree }\"\n      case \"$wt_path\" in\n        \"${WT_ROOT}\"/*)\n          # 2. Remove each one whose directory still exists on disk.\n          if [[ -d \"$wt_path\" ]]; then\n            git -C \"${REPO}\" worktree remove --force \"$wt_path\"\n          fi\n          ;;\n      esac\n      ;;\n  esac\ndone\n\n# 3. Prune stale registrations (directories that no longer exist).\ngit -C \"${REPO}\" worktree prune\n```\n\n## Post-checks\n\n1. No worktrees remain under `/repo/.worktrees`.\n2. No stale registrations remain.\n\n```bash\n# 1. No worktrees remain under /repo/.worktrees\nremaining=\"$(git -C \"${REPO}\" worktree list --porcelain |\n  awk -v root=\"${WT_ROOT}/\" '/^worktree / { p = substr($0, 10); if (p ~ \"^\" root) print p }')\"\n[[ -z \"$remaining\" ]] || { echo \"Still present: $remaining\" \u003e\u00262; exit 1; }\n\n# 2. No stale registrations remain\ngit -C \"${REPO}\" worktree list --porcelain |\n  awk '/^worktree / { print substr($0, 10) }' |\nwhile IFS= read -r p; do\n  [[ -d \"$p\" ]] || { echo \"Stale registration: $p\" \u003e\u00262; exit 1; }\ndone\n```\n\n**Notes**\n\n- `--force` lets the removal succeed even with uncommitted changes; drop it if you want those to block instead.\n- The `while` loop runs in a subshell (due to the pipe), so `exit` inside it only exits that subshell — the post-checks still run. If you need the main script to abort on removal failure, replace the pipe with a process substitution (`while ... done \u003c \u003c(git ...)`).",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "script-porcelain-z-cleanup",
+      "title": "Script worktree cleanup with NUL-safe listing, no filesystem deletion",
+      "status": "FAIL",
+      "duration_ms": 43344,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "output_contains.all: missing [porcelain -z]",
+            "passed": false,
+            "evidence": "output does not contain required keywords: [porcelain -z]"
+          },
+          {
+            "text": "output_contains{any:[worktree remove dry-run dry run]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[worktree remove dry-run dry run])"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "Write a bash snippet that finds the linked task checkouts under\n/repo/.worktrees, removes each one whose directory still exists on disk,\nand then prunes stale registrations. Task names may contain spaces.\nGive me the exact script plus the checks around it, in order.\nNo repository is attached here, so do not search the filesystem: answer\nwith the script and its checks only.\n",
+      "response": "Here's the script with its checks, in order:\n\n```bash\n#!/usr/bin/env bash\nset -euo pipefail\n\nREPO=\"/repo\"\nWORKTREE_ROOT=\"${REPO}/.worktrees\"\n\n# ── Checks ──────────────────────────────────────────────────────────\n\n# 1. git must be available\ncommand -v git \u003e/dev/null 2\u003e\u00261 || { echo \"error: git not found\" \u003e\u00262; exit 1; }\n\n# 2. /repo must exist and be a git repository\n[[ -d \"$REPO\" ]] || { echo \"error: $REPO does not exist\" \u003e\u00262; exit 1; }\n[[ -d \"$REPO/.git\" ]] || { echo \"error: $REPO is not a git repository\" \u003e\u00262; exit 1; }\n\n# 3. .worktrees directory must exist\n[[ -d \"$WORKTREE_ROOT\" ]] || { echo \"error: $WORKTREE_ROOT does not exist\" \u003e\u00262; exit 1; }\n\n# ── Remove linked task checkouts whose directories still exist ───────\n\n# 4. Find linked task checkouts under /repo/.worktrees\n#    and remove each one whose directory still exists on disk.\n#    --porcelain output is parsed with sed; the while-read loop\n#    preserves paths containing spaces.\ngit -C \"$REPO\" worktree list --porcelain \\\n  | sed -n 's/^worktree //p' \\\n  | while IFS= read -r wt; do\n      case \"$wt\" in\n          \"$WORKTREE_ROOT\"/*)\n              if [[ -d \"$wt\" ]]; then\n                  echo \"Removing worktree: $wt\"\n                  git -C \"$REPO\" worktree remove --force \"$wt\"\n              else\n                  echo \"Skipping (directory already gone): $wt\"\n              fi\n              ;;\n      esac\n  done\n\n# 5. Prune stale registrations (directories that no longer exist).\ngit -C \"$REPO\" worktree prune\n```\n\n**How it handles spaces:** `git worktree list --porcelain` emits one `worktree \u003cpath\u003e` line per checkout. `sed` strips the prefix, and `while IFS= read -r wt` reads the whole line without word-splitting, so paths with spaces stay intact. Every use of `\"$wt\"` is quoted.\n\n**What each step does:**\n\n| Step | Purpose |\n|------|---------|\n| 1–3 | Fail fast if git, the repo, or `.worktrees` is missing |\n| 4 | Lists all worktrees, filters to those under `.worktrees`, and removes only those whose directory still exists on disk |\n| 5 | Cleans up `.git/worktrees/` metadata for any registration whose directory is already gone |",
+      "observed_version": "2.0.22"
+    }
+  ],
+  "total_tokens": 93213,
+  "judge_tokens": 0,
+  "overall_tokens": 93213
+}

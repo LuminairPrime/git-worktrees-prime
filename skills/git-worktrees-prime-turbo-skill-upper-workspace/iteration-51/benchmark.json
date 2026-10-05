@@ -1,0 +1,277 @@
+{
+  "metadata": {
+    "skill_name": "git-worktrees-prime-turbo-skill-upper",
+    "skill_path": "/mnt/c/Users/MC/Documents/git-worktrees-prime/skills/git-worktrees-prime-turbo-skill-upper",
+    "timestamp": "2026-10-05T05:55:11Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Choose reuse, create, or current checkout correctly",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 0.956,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Prefer manager and enforce safe raw-Git location",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 1.077,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Establish base, branch, and detached-HEAD handling",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 0.895,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Apply cleanup decision tree and verify integration",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 0.869,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Refuse unsafe worktree operations",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 0.869,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Isolated fix in custom ignored location from required base",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 1.012,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Cleanup keeps review data and offline checkout, prunes only retired",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 0.967,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Repair moved checkout and finish on the same task branch",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 0.968,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Verify squash integration before deleting the task branch",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 0.98,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Place task worktrees beside a bare repository",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 0.901,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Anchor valuable detached commits before removing the checkout",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 1.001,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Lock intermittently mounted worktrees before storage goes offline",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 1.052,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Refuse worktree move of main or submodule-containing checkouts",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 0.865,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Script worktree cleanup with NUL-safe listing, no filesystem deletion",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 1.046,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Repair precedes inventory and status for a known moved checkout",
+      "configuration": "with_skill",
+      "run_number": 51,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 0.95,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0,
+        "stddev": 0,
+        "min": 0,
+        "max": 0
+      },
+      "time_seconds": {
+        "mean": 0.960533333333333,
+        "stddev": 0.06725658992908344,
+        "min": 0.865,
+        "max": 1.077
+      },
+      "tokens": {
+        "mean": 0,
+        "stddev": 0,
+        "min": 0,
+        "max": 0
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

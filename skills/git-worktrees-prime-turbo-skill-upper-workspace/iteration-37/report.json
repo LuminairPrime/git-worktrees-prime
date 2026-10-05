@@ -1,0 +1,64 @@
+{
+  "skill_name": "git-worktrees-prime-turbo-skill-upper",
+  "schema_version": "v1alpha1",
+  "engine_name": "opencode",
+  "model_name": "opencode/fledge-alpha-free",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/fledge-alpha-free"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/fledge-alpha-free"
+  },
+  "observed_configuration": {
+    "version": "2.0.22"
+  },
+  "start_time": "2026-10-05T00:41:09.083279633-03:00",
+  "end_time": "2026-10-05T00:42:08.840576546-03:00",
+  "case_results": [
+    {
+      "case_id": "resume-repair-reorganized",
+      "title": "Repair moved checkout and finish on the same task branch",
+      "status": "FAIL",
+      "duration_ms": 59535,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": false,
+            "evidence": "output does not contain \"repair\""
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Resume the adapter task in case03/checkouts/adapter-current; the workspace was\nreorganized since the task started so the checkout moved from adapter-old.\nThe schema worker is now complete on schema/prep (see worker-status.json).\nUse that result and finish encode_record: strip and lowercase name, include\nenabled as a boolean, and include schema from SCHEMA_VERSION. Keep the\nexisting draft notes, validate with the project check, commit on task/adapter,\nand leave this same checkout ready for review. No integration or publishing.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "Run this sequence from the current checkout:\n\n```bash\ncd /tmp/skill-up-3726911139/case03/checkouts/adapter-current\n\ngit status --porcelain --branch\ngit branch --show-current          # expect: task/adapter\ncat worker-status.json             # confirm schema/prep is complete/passed\n\n# Use the worker result, but do not merge/rebase/publish from schema branches.\nrg -n \"SCHEMA_VERSION|schema/prep|encode_record|draft|notes|TODO\" .\n\n# Edit only the encode_record implementation/helper comments where needed.\n# Required behavior:\n#   name = str(record.get(\"name\", \"\")).strip().lower()\n#   enabled = bool(record.get(\"enabled\"))\n#   include \"enabled\": enabled as a real boolean\n#   include \"schema\": SCHEMA_VERSION\n# Preserve all existing draft notes/comments and any other fields/behavior.\n\ngit diff\n```\n\nThen validate with the project check entrypoint:\n\n```bash\nif [ -x ./check.sh ]; then\n  ./check.sh\nelif [ -f Makefile ] \u0026\u0026 make -pn | grep -q '^check:'; then\n  make check\nelif [ -f package.json ]; then\n  npm run check\nelse\n  python3 -m pytest -q\nfi\n```\n\nCommit and leave ready:\n\n```bash\ngit add -A\ngit commit -m \"Finish encode_record using schema/prep result\"\ngit status --porcelain --branch\ngit log --oneline --decorate -3\n```\n\nDo **not** run `git push`, `git merge`, `git rebase`, `git worktree`, `npm publish`, or any schema integration step. Do not use `adapter-old` and do not move this checkout.",
+      "observed_version": "2.0.22"
+    }
+  ],
+  "total_tokens": 0,
+  "judge_tokens": 0,
+  "overall_tokens": 0
+}

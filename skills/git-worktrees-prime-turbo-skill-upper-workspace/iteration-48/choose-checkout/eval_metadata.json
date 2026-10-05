@@ -1,0 +1,6 @@
+{
+  "eval_id": 0,
+  "eval_name": "Choose reuse, create, or current checkout correctly",
+  "prompt": "I have a task to fix a bug on branch feature/login. There is already a worktree\nat /repo/.worktrees/login owned by another worker, and my current checkout has\nunrelated uncommitted changes. Should I reuse that worktree, create a new one,\nor just work in the current checkout? Explain your choice and what worktrees share.\n",
+  "assertions": null
+}

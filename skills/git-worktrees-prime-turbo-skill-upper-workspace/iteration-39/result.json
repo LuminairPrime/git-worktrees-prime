@@ -1,0 +1,64 @@
+{
+  "skill_name": "git-worktrees-prime-turbo-skill-upper",
+  "schema_version": "v1alpha1",
+  "engine_name": "opencode",
+  "model_name": "opencode/fledge-alpha-free#low",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/fledge-alpha-free#low"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/fledge-alpha-free#low"
+  },
+  "observed_configuration": {
+    "version": "2.0.22"
+  },
+  "start_time": "2026-10-05T00:46:03.290261825-03:00",
+  "end_time": "2026-10-05T00:46:17.162098191-03:00",
+  "case_results": [
+    {
+      "case_id": "resume-repair-reorganized",
+      "title": "Repair moved checkout and finish on the same task branch",
+      "status": "FAIL",
+      "duration_ms": 13653,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": false,
+            "evidence": "output does not contain \"repair\""
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Resume the adapter task in case03/checkouts/adapter-current; the workspace was\nreorganized since the task started so the checkout moved from adapter-old.\nThe schema worker is now complete on schema/prep (see worker-status.json).\nUse that result and finish encode_record: strip and lowercase name, include\nenabled as a boolean, and include schema from SCHEMA_VERSION. Keep the\nexisting draft notes, validate with the project check, commit on task/adapter,\nand leave this same checkout ready for review. No integration or publishing.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "Since I can't inspect the actual tree, here is the exact command sequence I would run, in order, from the checkout:\n\n```bash\ncd case03/checkouts/adapter-current\n\n# 1. Confirm checkout identity and branch state\ngit -C . rev-parse --show-toplevel\ngit status --short\ngit branch --show-current          # expect: task/adapter (or switch to it)\ngit branch                         # confirm task/adapter exists\n\n# 2. Read the schema worker's recorded result\ncat worker-status.json            # confirm schema/prep is \"complete\"/\"done\"\n# and read the result path/branch it references, e.g.:\ngit log --oneline -5 schema/prep   # or the commit/branch named in worker-status.json\n\n# 3. Apply the completed schema result to this checkout\ngit merge schema/prep             # or: git cherry-pick \u003csha from worker-status.json\u003e\n                                  # or however the workspace convention records it\ngit status                        # resolve any conflicts, then git add/git merge --continue\n\n# 4. Finish encode_record in the adapter module (exact file per worker-status.json / repo)\n#    e.g.:\n$EDITOR \u003cadapter-module\u003e.py        # or .ts/.js — the file defining encode_record\n\n# Requirements for encode_record:\n#   - name: value.strip().lower()\n#   - enabled: bool coercion of the source value\n#   - schema: taken from SCHEMA_VERSION constant\n#   - keep the existing draft notes/comments untouched\n\n# 5. Sanity-check the edit\ngit diff                          # review only encode_record body + schema merge\ngrep -n \"SCHEMA_VERSION\" -r .     # confirm the source of schema\n\n# 6. Validate with the project's check command\n#    run whichever the repo defines, typically one of:\npython -m pytest -q              # or: npm test / make check / ./scripts/check.sh\n# Confirm encode_record tests pass and no regressions\n\n# 7. Stage and commit on task/adapter\ngit add -A\ngit status                        # verify only intended files\ngit commit -m \"adapter: finish encode_record (normalize name, bool enabled, schema from SCHEMA_VERSION)\"\n\n# 8. Leave the checkout ready for review\ngit status                        # clean\ngit log --oneline -3              # shows the new commit on task/adapter\ngit branch --show-current         # task/adapter\n\n# Explicitly NOT done:\n#   - no merge of task/adapter into main/develop\n#   - no push / publish / release\n```\n\nIf `worker-status.json` indicates the schema result should be vendored as a file rather than merged (e.g., a `SCHEMA_VERSION.json` or generated module), step 3 becomes copying that artifact into the checkout and `git add`ing it before step 4 — the rest of the sequence is unchanged.",
+      "observed_version": "2.0.22"
+    }
+  ],
+  "total_tokens": 0,
+  "judge_tokens": 0,
+  "overall_tokens": 0
+}

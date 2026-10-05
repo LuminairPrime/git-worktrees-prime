@@ -1,0 +1,64 @@
+{
+  "skill_name": "git-worktrees-prime-turbo-skill-upper",
+  "schema_version": "v1alpha1",
+  "engine_name": "opencode",
+  "model_name": "opencode/fledge-alpha-free#high",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/fledge-alpha-free#high"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/fledge-alpha-free#high"
+  },
+  "observed_configuration": {
+    "version": "2.0.22"
+  },
+  "start_time": "2026-10-05T00:43:12.59008013-03:00",
+  "end_time": "2026-10-05T00:45:44.321195303-03:00",
+  "case_results": [
+    {
+      "case_id": "resume-repair-reorganized",
+      "title": "Repair moved checkout and finish on the same task branch",
+      "status": "FAIL",
+      "duration_ms": 151539,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": false,
+            "evidence": "output does not contain \"repair\""
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Resume the adapter task in case03/checkouts/adapter-current; the workspace was\nreorganized since the task started so the checkout moved from adapter-old.\nThe schema worker is now complete on schema/prep (see worker-status.json).\nUse that result and finish encode_record: strip and lowercase name, include\nenabled as a boolean, and include schema from SCHEMA_VERSION. Keep the\nexisting draft notes, validate with the project check, commit on task/adapter,\nand leave this same checkout ready for review. No integration or publishing.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "Run this from the parent workspace; do not use `adapter-old`.\n\n```bash\ncd case03/checkouts/adapter-current\n\n# Confirm location, branch, and pre-existing changes\npwd\ngit branch --show-current\ngit status --short --branch\n\n# Confirm the completed schema worker and matching branch commit\npython -m json.tool worker-status.json\ngit branch --list task/adapter schema/prep\ngit log -1 --format='%H %s' schema/prep\n\n# Locate the work to finish and the schema constant\ngrep -RIn -- 'def encode_record' .\ngrep -RIn -- 'SCHEMA_VERSION' .\ngit grep -n 'SCHEMA_VERSION' schema/prep -- .\n```\n\nCheck that:\n\n- `pwd` ends with `case03/checkouts/adapter-current`\n- `git branch --show-current` reports `task/adapter`\n- `worker-status.json` reports the schema worker as complete on `schema/prep`\n- the `schema/prep` commit in `worker-status.json` matches `git log`\n- the checkout contains the same `encode_record` draft notes recorded before the move\n\nIf the branch is not already correct:\n\n```bash\ngit switch task/adapter\n```\n\nLocate and edit the adapter module:\n\n```bash\nFILE=$(grep -Rsl 'def encode_record' --include='*.py' . | head -n 1)\nprintf '%s\\n' \"$FILE\"\n${EDITOR:-vi} \"$FILE\"\n```\n\nMake the minimal body change while retaining all existing comments, docstrings, TODOs, and draft notes:\n\n```python\nreturn {\n    \"name\": record[\"name\"].strip().lower(),\n    \"enabled\": bool(record[\"enabled\"]),\n    \"schema\": SCHEMA_VERSION,\n}\n```\n\nUse the existing `SCHEMA_VERSION` import if one is present. If it is unavailable on `task/adapter` but defined by the completed `schema/prep` result, make the corresponding import/constant available in the adapter source using the project’s existing pattern. Do not merge or switch to `schema/prep`.\n\nThen validate:\n\n```bash\npython -m py_compile \"$FILE\"\n```\n\nRun the project’s documented check command and require exit status `0`—for a Python project check, normally:\n\n```bash\npython check.py\n```\n\nReview the exact edit before staging:\n\n```bash\ngit diff -- \"$FILE\"\n```\n\nConfirm that only normalization, boolean conversion, and the schema field changed and that the draft notes remain. Then commit on the existing adapter branch:\n\n```bash\ngit add \"$FILE\"\ngit commit -m \"Finish adapter encode_record\"\n\ngit status --short --branch\ngit log -1 --format='%H %s'\n```\n\nExpected final state: branch `task/adapter`, clean working tree, the project check passed before commit, and the checkout at `case03/checkouts/adapter-current` remains ready for review. Do not merge, publish, tag, or `git push`.",
+      "observed_version": "2.0.22"
+    }
+  ],
+  "total_tokens": 0,
+  "judge_tokens": 0,
+  "overall_tokens": 0
+}

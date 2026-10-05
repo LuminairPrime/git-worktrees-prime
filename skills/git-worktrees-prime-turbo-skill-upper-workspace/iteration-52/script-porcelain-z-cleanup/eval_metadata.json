@@ -1,0 +1,6 @@
+{
+  "eval_id": 0,
+  "eval_name": "Script worktree cleanup with NUL-safe listing, no filesystem deletion",
+  "prompt": "Write a bash snippet that finds the linked task checkouts under\n/repo/.worktrees, removes each one whose directory still exists on disk,\nand then prunes stale registrations. Task names may contain spaces.\nGive me the exact script plus the checks around it, in order.\nNo repository is attached here, so do not search the filesystem: answer\nwith the script and its checks only.\n",
+  "assertions": null
+}

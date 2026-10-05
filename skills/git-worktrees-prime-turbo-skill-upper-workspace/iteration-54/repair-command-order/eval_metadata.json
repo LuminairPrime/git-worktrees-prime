@@ -1,0 +1,6 @@
+{
+  "eval_id": 0,
+  "eval_name": "Repair precedes inventory and status for a known moved checkout",
+  "prompt": "The live linked checkout /repo/tasks/adapter-old was moved to\n/repo/tasks/adapter-current. Its registration is stale. The surviving primary\ncheckout is /repo/primary. Keep the task branch and draft files and prepare\nthis same checkout for continued work. No repository is attached; do not run\ntools or search files. Return only a JSON object with a \"commands\" array of\nshell command strings for recovery and verification, in execution order.\nDo not include development or cleanup commands.\n",
+  "assertions": null
+}

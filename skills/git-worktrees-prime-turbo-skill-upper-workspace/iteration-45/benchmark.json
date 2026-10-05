@@ -1,0 +1,900 @@
+{
+  "metadata": {
+    "skill_name": "git-worktrees-prime-turbo-skill-upper",
+    "skill_path": "/mnt/c/Users/MC/Documents/git-worktrees-prime/skills/git-worktrees-prime-turbo-skill-upper",
+    "timestamp": "2026-10-05T05:17:53Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Choose reuse, create, or current checkout correctly",
+      "configuration": "with_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 25.266,
+        "tokens": 644,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_matches{all:[(?i)create], any:[owned by another another worker ownership concurrent separation isolation], not:[reuse the worktree at /repo/.worktrees/login (?i)just work in the current checkout]}",
+          "passed": true,
+          "evidence": "output satisfies all regex checks (all:[(?i)create], any:[owned by another another worker ownership concurrent separation isolation], not:[reuse the worktree at /repo/.worktrees/login (?i)just work in the current checkout])"
+        },
+        {
+          "text": "output_contains{any:[share objects share per-worktree HEAD index]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[share objects share per-worktree HEAD index])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Prefer manager and enforce safe raw-Git location",
+      "configuration": "with_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 13.445,
+        "tokens": 5066,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[check-ignore], any:[.worktrees unique unused path ignore]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[check-ignore], any:[.worktrees unique unused path ignore])"
+        },
+        {
+          "text": "output_contains{any:[harness manager raw Git fallback exit 0 ignored .gitignore info/exclude]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[harness manager raw Git fallback exit 0 ignored .gitignore info/exclude])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Establish base, branch, and detached-HEAD handling",
+      "configuration": "with_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 59.746,
+        "tokens": 9573,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[integration target], any:[do not assume starting commit task branch detached]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[integration target], any:[do not assume starting commit task branch detached])"
+        },
+        {
+          "text": "output_contains{any:[detached HEAD detached anchor checkout protection checked out elsewhere]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[detached HEAD detached anchor checkout protection checked out elsewhere])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Apply cleanup decision tree and verify integration",
+      "configuration": "with_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 40.849,
+        "tokens": 5759,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[prune --dry-run], any:[separately branch deletion checkout removal untracked ignored detached]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[prune --dry-run], any:[separately branch deletion checkout removal untracked ignored detached])"
+        },
+        {
+          "text": "output_contains{any:[merge-base ancestor squash ancestry branch -d verify worktree list]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[merge-base ancestor squash ancestry branch -d verify worktree list])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Refuse unsafe worktree operations",
+      "configuration": "with_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 32.635,
+        "tokens": 6749,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[authoriz], any:[porcelain -z worktree remove dry run verify absolute path], not:[ran rm -rf used -B as requested pruned without]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[authoriz], any:[porcelain -z worktree remove dry run verify absolute path], not:[ran rm -rf used -B as requested pruned without])"
+        },
+        {
+          "text": "output_contains{any:[-B -b checkout protection do not refuse must not require]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[-B -b checkout protection do not refuse must not require])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Isolated fix in custom ignored location from required base",
+      "configuration": "with_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 78.665,
+        "tokens": 9273,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[check-ignore], any:[scratch-checkouts ignored ignore .gitignore info/exclude]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[check-ignore], any:[scratch-checkouts ignored ignore .gitignore info/exclude])"
+        },
+        {
+          "text": "output_contains{any:[release/next base task/normalize commit preserve colleague intact], not:[work in the current checkout edit the colleague checkout]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[release/next base task/normalize commit preserve colleague intact], not:[work in the current checkout edit the colleague checkout])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Cleanup keeps review data and offline checkout, prunes only retired",
+      "configuration": "with_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 83.103,
+        "tokens": 5782,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_matches{all:[prune (--dry-run|-n)], any:[review.db preserve outside the removal path review branch task/completed]}",
+          "passed": true,
+          "evidence": "output satisfies all regex checks (all:[prune (--dry-run|-n)], any:[review.db preserve outside the removal path review branch task/completed])"
+        },
+        {
+          "text": "output_contains{any:[offline unmounted retain still in use retired worktree remove worktree list], not:[prune the offline checkout delete the review branch]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[offline unmounted retain still in use retired worktree remove worktree list], not:[prune the offline checkout delete the review branch])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Repair moved checkout and finish on the same task branch",
+      "configuration": "with_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 50.962,
+        "tokens": 6254,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[repair], any:[worktree repair current absolute path worktree list registration]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[repair], any:[worktree repair current absolute path worktree list registration])"
+        },
+        {
+          "text": "output_contains{any:[task/adapter draft preserve schema/prep prerequisite commit same checkout], not:[prune the moved checkout delete and recreate]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[task/adapter draft preserve schema/prep prerequisite commit same checkout], not:[prune the moved checkout delete and recreate])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Verify squash integration before deleting the task branch",
+      "configuration": "with_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 76.915,
+        "tokens": 5695,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[branch -D], any:[retain verify squash ancestry authorized replacement]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[branch -D], any:[retain verify squash ancestry authorized replacement])"
+        },
+        {
+          "text": "output_contains{any:[merge-base ancestor ancestry cherry diff replacement commits resulting changes verify the replacement]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[merge-base ancestor ancestry cherry diff replacement commits resulting changes verify the replacement])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Place task worktrees beside a bare repository",
+      "configuration": "with_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 52.17,
+        "tokens": 5008,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "output_matches{all:[(?i)sibling], any:[bare no main checkout no working tree unused path unique]}",
+          "passed": true,
+          "evidence": "output satisfies all regex checks (all:[(?i)sibling], any:[bare no main checkout no working tree unused path unique])"
+        },
+        {
+          "text": "output_contains{any:[worktree add check-ignore verify -b]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[worktree add check-ignore verify -b])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Anchor valuable detached commits before removing the checkout",
+      "configuration": "with_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 39.796,
+        "tokens": 3622,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[branch], any:[anchor detached rev-parse HEAD valuable preserve]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[branch], any:[anchor detached rev-parse HEAD valuable preserve])"
+        },
+        {
+          "text": "output_contains{any:[worktree remove before removal after anchoring checkout removal]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[worktree remove before removal after anchoring checkout removal])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Lock intermittently mounted worktrees before storage goes offline",
+      "configuration": "with_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 22.039,
+        "tokens": 3265,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[lock], any:[worktree lock intermittent offline gc.worktreePruneExpire expire]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[lock], any:[worktree lock intermittent offline gc.worktreePruneExpire expire])"
+        },
+        {
+          "text": "output_contains{any:[repair do not prune unavailable missing directory unlock]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[repair do not prune unavailable missing directory unlock])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Refuse worktree move of main or submodule-containing checkouts",
+      "configuration": "with_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 0.849,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Script worktree cleanup with NUL-safe listing, no filesystem deletion",
+      "configuration": "with_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 1.069,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Choose reuse, create, or current checkout correctly",
+      "configuration": "without_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 29.149,
+        "tokens": 1111,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_matches{all:[(?i)create], any:[owned by another another worker ownership concurrent separation isolation], not:[reuse the worktree at /repo/.worktrees/login (?i)just work in the current checkout]}",
+          "passed": true,
+          "evidence": "output satisfies all regex checks (all:[(?i)create], any:[owned by another another worker ownership concurrent separation isolation], not:[reuse the worktree at /repo/.worktrees/login (?i)just work in the current checkout])"
+        },
+        {
+          "text": "output_contains{any:[share objects share per-worktree HEAD index]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[share objects share per-worktree HEAD index])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Prefer manager and enforce safe raw-Git location",
+      "configuration": "without_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 1,
+        "failed": 1,
+        "total": 2,
+        "time_seconds": 160.669,
+        "tokens": 13577,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": false,
+          "evidence": "output does not contain \"check-ignore\""
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Establish base, branch, and detached-HEAD handling",
+      "configuration": "without_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 66.524,
+        "tokens": 933,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[integration target], any:[do not assume starting commit task branch detached]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[integration target], any:[do not assume starting commit task branch detached])"
+        },
+        {
+          "text": "output_contains{any:[detached HEAD detached anchor checkout protection checked out elsewhere]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[detached HEAD detached anchor checkout protection checked out elsewhere])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Apply cleanup decision tree and verify integration",
+      "configuration": "without_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 1,
+        "failed": 1,
+        "total": 2,
+        "time_seconds": 42.743,
+        "tokens": 7090,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": false,
+          "evidence": "output does not contain \"prune --dry-run\""
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Refuse unsafe worktree operations",
+      "configuration": "without_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 1,
+        "failed": 1,
+        "total": 2,
+        "time_seconds": 48.728,
+        "tokens": 2860,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": false,
+          "evidence": "output does not contain \"authoriz\""
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Isolated fix in custom ignored location from required base",
+      "configuration": "without_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 55.193,
+        "tokens": 1962,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[check-ignore], any:[scratch-checkouts ignored ignore .gitignore info/exclude]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[check-ignore], any:[scratch-checkouts ignored ignore .gitignore info/exclude])"
+        },
+        {
+          "text": "output_contains{any:[release/next base task/normalize commit preserve colleague intact], not:[work in the current checkout edit the colleague checkout]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[release/next base task/normalize commit preserve colleague intact], not:[work in the current checkout edit the colleague checkout])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Cleanup keeps review data and offline checkout, prunes only retired",
+      "configuration": "without_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 299.925,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Repair moved checkout and finish on the same task branch",
+      "configuration": "without_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 1,
+        "failed": 1,
+        "total": 2,
+        "time_seconds": 67.425,
+        "tokens": 1733,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": false,
+          "evidence": "output does not contain \"repair\""
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Verify squash integration before deleting the task branch",
+      "configuration": "without_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 96.634,
+        "tokens": 1546,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[branch -D], any:[retain verify squash ancestry authorized replacement]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[branch -D], any:[retain verify squash ancestry authorized replacement])"
+        },
+        {
+          "text": "output_contains{any:[merge-base ancestor ancestry cherry diff replacement commits resulting changes verify the replacement]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[merge-base ancestor ancestry cherry diff replacement commits resulting changes verify the replacement])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Place task worktrees beside a bare repository",
+      "configuration": "without_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 50.623,
+        "tokens": 1652,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "output_matches{all:[(?i)sibling], any:[bare no main checkout no working tree unused path unique]}",
+          "passed": true,
+          "evidence": "output satisfies all regex checks (all:[(?i)sibling], any:[bare no main checkout no working tree unused path unique])"
+        },
+        {
+          "text": "output_contains{any:[worktree add check-ignore verify -b]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[worktree add check-ignore verify -b])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Anchor valuable detached commits before removing the checkout",
+      "configuration": "without_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 52.71,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[branch], any:[anchor detached rev-parse HEAD valuable preserve]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[branch], any:[anchor detached rev-parse HEAD valuable preserve])"
+        },
+        {
+          "text": "output_contains{any:[worktree remove before removal after anchoring checkout removal]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[worktree remove before removal after anchoring checkout removal])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Lock intermittently mounted worktrees before storage goes offline",
+      "configuration": "without_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 1.04,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Refuse worktree move of main or submodule-containing checkouts",
+      "configuration": "without_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 0.934,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Script worktree cleanup with NUL-safe listing, no filesystem deletion",
+      "configuration": "without_skill",
+      "run_number": 45,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 0.979,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.8571428571428571,
+        "stddev": 0.3499271061118826,
+        "min": 0,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 41.25064285714286,
+        "stddev": 26.322362734828303,
+        "min": 0.849,
+        "max": 83.103
+      },
+      "tokens": {
+        "mean": 4763.571428571428,
+        "stddev": 2910.31038389589,
+        "min": 0,
+        "max": 9573
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.5714285714285714,
+        "stddev": 0.41649656391752143,
+        "min": 0,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 69.51971428571429,
+        "stddev": 75.52607166254253,
+        "min": 0.934,
+        "max": 299.925
+      },
+      "tokens": {
+        "mean": 2318.8571428571427,
+        "stddev": 3601.38875707578,
+        "min": 0,
+        "max": 13577
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.29",
+      "time_seconds": "-28.3",
+      "tokens": "+2444.7"
+    }
+  }
+}

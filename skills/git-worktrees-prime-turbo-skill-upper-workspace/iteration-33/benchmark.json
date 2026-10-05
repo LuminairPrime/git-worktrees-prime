@@ -1,0 +1,165 @@
+{
+  "metadata": {
+    "skill_name": "git-worktrees-prime-turbo-skill-upper",
+    "skill_path": "/mnt/c/Users/MC/Documents/git-worktrees-prime/skills/git-worktrees-prime-turbo-skill-upper",
+    "timestamp": "2026-10-05T03:27:18Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Refuse unsafe worktree operations",
+      "configuration": "with_skill",
+      "run_number": 33,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 1,
+        "failed": 1,
+        "total": 2,
+        "time_seconds": 40.881,
+        "tokens": 6160,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": false,
+          "evidence": "output does not contain \"authoriz\""
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Cleanup keeps review data and offline checkout, prunes only retired",
+      "configuration": "with_skill",
+      "run_number": 33,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 92.749,
+        "tokens": 9533,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_matches{all:[prune (--dry-run|-n)], any:[review.db preserve outside the removal path review branch task/completed]}",
+          "passed": true,
+          "evidence": "output satisfies all regex checks (all:[prune (--dry-run|-n)], any:[review.db preserve outside the removal path review branch task/completed])"
+        },
+        {
+          "text": "output_contains{any:[offline unmounted retain still in use retired worktree remove worktree list], not:[prune the offline checkout delete the review branch]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[offline unmounted retain still in use retired worktree remove worktree list], not:[prune the offline checkout delete the review branch])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Repair moved checkout and finish on the same task branch",
+      "configuration": "with_skill",
+      "run_number": 33,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 1,
+        "failed": 1,
+        "total": 2,
+        "time_seconds": 23.276,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": false,
+          "evidence": "output does not contain \"repair\""
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Anchor valuable detached commits before removing the checkout",
+      "configuration": "with_skill",
+      "run_number": 33,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 49.538,
+        "tokens": 9667,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[branch], any:[anchor detached rev-parse HEAD valuable preserve]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[branch], any:[anchor detached rev-parse HEAD valuable preserve])"
+        },
+        {
+          "text": "output_contains{any:[worktree remove before removal after anchoring checkout removal]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[worktree remove before removal after anchoring checkout removal])"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.75,
+        "stddev": 0.25,
+        "min": 0.5,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 51.611000000000004,
+        "stddev": 25.566763082173697,
+        "min": 23.276,
+        "max": 92.749
+      },
+      "tokens": {
+        "mean": 6340,
+        "stddev": 3920.847421157829,
+        "min": 0,
+        "max": 9667
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}
