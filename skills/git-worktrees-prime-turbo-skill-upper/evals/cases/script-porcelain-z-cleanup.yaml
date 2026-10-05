@@ -1,0 +1,41 @@
+# Stable case ID used in reports. Keep it the same as the filename without .yaml.
+id: script-porcelain-z-cleanup
+# Human-readable summary shown in case lists and reports.
+title: Script worktree cleanup with NUL-safe listing, no filesystem deletion
+# Optional background explaining the behavior or regression this case covers.
+description: |
+  Verifies the Skill requires scripts to parse `worktree list --porcelain -z`
+  (NUL-safe, never line-split display output), removes checkouts only through
+  the manager or `worktree remove`, and prunes only after reviewing a dry run.
+
+input:
+  # User prompt sent to the Agent for a single-turn case.
+  prompt: |
+    Write a bash snippet that finds the linked task checkouts under
+    /repo/.worktrees, removes each one whose directory still exists on disk,
+    and then prunes stale registrations. Task names may contain spaces.
+    Give me the exact script plus the checks around it, in order.
+    No repository is attached here, so do not search the filesystem: answer
+    with the script and its checks only.
+
+# Cheap pre-judge checks; when these fail, the judge block is skipped.
+# No literal gates here: the "porcelain -z" requirement is enforced by the
+# judge, since only the flag's exact lowercase form is ever correct.
+expect: {}
+
+judge:
+  # Grading strategy used to decide whether this case passes.
+  # Options: rule_based | agent_judge | script.
+  type: rule_based
+  # Assertions that must pass when judge.type is rule_based.
+  success:
+    - output_contains:
+        all: ["porcelain -z"]
+        any: ["NUL", "null", "-z", "spaces"]
+    - output_contains:
+        any: ["worktree remove", "dry-run", "dry run"]
+  failure:
+    # Affirmative-shaped recommendations only; correct prohibitions such as
+    # "Do not delete directories with rm -rf" must not trip these rules.
+    - output_contains:
+        any: ["just rm -rf", "rm -rf the", "pruned without dry run", "prune without reviewing", "list | while read", "list | awk", "for d in .worktrees"]
