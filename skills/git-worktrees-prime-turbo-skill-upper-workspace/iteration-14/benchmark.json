@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "skill_name": "git-worktrees-prime-turbo-skill-upper",
+    "skill_path": "/mnt/c/Users/MC/Documents/git-worktrees-prime/skills/git-worktrees-prime-turbo-skill-upper",
+    "timestamp": "2026-10-04T09:36:43Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Place task worktrees beside a bare repository",
+      "configuration": "with_skill",
+      "run_number": 14,
+      "result": {
+        "pass_rate": 1,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 16.797,
+        "tokens": 4150,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[sibling], any:[bare no main checkout no working tree unused path unique]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[sibling], any:[bare no main checkout no working tree unused path unique])"
+        },
+        {
+          "text": "output_contains{any:[worktree add check-ignore verify -b]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (any:[worktree add check-ignore verify -b])"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 16.797,
+        "stddev": 0,
+        "min": 16.797,
+        "max": 16.797
+      },
+      "tokens": {
+        "mean": 4150,
+        "stddev": 0,
+        "min": 4150,
+        "max": 4150
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

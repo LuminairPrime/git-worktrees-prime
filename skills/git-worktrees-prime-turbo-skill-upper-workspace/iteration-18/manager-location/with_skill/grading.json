@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "expect.must_contain",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "expect.must_not_contain",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "output_contains{all:[check-ignore], any:[.worktrees unique unused path ignore]}",
+      "passed": true,
+      "evidence": "output satisfies all contains checks (all:[check-ignore], any:[.worktrees unique unused path ignore])"
+    },
+    {
+      "text": "output_contains{any:[harness manager raw Git fallback exit 0 ignored .gitignore info/exclude]}",
+      "passed": true,
+      "evidence": "output satisfies all contains checks (any:[harness manager raw Git fallback exit 0 ignored .gitignore info/exclude])"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1
+  }
+}

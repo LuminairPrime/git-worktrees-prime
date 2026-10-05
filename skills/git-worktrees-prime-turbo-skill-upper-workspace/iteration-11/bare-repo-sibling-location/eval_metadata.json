@@ -1,0 +1,11 @@
+{
+  "eval_id": 0,
+  "eval_name": "Place task worktrees beside a bare repository",
+  "prompt": "The project is a bare repository at /srv/repos/api.git and I need a task\nworktree for task \"rate-limit\" using raw Git. There is no repo location\nconvention. Where should I place the checkout, and why not inside the\nrepository directory?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact placement and the checks you would run, in order.\n",
+  "assertions": [
+    "expect.must_contain",
+    "expect.must_not_contain",
+    "output_contains{all:[sibling], any:[bare no main checkout no working tree unused path unique]}",
+    "output_contains{any:[worktree add check-ignore verify -b]}"
+  ]
+}

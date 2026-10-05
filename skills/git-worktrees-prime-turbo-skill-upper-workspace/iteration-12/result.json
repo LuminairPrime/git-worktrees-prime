@@ -1,0 +1,74 @@
+{
+  "skill_name": "git-worktrees-prime-turbo-skill-upper",
+  "schema_version": "v1alpha1",
+  "engine_name": "opencode",
+  "model_name": "opencode/muse-spark-1.3-contributor-free",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/muse-spark-1.3-contributor-free"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/muse-spark-1.3-contributor-free"
+  },
+  "observed_configuration": {
+    "version": "2.0.22"
+  },
+  "start_time": "2026-10-04T06:33:07.108819146-03:00",
+  "end_time": "2026-10-04T06:33:26.123639341-03:00",
+  "case_results": [
+    {
+      "case_id": "cleanup-offline-prune",
+      "title": "Cleanup keeps review data and offline checkout, prunes only retired",
+      "status": "PASS",
+      "duration_ms": 18813,
+      "turns": 1,
+      "input_tokens": 7837,
+      "output_tokens": 183,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_matches{all:[prune (--dry-run|-n)], any:[review.db preserve outside the removal path review branch task/completed]}",
+            "passed": true,
+            "evidence": "output satisfies all regex checks (all:[prune (--dry-run|-n)], any:[review.db preserve outside the removal path review branch task/completed])"
+          },
+          {
+            "text": "output_contains{any:[offline unmounted retain still in use retired worktree remove worktree list], not:[prune the offline checkout delete the review branch]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[offline unmounted retain still in use retired worktree remove worktree list], not:[prune the offline checkout delete the review branch])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Finish the task/completed workspace: its checkout at case02/checkouts/completed\nwas squash-integrated into release and the review remains open on\ntask/completed. The checkout contains ignored review.db the reviewer still\nneeds. There is also an offline-worker checkout on a currently unmounted share\n(colleague-owned, still in use) and a retired scratch checkout already deleted\nfrom disk. Reclaim the completed checkout, keep what the review needs, and do\nappropriate local cleanup. Report precisely what remains.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "1. Inventory - confirm canonical path/owner, do not guess:\n```sh\ngit worktree list --porcelain -z\n```\nExpect: primary, `.../case02/checkouts/completed` on `task/completed`, offline-worker path on unmounted share, `scratch` path missing. Use absolute path from this output as `\u003ccompleted\u003e` below.\n\n2. Inspect loss-risk state in target only:\n```sh\ngit -C \"\u003ccompleted\u003e\" status --short --branch --untracked-files=all\ngit -C \"\u003ccompleted\u003e\" status --short --ignored\ngit -C \"\u003ccompleted\u003e\" rev-parse HEAD\n```\nExpect: `!! review.db` - ignored, reviewer still needs. Record `HEAD` as `\u003ctask-tip\u003e`.\n\n3. Verify integration target, do not use `branch -d` as proof:\n```sh\ngit rev-parse --verify \"release^{commit}\"\ngit merge-base --is-ancestor \"\u003ctask-tip\u003e\" \"release\"; echo $?\n```\nExpected non-zero: squash breaks ancestry. Manually verify replacement commits/diff. Review remains open on `task/completed` -\u003e branch must be retained.\n\n4. Preserve outside deletion path - ignored files are not kept by `remove`/archive:\n```sh\ncp \"\u003ccompleted\u003e/review.db\" \"\u003cpreservation-dir-outside-completed\u003e/review.db\"\nls -l \"\u003cpreservation-dir-outside-completed\u003e/review.db\"\n```\n\n5. Reclaim only exact task checkout, from survivor, after leaving it:\n```sh\ncd \"\u003cprimary-root\u003e\"\ngit -C \"\u003cprimary-root\u003e\" worktree remove \"\u003ccompleted\u003e\"\n```\nDo not `rm -rf`, do not touch offline-worker, primary, parent, siblings.\n\n6. Retain branch - do not delete:\n```sh\n# DO NOT RUN: git branch -d task/completed\ngit show-ref --verify --quiet \"refs/heads/task/completed\"\ngit branch -vv --list \"task/completed\"\n```\n\n7. Stale metadata check - dry-run only:\n```sh\ngit -C \"\u003cprimary-root\u003e\" worktree prune --dry-run --verbose\n```\nEntries will include intentionally-deleted `scratch` AND unmounted but still-in-use offline-worker. Since not every entry is intentionally removed:\n```sh\n# DO NOT RUN: git worktree prune --verbose\n# DO NOT unlock offline-worker\n```\n\n8. Verify result:\n```sh\ngit worktree list --porcelain -z\ntest ! -e \"\u003ccompleted\u003e\"; echo $?\ngit show-ref --verify \"refs/heads/task/completed\"\nls -l \"\u003cpreservation-dir-outside-completed\u003e/review.db\"\n```\n\nReport remains:\n* Removed: checkout `\u003ccompleted\u003e` only.\n* Retained: branch `task/completed` - open review, squash-integrated to `release`.\n* Retained: `review.db` copy at `\u003cpreservation-dir-outside-completed\u003e/review.db`.\n* Retained: offline-worker registration - colleague-owned, unmounted, still in use.\n* Retained: `scratch` stale registration - prune blocked by offline-worker entry.\n",
+      "observed_version": "2.0.22"
+    }
+  ],
+  "total_tokens": 8020,
+  "judge_tokens": 0,
+  "overall_tokens": 8020
+}

@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "expect.must_contain",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "expect.must_not_contain",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "output_contains{all:[integration target], any:[do not assume starting commit task branch detached]}",
+      "passed": true,
+      "evidence": "output satisfies all contains checks (all:[integration target], any:[do not assume starting commit task branch detached])"
+    },
+    {
+      "text": "output_contains.any: [detached HEAD detached anchor checkout protection checked out elsewhere]",
+      "passed": false,
+      "evidence": "output does not contain any of [detached HEAD detached anchor checkout protection checked out elsewhere]"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4,
+    "pass_rate": 0.75
+  }
+}

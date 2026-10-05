@@ -1,0 +1,161 @@
+{
+  "skill_name": "git-worktrees-prime-turbo-skill-upper",
+  "schema_version": "v1alpha1",
+  "engine_name": "opencode",
+  "model_name": "opencode/muse-spark-1.3-contributor-free",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/muse-spark-1.3-contributor-free"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/muse-spark-1.3-contributor-free"
+  },
+  "observed_configuration": {
+    "version": "2.0.22"
+  },
+  "start_time": "2026-10-04T06:08:48.06787495-03:00",
+  "end_time": "2026-10-04T06:09:56.603716876-03:00",
+  "case_results": [
+    {
+      "case_id": "isolated-fix-custom-location",
+      "title": "Isolated fix in custom ignored location from required base",
+      "status": "PASS",
+      "duration_ms": 23266,
+      "turns": 1,
+      "input_tokens": 6987,
+      "output_tokens": 179,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[check-ignore], any:[scratch-checkouts ignored ignore .gitignore info/exclude]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[check-ignore], any:[scratch-checkouts ignored ignore .gitignore info/exclude])"
+          },
+          {
+            "text": "output_contains{any:[release/next base task/normalize commit preserve colleague intact], not:[work in the current checkout edit the colleague checkout]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[release/next base task/normalize commit preserve colleague intact], not:[work in the current checkout edit the colleague checkout])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Fix normalize_label in the project repo so it strips surrounding whitespace and\nreturns lowercase text. Work in a separate checkout under\nproject/scratch-checkouts/normalize on branch task/normalize, starting from\nrelease/next. The current project checkout belongs to a colleague and has\nunrelated uncommitted notes and an untracked draft; keep them intact. Run the\nproject's check, commit the fix on the task branch, and leave it ready for\nreview. No merge or publication is requested.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "In order, from the parent of `project/`:\n\n1. Inventory, preserve colleague state:\n```sh\ngit -C project worktree list --porcelain -z\ngit -C project status --short --branch\ngit -C project rev-parse --verify \"release/next^{commit}\"\n```\n\n2. Require ignore coverage for in-checkout destination, exit `0` required:\n```sh\ngit -C project check-ignore -q -- scratch-checkouts/normalize/\n```\n\n3. Create isolated checkout, new branch explicitly from base:\n```sh\ngit -C project worktree add -b task/normalize scratch-checkouts/normalize release/next\n```\n\n4. Verify new checkout:\n```sh\ngit -C project/scratch-checkouts/normalize rev-parse --show-toplevel\ngit -C project/scratch-checkouts/normalize status --short --branch\ngit -C project/scratch-checkouts/normalize rev-parse HEAD\ngit -C project check-ignore -q -- scratch-checkouts/normalize/\n```\n\n5. In `project/scratch-checkouts/normalize` only, fix `normalize_label` to `strip()` surrounding whitespace and `lower()` result. Do not touch `project/` original, do not stash/reset/clean/pull there.\n\n6. Run project's documented check from task checkout:\n```sh\ngit -C project/scratch-checkouts/normalize status --short --branch\n# read check in task checkout README/CONTRIBUTING/Makefile/package.json/pyproject.toml, then run that check in project/scratch-checkouts/normalize\n```\n\n7. Commit on task branch:\n```sh\ngit -C project/scratch-checkouts/normalize add -- \u003cfixed-file\u003e\ngit -C project/scratch-checkouts/normalize status --short --branch\ngit -C project/scratch-checkouts/normalize commit -m \"Fix normalize_label to strip whitespace and lowercase\"\ngit -C project/scratch-checkouts/normalize log -1 --oneline\ngit -C project/scratch-checkouts/normalize status --short --branch\n```\n\n8. Leave for review, no integration:\n```sh\ngit -C project worktree list --porcelain -z\n```\nRetain `project/scratch-checkouts/normalize` and `task/normalize`. Do not merge, push, remove worktree, delete branch, or prune.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "cleanup-offline-prune",
+      "title": "Cleanup keeps review data and offline checkout, prunes only retired",
+      "status": "FAIL",
+      "duration_ms": 24603,
+      "turns": 1,
+      "input_tokens": 7833,
+      "output_tokens": 191,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "failure: output_contains{any:[prune the offline checkout delete the review branch rm -rf prune without review data needs no backup]}",
+            "passed": false,
+            "evidence": "failure rule matched: output satisfies all contains checks (any:[prune the offline checkout delete the review branch rm -rf prune without review data needs no backup])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 1,
+          "total": 3,
+          "pass_rate": 0.6666666666666666
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Finish the task/completed workspace: its checkout at case02/checkouts/completed\nwas squash-integrated into release and the review remains open on\ntask/completed. The checkout contains ignored review.db the reviewer still\nneeds. There is also an offline-worker checkout on a currently unmounted share\n(colleague-owned, still in use) and a retired scratch checkout already deleted\nfrom disk. Reclaim the completed checkout, keep what the review needs, and do\nappropriate local cleanup. Report precisely what remains.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "In order, from a surviving checkout (`\u003cprimary-root\u003e`, not `case02/checkouts/completed`):\n\n1. Inventory, resolve canonical paths/ownership:\n```sh\ngit -C \"\u003cprimary-root\u003e\" worktree list --porcelain -z\n```\nConfirm: exact absolute path for `case02/checkouts/completed` -\u003e `task/completed`, `release` integration target, colleague-owned offline-worker path (unmounted, in use), deleted scratch path. Do not remove primary, cwd, parent, or siblings.\n\n2. Inspect disposable state in completed checkout — `references/raw-git-commands.md:46-48`:\n```sh\ngit -C \"case02/checkouts/completed\" status --short --branch --untracked-files=all\ngit -C \"case02/checkouts/completed\" status --short --ignored\ngit -C \"case02/checkouts/completed\" rev-parse HEAD\n```\nCheck: tracked/untracked diffs, `review.db` ignored file, detached commits, `MERGE_HEAD/REBASE_HEAD/CHERRY_PICK_HEAD`, submodules/nested repos separately.\n\n3. Preserve reviewer state outside deletion path (`remove` deletes ignored files):\n```sh\nls -l \"case02/checkouts/completed/review.db\"\ncp \"case02/checkouts/completed/review.db\" \"\u003csafe-path-outside-case02/checkouts/completed\u003e/review.db\"\nls -l \"\u003csafe-path-outside-case02/checkouts/completed\u003e/review.db\"\n```\n\n4. Verify squash-integration; expect ancestry break — `references/raw-git-commands.md:51`:\n```sh\ngit -C \"\u003cprimary-root\u003e\" merge-base --is-ancestor \"$(git -C \"case02/checkouts/completed\" rev-parse HEAD)\" \"release\"; echo $?\n```\n`exit 1` expected for squash. Verify replacement instead: inspect `release` log and resulting tree/diff for `task/completed` changes. `branch -d` success is not evidence here.\n\n5. Leave directory, remove only exact checkout — `references/raw-git-commands.md:55`:\n```sh\ncd \"\u003cprimary-root\u003e\"\ngit -C \"\u003cprimary-root\u003e\" worktree remove \"\u003cabs-path-to-case02/checkouts/completed\u003e\"\n```\nNo `rm -rf`, no `--force`, no colleague checkout.\n\n6. Verify removal:\n```sh\ngit -C \"\u003cprimary-root\u003e\" worktree list --porcelain -z\ntest ! -e \"\u003cabs-path-to-case02/checkouts/completed\u003e\" \u0026\u0026 echo \"removed\"\n```\n\n7. Branch decision: retain. Do NOT run:\n```sh\ngit -C \"\u003cprimary-root\u003e\" branch -d \"task/completed\"\n```\nReason: open review on `task/completed` needs the ref; squash breaks `-d` ancestry check.\n\n8. Stale registrations, dry-run first — `references/raw-git-commands.md:61-62`:\n```sh\ngit -C \"\u003cprimary-root\u003e\" worktree prune --dry-run --verbose\n```\nPrune only if every entry is the intentionally deleted retired scratch. Unmounted offline-worker missing ≠ deletable. If dry-run lists offline-worker, do NOT prune. If only scratch:\n```sh\ngit -C \"\u003cprimary-root\u003e\" worktree prune --verbose\ngit -C \"\u003cprimary-root\u003e\" worktree list --porcelain -z\n```\n\nRemains to report:\n- Removed: checkout `case02/checkouts/completed`.\n- Retained: branch `task/completed` (open review, squash-integrated to `release`); preserved `review.db` at `\u003csafe-path\u003e/review.db`; registration for colleague-owned offline-worker checkout (unmounted, still in use, never pruned/unlocked); primary checkout.\n- Pruned (conditional): stale registration for retired scratch checkout already deleted from disk — only if dry-run proved no offline entry.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "resume-repair-reorganized",
+      "title": "Repair moved checkout and finish on the same task branch",
+      "status": "PASS",
+      "duration_ms": 20133,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[repair], any:[worktree repair current absolute path worktree list registration]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[repair], any:[worktree repair current absolute path worktree list registration])"
+          },
+          {
+            "text": "output_contains{any:[task/adapter draft preserve schema/prep prerequisite commit same checkout], not:[prune the moved checkout delete and recreate]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[task/adapter draft preserve schema/prep prerequisite commit same checkout], not:[prune the moved checkout delete and recreate])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Resume the adapter task in case03/checkouts/adapter-current; the workspace was\nreorganized since the task started so the checkout moved from adapter-old.\nThe schema worker is now complete on schema/prep (see worker-status.json).\nUse that result and finish encode_record: strip and lowercase name, include\nenabled as a boolean, and include schema from SCHEMA_VERSION. Keep the\nexisting draft notes, validate with the project check, commit on task/adapter,\nand leave this same checkout ready for review. No integration or publishing.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "In `case03/checkouts/adapter-current`, in order:\n\n1. `cd case03/checkouts/adapter-current \u0026\u0026 pwd`\n   Check: still in adapter task checkout, not `adapter-old`.\n\n2. `git worktree list`\n   Check: `adapter-current` listed, `adapter-old` stale/missing.\n\n3. `git worktree repair`\n   Then `git worktree list` again.\n   Then `git worktree prune --dry-run` — only prune if it targets the old `adapter-old` path, preserve draft notes.\n\n4. `git branch --show-current`\n   Check: on `task/adapter`. If not: `git checkout task/adapter`.\n\n5. `git status --short --branch`\n   Check: working tree state, identify existing draft notes to keep. Do not delete/reset untracked files.\n\n6. `cat worker-status.json`\n   Check: schema worker `schema/prep` = complete. Note result/SHA.\n\n7. `git branch -a --list \"schema/prep\" \u0026\u0026 git log --oneline -3 schema/prep`\n   `cat SCHEMA_VERSION` or `grep -R SCHEMA_VERSION`\n   Check: expected schema version value to use.\n\n8. Finish `encode_record` in place:\n   - `name.strip().lower()`\n   - `enabled` as `boolean`\n   - `schema` from `SCHEMA_VERSION`\n   Keep existing draft notes unmodified.\n\n9. `git diff -- encode_record-file`\n   `git status --short`\n   Check: only intended file changed, draft notes still present.\n\n10. Run project check, e.g. `make check` / documented check script.\n    Check: passes with no failures.\n\n11. `git add \u003cencode_record-file-only\u003e`\n    `git branch --show-current` — confirm still `task/adapter`\n    `git commit -m \"...\"`\n    Check: `git status --short --branch` clean except intentional draft notes, `git log --oneline -2`.\n\n12. `git worktree list \u0026\u0026 pwd \u0026\u0026 git branch --show-current`\n    Leave `adapter-current` on `task/adapter` ready for review.\n    No merge, no integration, no push/publish.\n",
+      "observed_version": "2.0.22"
+    }
+  ],
+  "total_tokens": 15190,
+  "judge_tokens": 0,
+  "overall_tokens": 15190
+}

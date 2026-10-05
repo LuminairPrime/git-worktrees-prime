@@ -1,0 +1,115 @@
+{
+  "skill_name": "git-worktrees-prime-turbo-skill-upper",
+  "schema_version": "v1alpha1",
+  "engine_name": "opencode",
+  "model_name": "opencode/muse-spark-1.3-contributor-free",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/muse-spark-1.3-contributor-free"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/muse-spark-1.3-contributor-free"
+  },
+  "observed_configuration": {
+    "version": "2.0.22"
+  },
+  "start_time": "2026-10-04T06:07:30.112361525-03:00",
+  "end_time": "2026-10-04T06:07:44.752250645-03:00",
+  "case_results": [
+    {
+      "case_id": "choose-checkout",
+      "title": "Choose reuse, create, or current checkout correctly",
+      "status": "PASS",
+      "duration_ms": 8386,
+      "turns": 1,
+      "input_tokens": 4051,
+      "output_tokens": 86,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_matches{all:[(?i)create], any:[owned by another another worker ownership concurrent separation isolation], not:[reuse the worktree at /repo/.worktrees/login work in the current checkout]}",
+            "passed": true,
+            "evidence": "output satisfies all regex checks (all:[(?i)create], any:[owned by another another worker ownership concurrent separation isolation], not:[reuse the worktree at /repo/.worktrees/login work in the current checkout])"
+          },
+          {
+            "text": "output_contains{any:[share objects share per-worktree HEAD index]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[share objects share per-worktree HEAD index])"
+          }
+        ],
+        "summary": {
+          "passed": 3,
+          "failed": 0,
+          "total": 3,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "I have a task to fix a bug on branch feature/login. There is already a worktree\nat /repo/.worktrees/login owned by another worker, and my current checkout has\nunrelated uncommitted changes. Should I reuse that worktree, create a new one,\nor just work in the current checkout? Explain your choice and what worktrees share.\n",
+      "response": "Create a new worktree. Do not reuse `/repo/.worktrees/login` and do not work in current checkout.\n\n* Owned by another worker: reuse only if no other worker owns it. Coordinate via owner if you must use that checkout.\n* Current checkout has unrelated uncommitted changes: requires separation. Uncommitted changes do not follow a raw `git worktree add` automatically — do not stash/reset/bulk-copy them.\n* `feature/login` is already checked out elsewhere: Git will refuse a second checkout of same branch. Create different branch from required commit e.g. `\u003cprimary-root\u003e/.worktrees/login-\u003ctask\u003e` with `-b \u003cnew-branch\u003e`, or detached `HEAD` for inspection only. Never use `-B` to override.\n\nWhat worktrees share: separate working files + index/`HEAD` per checkout, but share objects, most refs, remotes, much config. Per-worktree only: `HEAD`, `refs/bisect/*`, `refs/worktree/*`, `refs/rewritten/*`. No security boundary — also isolate ports/DBs/outputs.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "manager-location",
+      "title": "Prefer manager and enforce safe raw-Git location",
+      "status": "PASS",
+      "duration_ms": 5857,
+      "turns": 1,
+      "input_tokens": 7670,
+      "output_tokens": 183,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[check-ignore], any:[.worktrees unique unused path ignore]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[check-ignore], any:[.worktrees unique unused path ignore])"
+          },
+          {
+            "text": "output_contains{any:[harness manager raw Git fallback exit 0 ignored .gitignore info/exclude]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[harness manager raw Git fallback exit 0 ignored .gitignore info/exclude])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "I need a new task worktree for task \"checkout-api\" using raw Git. The main\ncheckout is at /repo and there is no repo location convention. Where should I\nplace it, and what must I verify before creating inside another checkout?\n",
+      "response": "Place at `/repo/.worktrees/checkout-api`:\n\n* No convention -\u003e default for raw Git is `\u003cprimary-root\u003e/.worktrees/\u003ctask\u003e`.\n* `/repo` is main checkout (not bare), so not sibling-dir case.\n* Use unused path, do not nest inside another disposable worktree.\n\nBefore creating inside another checkout, verify ignore coverage:\n\n1. Locate exclude: `git rev-parse --path-format=absolute --git-path info/exclude` — `.git` may be file.\n2. From enclosing checkout, require exit 0:\n   `git -C \"\u003cenclosing-checkout\u003e\" check-ignore -q -- \"\u003cselected-relative-path\u003e/\"`\n3. Verify again after creation.\n",
+      "observed_version": "2.0.22"
+    }
+  ],
+  "total_tokens": 11990,
+  "judge_tokens": 0,
+  "overall_tokens": 11990
+}

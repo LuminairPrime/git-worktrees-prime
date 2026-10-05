@@ -1,0 +1,64 @@
+{
+  "skill_name": "git-worktrees-prime-turbo-skill-upper",
+  "schema_version": "v1alpha1",
+  "engine_name": "opencode",
+  "model_name": "opencode/muse-spark-1.3-contributor-free",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/muse-spark-1.3-contributor-free"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/muse-spark-1.3-contributor-free"
+  },
+  "observed_configuration": {
+    "version": "2.0.22"
+  },
+  "start_time": "2026-10-04T22:12:35.329956542-03:00",
+  "end_time": "2026-10-04T22:12:48.699942953-03:00",
+  "case_results": [
+    {
+      "case_id": "bare-repo-sibling-location",
+      "title": "Place task worktrees beside a bare repository",
+      "status": "PASS",
+      "duration_ms": 13177,
+      "turns": 1,
+      "input_tokens": 6614,
+      "output_tokens": 77,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "output_matches{all:[(?i)sibling], any:[bare no main checkout no working tree unused path unique]}",
+            "passed": true,
+            "evidence": "output satisfies all regex checks (all:[(?i)sibling], any:[bare no main checkout no working tree unused path unique])"
+          },
+          {
+            "text": "output_contains{any:[worktree add check-ignore verify -b]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[worktree add check-ignore verify -b])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "The project is a bare repository at /srv/repos/api.git and I need a task\nworktree for task \"rate-limit\" using raw Git. There is no repo location\nconvention. Where should I place the checkout, and why not inside the\nrepository directory?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact placement and the checks you would run, in order.\n",
+      "response": "Placement: `/srv/repos/rate-limit` — sibling of `/srv/repos/api.git` under `/srv/repos/`.\n\nWhy:\n- No location convention -\u003e bare repo rule: sibling of repository directory.\n- Never inside `/srv/repos/api.git`: bare directory is `$GIT_DIR` only, no main worktree. Checkout inside would mix work files with objects/refs/config and break registration/bare-ness.\n\nChecks, in order:\n1. Confirm manager=`raw Git`, base/integration target — do not assume `main`/`master`/`origin`/`HEAD`.\n2. Verify unused path `/srv/repos/rate-limit` and unused branch `rate-limit`: `git --git-dir=/srv/repos/api.git worktree list --porcelain -z`, `branch --list rate-limit`.\n3. If current remote base required: fetch relevant remote, resolve ref to commit before creation.\n4. Create: `git -C /srv/repos/api.git worktree add -b rate-limit /srv/repos/rate-limit \u003cbase-commit\u003e` — never `-B` / override protection.\n5. Verify: returned path, `HEAD` commit, branch, `worktree list` registration.",
+      "observed_version": "2.0.22"
+    }
+  ],
+  "total_tokens": 6691,
+  "judge_tokens": 0,
+  "overall_tokens": 6691
+}

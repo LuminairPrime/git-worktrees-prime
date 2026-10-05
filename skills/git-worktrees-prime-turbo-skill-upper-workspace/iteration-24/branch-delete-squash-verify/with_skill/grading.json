@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "expect.must_contain",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "expect.must_not_contain",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "output_contains{all:[branch -D], any:[retain verify squash ancestry authorized replacement]}",
+      "passed": true,
+      "evidence": "output satisfies all contains checks (all:[branch -D], any:[retain verify squash ancestry authorized replacement])"
+    },
+    {
+      "text": "output_contains{any:[merge-base ancestor ancestry cherry diff replacement commits resulting changes verify the replacement]}",
+      "passed": true,
+      "evidence": "output satisfies all contains checks (any:[merge-base ancestor ancestry cherry diff replacement commits resulting changes verify the replacement])"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1
+  }
+}
