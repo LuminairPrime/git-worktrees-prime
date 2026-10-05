@@ -1,0 +1,43 @@
+# Stable case ID used in reports. Keep it the same as the filename without .yaml.
+id: offline-lock-gc-prune
+# Human-readable summary shown in case lists and reports.
+title: Lock intermittently mounted worktrees before storage goes offline
+# Optional background explaining the behavior or regression this case covers.
+description: |
+  Verifies the Skill locks a worktree on storage about to go offline, expects
+  git gc to auto-prune unlocked stale registrations, and refuses to prune a
+  merely unavailable checkout.
+
+input:
+  # User prompt sent to the Agent for a single-turn case.
+  prompt: |
+    A task worktree lives on a share that goes offline next week while the task
+    is still active. I am worried git gc will drop its registration while it is
+    unmounted. What should I do before the storage goes offline, and should I
+    prune the registration while it is unavailable?
+    No repository is attached here, so do not search the filesystem: answer with
+    the exact checks and commands you would run, in order.
+
+# Cheap pre-judge checks; when these fail, the judge block is skipped.
+expect:
+  must_contain:
+    - "lock"
+  must_not_contain:
+    - "prune it now"
+
+judge:
+  # Grading strategy used to decide whether this case passes.
+  # Options: rule_based | agent_judge | script.
+  type: rule_based
+  # Assertions that must pass when judge.type is rule_based.
+  success:
+    - output_contains:
+        all: ["lock"]
+        any: ["worktree lock", "intermittent", "offline", "gc.worktreePruneExpire", "expire"]
+    - output_contains:
+        any: ["repair", "do not prune", "unavailable", "missing directory", "unlock"]
+  failure:
+    # Affirmative-shaped recommendations only; prohibitions such as "do not
+    # prune while unavailable" must not trip this rule.
+    - output_contains:
+        any: ["prune it now", "yes, prune it", "locking is unnecessary"]

@@ -1,0 +1,45 @@
+# Stable case ID used in reports. Keep it the same as the filename without .yaml.
+id: bare-repo-sibling-location
+# Human-readable summary shown in case lists and reports.
+title: Place task worktrees beside a bare repository
+# Optional background explaining the behavior or regression this case covers.
+description: |
+  Verifies the Skill places a task checkout as a sibling of a bare repository
+  directory instead of inside it, since a bare repository has no main checkout.
+
+input:
+  # User prompt sent to the Agent for a single-turn case.
+  prompt: |
+    The project is a bare repository at /srv/repos/api.git and I need a task
+    worktree for task "rate-limit" using raw Git. There is no repo location
+    convention. Where should I place the checkout, and why not inside the
+    repository directory?
+    No repository is attached here, so do not search the filesystem: answer with
+    the exact placement and the checks you would run, in order.
+
+# Cheap pre-judge checks; when these fail, the judge block is skipped.
+# No must_not_contain gate here: a correct answer names the bad path to explain
+# the prohibition, so the ban on recommending it lives in the judge as a
+# line-anchored regex (imperative verb at line start).
+expect:
+  must_contain:
+    - "sibling"
+
+judge:
+  # Grading strategy used to decide whether this case passes.
+  # Options: rule_based | agent_judge | script.
+  type: rule_based
+  # Assertions that must pass when judge.type is rule_based.
+  success:
+    - output_contains:
+        all: ["sibling"]
+        any: ["bare", "no main checkout", "no working tree", "unused path", "unique"]
+    - output_contains:
+        any: ["worktree add", "check-ignore", "verify", "-b"]
+  failure:
+    # Line-anchored imperative recommending the bad path. A correct prohibition
+    # ("Do not use ...") starts the line with the negation, so it does not match.
+    - output_matches:
+        any: ["(?im)^[*\\- ]*(use|place|put|create)\\b[^\\n]*\\.git/\\.worktrees"]
+    - output_contains:
+        any: ["clone it again", "re-clone the repository"]

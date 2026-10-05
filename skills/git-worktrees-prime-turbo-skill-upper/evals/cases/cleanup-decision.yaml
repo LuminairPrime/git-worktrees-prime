@@ -1,0 +1,32 @@
+# Stable case ID used in reports. Keep it the same as the filename without .yaml.
+id: cleanup-decision
+# Human-readable summary shown in case lists and reports.
+title: Apply cleanup decision tree and verify integration
+description: |
+  Verifies checkout removal and branch deletion are decided separately, state is
+  preserved before removal, prune follows a reviewed dry run, and integration is
+  verified against the intended target rather than branch -d success.
+
+input:
+  prompt: |
+    My task worktree at /repo/.worktrees/old-task is done and merged via squash.
+    The branch still exists. Can I remove the checkout, delete the branch, and
+    prune? Walk through the checks in order.
+
+expect:
+  must_contain:
+    - "prune --dry-run"
+  must_not_contain:
+    - "delete everything now"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["prune --dry-run"]
+        any: ["separately", "branch deletion", "checkout removal", "untracked", "ignored", "detached"]
+    - output_contains:
+        any: ["merge-base", "ancestor", "squash", "ancestry", "branch -d", "verify", "worktree list"]
+  failure:
+    - output_contains:
+        any: ["branch -d success proves integration", "prune without dry run", "delete the directory with rm -rf"]

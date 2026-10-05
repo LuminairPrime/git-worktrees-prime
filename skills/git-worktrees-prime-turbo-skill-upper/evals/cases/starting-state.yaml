@@ -1,0 +1,34 @@
+# Stable case ID used in reports. Keep it the same as the filename without .yaml.
+id: starting-state
+# Human-readable summary shown in case lists and reports.
+title: Establish base, branch, and detached-HEAD handling
+description: |
+  Verifies the Skill records path, branch, base commit, and integration target,
+  refuses to assume main, and handles task branches and disposable detached checkouts.
+
+input:
+  prompt: |
+    I want a worktree to implement feature X. What base should I use, should I
+    assume main is the integration target, and how should I handle the task branch
+    versus a disposable inspection checkout?
+
+expect:
+  must_contain:
+    - "integration target"
+  must_not_contain:
+    - "always use main"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["integration target"]
+        any: ["do not assume", "starting commit", "task branch", "detached"]
+    - output_contains:
+        any: ["detached HEAD", "detached", "anchor", "checkout protection", "checked out elsewhere"]
+  failure:
+    # "override checkout protection to ..." (purpose clause) catches affirmative
+    # recommendations; bare "override checkout protection" is also how a correct
+    # prohibition ("Never override checkout protection.") is phrased.
+    - output_contains:
+        any: ["always use main", "assume main is correct", "override checkout protection to"]

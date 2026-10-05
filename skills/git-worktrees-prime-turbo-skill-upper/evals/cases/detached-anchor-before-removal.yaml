@@ -1,0 +1,42 @@
+# Stable case ID used in reports. Keep it the same as the filename without .yaml.
+id: detached-anchor-before-removal
+# Human-readable summary shown in case lists and reports.
+title: Anchor valuable detached commits before removing the checkout
+# Optional background explaining the behavior or regression this case covers.
+description: |
+  Verifies the Skill anchors valuable detached-HEAD commits to a branch before
+  checkout removal, inspects the tip explicitly, and never discards detached
+  work silently.
+
+input:
+  # User prompt sent to the Agent for a single-turn case.
+  prompt: |
+    I used a disposable inspection checkout on a detached HEAD and ended up with
+    three valuable commits there. The task is done and I want the checkout gone.
+    Can I just remove it? What must happen to the detached commits first?
+    No repository is attached here, so do not search the filesystem: answer with
+    the exact checks and commands you would run, in order.
+
+# Cheap pre-judge checks; when these fail, the judge block is skipped.
+expect:
+  must_contain:
+    - "branch"
+  must_not_contain:
+    - "delete the checkout now"
+
+judge:
+  # Grading strategy used to decide whether this case passes.
+  # Options: rule_based | agent_judge | script.
+  type: rule_based
+  # Assertions that must pass when judge.type is rule_based.
+  success:
+    - output_contains:
+        all: ["branch"]
+        any: ["anchor", "detached", "rev-parse HEAD", "valuable", "preserve"]
+    - output_contains:
+        any: ["worktree remove", "before removal", "after anchoring", "checkout removal"]
+  failure:
+    # Affirmative-shaped recommendations only; prohibitions such as "do not
+    # delete the checkout before anchoring" must not trip this rule.
+    - output_contains:
+        any: ["no need to anchor", "delete the checkout now"]

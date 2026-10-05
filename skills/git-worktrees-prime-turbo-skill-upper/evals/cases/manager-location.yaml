@@ -1,0 +1,31 @@
+# Stable case ID used in reports. Keep it the same as the filename without .yaml.
+id: manager-location
+# Human-readable summary shown in case lists and reports.
+title: Prefer manager and enforce safe raw-Git location
+description: |
+  Verifies the Skill prefers harness tools, picks an unused ignored path outside
+  disposable worktrees, and requires the check-ignore gate before creating inside a checkout.
+
+input:
+  prompt: |
+    I need a new task worktree for task "checkout-api" using raw Git. The main
+    checkout is at /repo and there is no repo location convention. Where should I
+    place it, and what must I verify before creating inside another checkout?
+
+expect:
+  must_contain:
+    - "check-ignore"
+  must_not_contain:
+    - "place it inside the disposable worktree"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["check-ignore"]
+        any: [".worktrees", "unique", "unused path", "ignore"]
+    - output_contains:
+        any: ["harness", "manager", "raw Git", "fallback", "exit 0", "ignored", ".gitignore", "info/exclude"]
+  failure:
+    - output_contains:
+        any: ["place it inside the disposable worktree", "no verification needed", "skip the ignore check"]

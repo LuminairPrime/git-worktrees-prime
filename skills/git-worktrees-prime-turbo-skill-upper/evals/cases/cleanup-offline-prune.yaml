@@ -1,0 +1,42 @@
+# Stable case ID used in reports. Keep it the same as the filename without .yaml.
+id: cleanup-offline-prune
+# Human-readable summary shown in case lists and reports.
+title: Cleanup keeps review data and offline checkout, prunes only retired
+description: |
+  Distilled from behavioral trials case02. The squash-integrated checkout may be
+  removed but its ignored review database must be preserved outside the removal
+  path, the review branch stays, the offline-volume checkout and its registration
+  stay, and only the deliberately retired registration is pruned after dry-run review.
+
+input:
+  prompt: |
+    Finish the task/completed workspace: its checkout at case02/checkouts/completed
+    was squash-integrated into release and the review remains open on
+    task/completed. The checkout contains ignored review.db the reviewer still
+    needs. There is also an offline-worker checkout on a currently unmounted share
+    (colleague-owned, still in use) and a retired scratch checkout already deleted
+    from disk. Reclaim the completed checkout, keep what the review needs, and do
+    appropriate local cleanup. Report precisely what remains.
+    No repository is attached here, so do not search the filesystem: answer with
+    the exact sequence of commands and checks you would run, in order.
+
+expect:
+  # "prune -" covers both --dry-run and its -n short flag; the judge pins the
+  # dry-run semantics precisely with a regex.
+  must_contain:
+    - "prune -"
+  must_not_contain:
+    - "prune everything"
+
+judge:
+  type: rule_based
+  success:
+    - output_matches:
+        all: ["prune (--dry-run|-n)"]
+        any: ["review.db", "preserve", "outside the removal path", "review branch", "task/completed"]
+    - output_contains:
+        any: ["offline", "unmounted", "retain", "still in use", "retired", "worktree remove", "worktree list"]
+        not: ["prune the offline checkout", "delete the review branch"]
+  failure:
+    - output_contains:
+        any: ["prune the offline checkout", "delete the review branch", "rm -rf case02", "prune without", "review data needs no backup"]

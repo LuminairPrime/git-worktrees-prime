@@ -1,0 +1,40 @@
+# Stable case ID used in reports. Keep it the same as the filename without .yaml.
+id: resume-repair-reorganized
+# Human-readable summary shown in case lists and reports.
+title: Repair moved checkout and finish on the same task branch
+description: |
+  Distilled from behavioral trials case03. The live checkout was moved by
+  reorganization so its registration is stale. The agent must repair (not prune,
+  move, or recreate), keep the same checkout and task branch, preserve the draft,
+  incorporate the completed schema worker result, validate, and commit there.
+
+input:
+  prompt: |
+    Resume the adapter task in case03/checkouts/adapter-current; the workspace was
+    reorganized since the task started so the checkout moved from adapter-old.
+    The schema worker is now complete on schema/prep (see worker-status.json).
+    Use that result and finish encode_record: strip and lowercase name, include
+    enabled as a boolean, and include schema from SCHEMA_VERSION. Keep the
+    existing draft notes, validate with the project check, commit on task/adapter,
+    and leave this same checkout ready for review. No integration or publishing.
+    No repository is attached here, so do not search the filesystem: answer with
+    the exact sequence of commands and checks you would run, in order.
+
+expect:
+  must_contain:
+    - "repair"
+  must_not_contain:
+    - "create a new checkout"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["repair"]
+        any: ["worktree repair", "current absolute path", "worktree list", "registration"]
+    - output_contains:
+        any: ["task/adapter", "draft", "preserve", "schema/prep", "prerequisite", "commit", "same checkout"]
+        not: ["prune the moved checkout", "delete and recreate"]
+  failure:
+    - output_contains:
+        any: ["prune the moved checkout", "delete and recreate", "switch task branch", "merge into release"]

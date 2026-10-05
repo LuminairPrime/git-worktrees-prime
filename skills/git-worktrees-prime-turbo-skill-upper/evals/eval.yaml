@@ -1,0 +1,44 @@
+# Evaluation config schema version used by skill-up. Do not change this value.
+schema_version: v1alpha1
+
+environment:
+  # Runtime environment used for each case; use none when no sandbox is needed.
+  # Options: none | opensandbox | docker.
+  type: none
+
+skills:
+  # Skills installed into the Agent Engine before running cases.
+  # source options: local_path.
+  - source: local_path
+    # Path to the Skill under test, relative to this Skill root unless absolute.
+    path: .
+
+engine:
+  # Agent Engine used to execute prompts and produce outputs for grading.
+  # Built-in options: claude_code | codex | opencode | qodercli | qwen_code.
+  name: opencode
+
+cases:
+  # Case YAML files included in this eval suite, relative to the Skill root.
+  files:
+    - evals/cases/choose-checkout.yaml
+    - evals/cases/manager-location.yaml
+    - evals/cases/starting-state.yaml
+    - evals/cases/cleanup-decision.yaml
+    - evals/cases/safety-constraints.yaml
+    - evals/cases/isolated-fix-custom-location.yaml
+    - evals/cases/cleanup-offline-prune.yaml
+    - evals/cases/resume-repair-reorganized.yaml
+    - evals/cases/branch-delete-squash-verify.yaml
+    - evals/cases/bare-repo-sibling-location.yaml
+    - evals/cases/detached-anchor-before-removal.yaml
+    - evals/cases/offline-lock-gc-prune.yaml
+  # Default constraints inherited by every case unless the case overrides them.
+  defaults:
+    timeout_seconds: 180
+    max_turns: 8
+
+report:
+  # Report formats written after each run.
+  # Options: json | junit | html.
+  formats: [json]

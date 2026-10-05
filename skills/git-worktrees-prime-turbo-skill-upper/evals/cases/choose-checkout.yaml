@@ -1,0 +1,43 @@
+# Stable case ID used in reports. Keep it the same as the filename without .yaml.
+id: choose-checkout
+# Human-readable summary shown in case lists and reports.
+title: Choose reuse, create, or current checkout correctly
+# Optional background explaining the behavior or regression this case covers.
+description: |
+  Verifies the Skill routes to reuse, create, or stay based on task ownership
+  and isolation need, and states that worktrees share objects but not HEAD.
+
+input:
+  # User prompt sent to the Agent for a single-turn case.
+  prompt: |
+    I have a task to fix a bug on branch feature/login. There is already a worktree
+    at /repo/.worktrees/login owned by another worker, and my current checkout has
+    unrelated uncommitted changes. Should I reuse that worktree, create a new one,
+    or just work in the current checkout? Explain your choice and what worktrees share.
+
+# Cheap pre-judge checks; when these fail, the judge block is skipped.
+# No must_contain gate here: the positive "create a new worktree" requirement is
+# enforced case-insensitively by the judge (output_matches with (?i)), because a
+# correct answer may start with capital "Create".
+expect:
+  must_not_contain:
+    - "reuse that worktree"
+    - "just work in the current checkout"
+
+judge:
+  # Grading strategy used to decide whether this case passes.
+  # Options: rule_based | agent_judge | script.
+  type: rule_based
+  # Assertions that must pass when judge.type is rule_based.
+  success:
+    - output_matches:
+        all: ["(?i)create"]
+        any: ["owned by another", "another worker", "ownership", "concurrent", "separation", "isolation"]
+        # "just work ..." (not bare "work ...") so a correct prohibition such as
+        # "do not work in the current checkout" does not trip this guard.
+        not: ["reuse the worktree at /repo/.worktrees/login", "(?i)just work in the current checkout"]
+    - output_contains:
+        any: ["share objects", "share", "per-worktree", "HEAD", "index"]
+  failure:
+    - output_contains:
+        any: ["reuse that worktree", "stay in the current checkout", "just use the current"]

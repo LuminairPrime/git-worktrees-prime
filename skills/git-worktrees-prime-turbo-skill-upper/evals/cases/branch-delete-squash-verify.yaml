@@ -1,0 +1,43 @@
+# Stable case ID used in reports. Keep it the same as the filename without .yaml.
+id: branch-delete-squash-verify
+# Human-readable summary shown in case lists and reports.
+title: Verify squash integration before deleting the task branch
+# Optional background explaining the behavior or regression this case covers.
+description: |
+  Verifies the Skill requires replacement-commit verification after squash
+  integration, retains the branch when branch -d refuses, and reserves -D for
+  verified-safe, authorized abandonment.
+
+input:
+  # User prompt sent to the Agent for a single-turn case.
+  prompt: |
+    My task branch was squash-merged into main and I already removed the
+    checkout. `git branch -d task/export` refuses because it is not merged.
+    Should I just run `git branch -D` now? Explain how to verify integration
+    first and when -D is acceptable.
+    No repository is attached here, so do not search the filesystem: answer with
+    the exact checks and commands you would run, in order.
+
+# Cheap pre-judge checks; when these fail, the judge block is skipped.
+expect:
+  must_contain:
+    - "branch -D"
+  must_not_contain:
+    - "delete it immediately"
+
+judge:
+  # Grading strategy used to decide whether this case passes.
+  # Options: rule_based | agent_judge | script.
+  type: rule_based
+  # Assertions that must pass when judge.type is rule_based.
+  success:
+    - output_contains:
+        all: ["branch -D"]
+        any: ["retain", "verify", "squash", "ancestry", "authorized", "replacement"]
+    - output_contains:
+        # Multiple verification vocabularies accepted: merge-base ancestry
+        # checks, cherry patch-equivalence, or resulting-tree diffs.
+        any: ["merge-base", "ancestor", "ancestry", "cherry", "diff", "replacement commits", "resulting changes", "verify the replacement"]
+  failure:
+    - output_contains:
+        any: ["branch -D right away", "delete the branch immediately", "-d proves integration"]
