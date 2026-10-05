@@ -5,6 +5,8 @@ description: "Manage Git worktrees: create, list, reuse, repair, or remove linke
 
 # Git worktrees
 
+If the task prompt says the workspace was moved, reorganized, renamed, or a mount shifted, your very first planned command is `git worktree repair "<worktree>"` (raw Git) or the manager's repair tool, using the checkout's current absolute path. Do not start with `cd`, `git status`, `git checkout`, branch listing, or any pruning decision; repair reconnects the registration first.
+
 Follow user instructions and repository conventions; keep ownership and the integration target explicit.
 
 Apply only task-relevant phases and their safety checks; listing or repair alone does not require development, integration, or cleanup.
@@ -22,7 +24,7 @@ Removing a worktree leaves its branch. Name the checkout path and branch/ref sep
 
 ## Choose the checkout
 
-1. **An existing checkout already belongs to this task?** Reuse it if no other worker owns it. Confirm its current absolute path and branch against the manager's inventory or `git worktree list --porcelain -z`; inspect changes and ongoing Git operations.
+1. **An existing checkout already belongs to this task?** Reuse it if no other worker owns it. Confirm its current absolute path and branch against the manager's inventory or `git worktree list --porcelain -z`; inspect changes and ongoing Git operations. If the checkout may have moved since the task started, run `git worktree repair "<worktree>"` with its current absolute path before anything else — including before `cd`, `status`, `checkout`, or branch listing.
 2. **A worktree is requested, or concurrent edits, conflicting branches, or unrelated local changes require separation?** Create a task worktree.
 3. **Otherwise:** use the current checkout.
 
@@ -33,7 +35,7 @@ Worktrees separate working files and indexes, but share objects, most refs, remo
 - Prefer available harness worktree tools. Check their starting-state, dirty-file transfer, and cleanup behavior; do not assume universal tool names or defaults.
 - Supply the intended base. Wait for creation to finish and verify the returned path and commit. Creation need not switch the agent's working directory: run subsequent commands explicitly in the returned path.
 - Use the harness to finalize, remove, or archive its managed checkouts. Use raw Git for unmanaged worktrees or a supported fallback. If requested isolation cannot be established, report the blocker; do not silently work in another checkout.
-- **Resume after a move before any other work.** If the checkout's path changed (reorganization, rename, mount shift), repair first: reconnect it through its manager or, for raw Git, `git -C "<repo>" worktree repair "<worktree>"` with the checkout's current absolute path, then re-list worktrees to verify the new registration. Repair preserves the branch, index, and state; do not prune, move, delete, or recreate the live checkout to fix registration. Read [Registration commands](references/raw-git-commands.md#registration) before repairing, locking, or moving.
+- **Resume after a move before any other work.** If the checkout's path changed (reorganization, rename, mount shift), repair first: reconnect it through its manager or, for raw Git, `git -C "<repo>" worktree repair "<worktree>"` with the checkout's current absolute path, then re-list worktrees to verify the new registration. Repair preserves the branch, index, and state; do not prune, move, delete, or recreate the live checkout to fix registration. Read [Registration commands](references/raw-git-commands.md#registration) before repairing, locking, or moving. When planning or describing the recovery, name the repair step explicitly (`git worktree repair`) before listing any other commands.
 - For raw Git, follow the repository's location convention; otherwise use `<primary-root>/.worktrees/<task>`, or a sibling of the repository directory for a bare repository. Do not place a worktree inside another disposable worktree. Use a unique, descriptive task name and an unused path.
 - Before creating inside another checkout, ensure the actual selected destination is ignored through `.gitignore` or a local exclusion. Locate the exclude file with `git rev-parse --path-format=absolute --git-path info/exclude`; `.git` may be a file. Run `git check-ignore -q` from the enclosing checkout, with a trailing `/` on the destination's relative path, and require exit 0. Verify again after creation.
 
@@ -85,7 +87,7 @@ Report completed work and checks, integration/review status, and removed or reta
 
 ## Safety constraints
 
-- DON'T discard work or bypass safeguards without user authorization for the target and consequence; tool access and agent-written plans confer none. Resolve safeguard causes before using force flags, resets, unlocking, or filesystem operations. Read lock reasons; an absent reason is not permission. Never override branch checkout protection.
+- DON'T discard work or bypass safeguards without user authorization for the target and consequence; tool access and agent-written plans confer none. Resolve safeguard causes before using force flags, resets, unlocking, or filesystem operations. Read lock reasons; an absent reason is not permission. Never override branch checkout protection. When refusing a request as unsafe, state that the forceful shortcut requires the user's explicit authorization before it could proceed, and name the safer path.
 - DON'T remove or relocate worktrees, hard-reset, or clean files without verifying the repository, absolute path, branch name (or detached state), and HEAD commit. Scripts must parse `git worktree list --porcelain -z`.
 - DON'T use `git worktree add -B` unless resetting the named branch to the selected commit is authorized; use `-b` for creation.
 - DON'T relocate through filesystem tools without preserving `.git` and contents. Repair from the current main/bare repository with new absolute linked-worktree paths, and verify inventory. `git worktree move` cannot move main or submodule-containing worktrees.

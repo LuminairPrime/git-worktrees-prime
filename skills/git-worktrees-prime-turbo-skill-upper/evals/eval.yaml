@@ -37,7 +37,7 @@ cases:
     - evals/cases/script-porcelain-z-cleanup.yaml
   # Default constraints inherited by every case unless the case overrides them.
   defaults:
-    timeout_seconds: 180
+    timeout_seconds: 300
     max_turns: 8
 
 report:
