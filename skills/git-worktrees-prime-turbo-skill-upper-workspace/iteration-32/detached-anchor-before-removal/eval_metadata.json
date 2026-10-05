@@ -1,6 +1,0 @@
-{
-  "eval_id": 0,
-  "eval_name": "Anchor valuable detached commits before removing the checkout",
-  "prompt": "I used a disposable inspection checkout on a detached HEAD and ended up with\nthree valuable commits there. The task is done and I want the checkout gone.\nCan I just remove it? What must happen to the detached commits first?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
-  "assertions": null
-}

@@ -1,6 +1,0 @@
-{
-  "eval_id": 0,
-  "eval_name": "Isolated fix in custom ignored location from required base",
-  "prompt": "Fix normalize_label in the project repo so it strips surrounding whitespace and\nreturns lowercase text. Work in a separate checkout under\nproject/scratch-checkouts/normalize on branch task/normalize, starting from\nrelease/next. The current project checkout belongs to a colleague and has\nunrelated uncommitted notes and an untracked draft; keep them intact. Run the\nproject's check, commit the fix on the task branch, and leave it ready for\nreview. No merge or publication is requested.\n",
-  "assertions": null
-}

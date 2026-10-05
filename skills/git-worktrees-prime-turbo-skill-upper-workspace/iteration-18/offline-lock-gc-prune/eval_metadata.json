@@ -1,6 +1,0 @@
-{
-  "eval_id": 0,
-  "eval_name": "Lock intermittently mounted worktrees before storage goes offline",
-  "prompt": "A task worktree lives on a share that goes offline next week while the task\nis still active. I am worried git gc will drop its registration while it is\nunmounted. What should I do before the storage goes offline, and should I\nprune the registration while it is unavailable?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
-  "assertions": null
-}

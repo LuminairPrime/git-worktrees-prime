@@ -1,9 +1,0 @@
-{
-  "eval_id": 0,
-  "eval_name": "Prefer manager and enforce safe raw-Git location",
-  "prompt": "I need a new task worktree for task \"checkout-api\" using raw Git. The main\ncheckout is at /repo and there is no repo location convention. Where should I\nplace it, and what must I verify before creating inside another checkout?\n",
-  "assertions": [
-    "expect.must_contain",
-    "expect.must_not_contain"
-  ]
-}
