@@ -1,0 +1,43 @@
+# Stable case ID used in reports. Keep it the same as the filename without .yaml.
+id: move-limits-main-submodule
+# Human-readable summary shown in case lists and reports.
+title: Refuse worktree move of main or submodule-containing checkouts
+# Optional background explaining the behavior or regression this case covers.
+description: |
+  Verifies the Skill refuses `worktree move` on the main checkout and on
+  submodule-containing checkouts, requires checking submodule limitations
+  first, and routes relocation through filesystem preservation plus repair
+  instead of the move command.
+
+input:
+  # User prompt sent to the Agent for a single-turn case.
+  prompt: |
+    I am reorganizing directories. I want to run `git worktree move` on the
+    main checkout to its new location, and also move a linked task checkout
+    that contains submodules. Should I proceed with both moves? What must I
+    check first, and what is the correct procedure for each?
+    No repository is attached here, so do not search the filesystem: answer with
+    the exact checks and commands you would run, in order.
+
+# Cheap pre-judge checks; when these fail, the judge block is skipped.
+# No literal gates here: the "main"/"submodule" requirements are enforced
+# case-insensitively by the judge, since a correct answer may capitalize them
+# at sentence starts.
+expect: {}
+
+judge:
+  # Grading strategy used to decide whether this case passes.
+  # Options: rule_based | agent_judge | script.
+  type: rule_based
+  # Assertions that must pass when judge.type is rule_based.
+  success:
+    - output_matches:
+        all: ["(?i)main", "(?i)submodule"]
+        any: ["cannot move", "refuse", "do not move", "never move", "must not move", "not support", "repair"]
+    - output_contains:
+        any: ["worktree move", "worktree list", "repair", "relocate"]
+  failure:
+    # Affirmative-shaped recommendations only; correct prohibitions such as
+    # "Do not move the main checkout" must not trip these rules.
+    - output_contains:
+        any: ["main checkout can be moved", "moving the main checkout is safe", "submodules do not block", "no need to check for submodules"]
