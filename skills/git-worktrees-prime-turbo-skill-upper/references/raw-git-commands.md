@@ -61,3 +61,24 @@ git -C "<repo>" worktree list --porcelain -z
 git -C "<repo>" worktree prune --dry-run --verbose
 git -C "<repo>" worktree prune --verbose
 ```
+
+## Registration
+
+Repair a relocated live checkout, lock one before its storage goes offline,
+or move a linked checkout. Run from the main checkout or bare repository;
+`<worktree>` is the checkout's current absolute path.
+
+```sh
+git -C "<repo>" worktree list --porcelain -z
+git -C "<repo>" worktree repair "<worktree>"
+git -C "<repo>" worktree list --porcelain -z
+
+# Before storage goes offline; the reason flag precedes the path.
+# Read the reason before unlocking; never prune or unlock a merely
+# unavailable checkout.
+git -C "<repo>" worktree lock --reason "<why-offline>" "<worktree>"
+git -C "<repo>" worktree unlock "<worktree>"
+
+# Linked checkouts only; cannot move main or submodule-containing worktrees.
+git -C "<repo>" worktree move "<worktree>" "<new-path>"
+```
