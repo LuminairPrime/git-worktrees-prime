@@ -35,6 +35,7 @@ cases:
     - evals/cases/offline-lock-gc-prune.yaml
     - evals/cases/move-limits-main-submodule.yaml
     - evals/cases/script-porcelain-z-cleanup.yaml
+    - evals/cases/repair-command-order.yaml
   # Default constraints inherited by every case unless the case overrides them.
   defaults:
     timeout_seconds: 300

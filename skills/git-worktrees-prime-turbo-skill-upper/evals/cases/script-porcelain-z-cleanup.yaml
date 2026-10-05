@@ -33,7 +33,10 @@ judge:
         all: ["porcelain -z"]
         any: ["NUL", "null", "-z", "spaces"]
     - output_contains:
-        any: ["worktree remove", "dry-run", "dry run"]
+        all: ["worktree remove"]
+    - output_matches:
+        all: ['(?i)prune\s+(--dry-run|-n)', '(?i)(ownership|task-owned|owner)', '(?i)(ignored|preserv)', '(?i)(review|inspect).*dry.run|(?i)dry.run.*(review|inspect)']
+        not: ['(?m)^\s*git[^\n]*worktree remove[^\n]*(--force| -f\b)']
   failure:
     # Affirmative-shaped recommendations only; correct prohibitions such as
     # "Do not delete directories with rm -rf" must not trip these rules.

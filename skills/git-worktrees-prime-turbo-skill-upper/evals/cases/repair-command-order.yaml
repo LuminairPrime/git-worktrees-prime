@@ -1,0 +1,16 @@
+id: repair-command-order
+title: Repair precedes inventory and status for a known moved checkout
+description: Checks command ordering rather than accepting a mention of repair anywhere.
+input:
+  prompt: |
+    The live linked checkout /repo/tasks/adapter-old was moved to
+    /repo/tasks/adapter-current. Its registration is stale. The surviving primary
+    checkout is /repo/primary. Keep the task branch and draft files and prepare
+    this same checkout for continued work. No repository is attached; do not run
+    tools or search files. Return only a JSON object with a "commands" array of
+    shell command strings for recovery and verification, in execution order.
+    Do not include development or cleanup commands.
+judge:
+  type: script
+  script_path: evals/fixtures/check-repair-order.py
+  timeout_seconds: 30

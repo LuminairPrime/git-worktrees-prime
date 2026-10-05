@@ -69,7 +69,6 @@ or move a linked checkout. Run from the main checkout or bare repository;
 `<worktree>` is the checkout's current absolute path.
 
 ```sh
-git -C "<repo>" worktree list --porcelain -z
 git -C "<repo>" worktree repair "<worktree>"
 git -C "<repo>" worktree list --porcelain -z
 

@@ -5,7 +5,7 @@ description: "Manage Git worktrees: create, list, reuse, repair, or remove linke
 
 # Git worktrees
 
-If the task prompt says the workspace was moved, reorganized, renamed, or a mount shifted, your very first planned command is `git worktree repair "<worktree>"` (raw Git) or the manager's repair tool, using the checkout's current absolute path. Do not start with `cd`, `git status`, `git checkout`, branch listing, or any pruning decision; repair reconnects the registration first.
+When a live checkout has moved and its registration is stale, repair it before other Git operations: `git -C "<surviving-repo>" worktree repair "<current-absolute-worktree-path>"`, or its manager's supported repair tool. If the surviving repository or current path is unknown, establish those paths first. A reorganization alone does not prove a checkout moved; an unavailable mount calls for retention, not repair at an invented path.
 
 Follow user instructions and repository conventions; keep ownership and the integration target explicit.
 
@@ -24,7 +24,7 @@ Removing a worktree leaves its branch. Name the checkout path and branch/ref sep
 
 ## Choose the checkout
 
-1. **An existing checkout already belongs to this task?** Reuse it if no other worker owns it. Confirm its current absolute path and branch against the manager's inventory or `git worktree list --porcelain -z`; inspect changes and ongoing Git operations. If the checkout may have moved since the task started, run `git worktree repair "<worktree>"` with its current absolute path before anything else — including before `cd`, `status`, `checkout`, or branch listing.
+1. **An existing checkout already belongs to this task?** Reuse it if no other worker owns it. For a moved checkout, apply the repair rule above first. Confirm its current absolute path and branch against the manager's inventory or `git worktree list --porcelain -z`; inspect changes and ongoing Git operations.
 2. **A worktree is requested, or concurrent edits, conflicting branches, or unrelated local changes require separation?** Create a task worktree.
 3. **Otherwise:** use the current checkout.
 
@@ -72,6 +72,8 @@ Evaluate checkout removal and branch deletion separately. Routine cleanup of thi
 7. **Verify the result.** Re-list worktrees and check the removed path and chosen refs. Report anything retained and why. Do not claim complete deletion if a branch, harness snapshot, or archive remains.
 
 Before raw Git worktree removal, task-branch deletion, or registration pruning, read [Cleanup commands](references/raw-git-commands.md#cleanup). Apply the decision tree above to each requested operation.
+
+For batch scripts, existence and a directory-name prefix are filters, not removal authorization. Parse complete NUL-delimited records, including lock and detached state; remove only individually reviewed task-owned paths. Default to reporting candidates until preservation and ownership checks pass. Never add `--force` merely to make the loop finish; stop on refusal. Pruning affects the repository inventory, so review every dry-run entry, including entries outside the script's selected directory.
 
 - Compare the actual task tip against a verified, current integration ref. `branch -d` may check the branch's upstream rather than the intended integration target; success is not integration evidence.
 - Squash or rebase integration may break ancestry. Verify the replacement commits and resulting changes. If `branch -d` refuses, retain the branch until its obsolete history is verified safe and authorized to delete; only then consider `branch -D`.
