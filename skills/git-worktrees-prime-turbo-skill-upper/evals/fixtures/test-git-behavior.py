@@ -58,10 +58,35 @@ class GitBehavior(unittest.TestCase):
             self.assertIn(b"review.db", git(task, "status", "--short", "--ignored"))
             preserved = root / "preserved.db"
             preserved.write_bytes((task / "review.db").read_bytes())
+            self.assertEqual(preserved.read_bytes(), valuable)
             git(primary, "worktree", "remove", str(task))
             self.assertFalse(task.exists())
             self.assertEqual(preserved.read_bytes(), valuable)
             git(primary, "show-ref", "--verify", "refs/heads/task/review")
+
+    def test_locked_unavailable_checkout_survives_prune(self):
+        with tempfile.TemporaryDirectory(prefix="worktree-offline-") as directory:
+            root = Path(directory)
+            primary, task, unavailable = root / "primary", root / "task", root / "offline-storage"
+            def git(path, *args):
+                return subprocess.run(["git", "-C", str(path), *args], check=True,
+                                      capture_output=True).stdout
+            primary.mkdir()
+            git(primary, "init", "-b", "main")
+            git(primary, "config", "user.name", "Fixture")
+            git(primary, "config", "user.email", "fixture@example.invalid")
+            git(primary, "commit", "--allow-empty", "-m", "Initial")
+            git(primary, "worktree", "add", "-b", "task/offline", str(task))
+            git(primary, "worktree", "lock", "--reason", "Offline for travel", str(task))
+            # Simulate unavailable storage without deleting fixture data.
+            task.rename(unavailable)
+            dry_run = git(primary, "worktree", "prune", "--dry-run", "--verbose", "--expire", "now")
+            self.assertEqual(dry_run, b"")
+            git(primary, "worktree", "prune", "--verbose", "--expire", "now")
+            inventory = git(primary, "worktree", "list", "--porcelain", "-z").split(b"\0")
+            self.assertIn(b"worktree " + str(task).encode(), inventory)
+            self.assertIn(b"locked Offline for travel", inventory)
+            git(primary, "show-ref", "--verify", "refs/heads/task/offline")
 
 
 if __name__ == "__main__":

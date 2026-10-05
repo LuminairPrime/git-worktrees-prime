@@ -100,3 +100,37 @@ produced 15 HTTP 429 quota errors and no graded results. Runtime instructions ar
 unchanged from the preceding pass; this iteration strengthens verification rather
 than claiming a measured model improvement. Existing report directories are left
 outside the commit.
+
+## Next iteration: verified preservation and mixed cleanup decisions
+
+The next pass requires verified preserved contents or an anchored commit before
+checkout removal; a planned or failed backup is insufficient. It also replaces
+the long repeated repair paragraph with a pointer to the opening rule. The main
+skill is now 1,872 words, down from 1,916 in the preceding revision.
+
+`cleanup-mixed-decisions` grades explicit checkout and branch choices for five
+states: pending local review, locked offline storage, verified integrated work,
+valuable ignored data without backup, and unanchored detached commits. The script
+judge requires every decision to be correct; safety keywords cannot compensate
+for an unsafe action. Its mutations reject direct removal of valuable/offline
+state, deletion of required refs and premature pruning. The constrained JSON case
+tests planning decisions, not actual tool execution or proof that preservation
+was performed.
+
+An additional disposable Git test locks a checkout before simulating unavailable
+storage, then verifies that a prune dry run and matching prune retain its
+registration, lock reason and branch. The ignored-data test now verifies the copy
+before removal as well as afterward. Five judge tests and three Git behavior tests
+pass. The 16-case suite validates; whitespace and YAML CJK checks pass.
+
+The targeted pre-change run (iteration-53) and full post-change run
+(iteration-54, 16 cases) both returned provider quota errors without grading.
+No new behavioral pass rate or improvement claim follows from them.
+
+Recommendation: stop open-ended iterations now. This pass supplies a small real
+instruction improvement and better decision coverage, but returns are diminishing.
+Resume when model access allows the strengthened cases to be graded, or when
+real usage exposes a new failure. A frozen-model layout comparison or agent-run
+disposable fixtures would provide more information than another prose-polishing
+round. The shorter main document is an editorial improvement, not a measured
+retention gain.

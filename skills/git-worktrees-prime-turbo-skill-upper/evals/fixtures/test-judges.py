@@ -10,9 +10,30 @@ ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location("repair", Path(__file__).with_name("check-repair-order.py"))
 repair = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(repair)
+cleanup_spec = importlib.util.spec_from_file_location("cleanup", Path(__file__).with_name("check-cleanup-decisions.py"))
+cleanup = importlib.util.module_from_spec(cleanup_spec)
+cleanup_spec.loader.exec_module(cleanup)
 
 
 class JudgeChecks(unittest.TestCase):
+    def test_cleanup_decision_mutations(self):
+        expected = cleanup.EXPECTED
+        self.assertTrue(cleanup.check(json.dumps(expected)))
+        for name in ("review", "offline", "draft", "detached"):
+            changed = json.loads(json.dumps(expected))
+            changed[name]["checkout"] = "remove"
+            with self.subTest(name=name):
+                self.assertFalse(cleanup.check(json.dumps(changed)))
+        for name in ("review", "offline", "draft", "detached"):
+            changed = json.loads(json.dumps(expected))
+            changed[name]["branch"] = "delete"
+            self.assertFalse(cleanup.check(json.dumps(changed)))
+        for value in (True, 0, "false", None):
+            changed = dict(expected, prune_now=value)
+            self.assertFalse(cleanup.check(json.dumps(changed)))
+        for malformed in ("", "retain preserve dry-run", "[]", "null"):
+            self.assertFalse(cleanup.check(malformed))
+
     commands = [
         'git -C "/repo/primary" worktree repair "/repo/tasks/adapter-current"',
         'git -C "/repo/primary" worktree list --porcelain -z',
