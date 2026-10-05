@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "expect.must_contain",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "expect.must_not_contain",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "output_contains{all:[branch], any:[anchor detached rev-parse HEAD valuable preserve]}",
+      "passed": true,
+      "evidence": "output satisfies all contains checks (all:[branch], any:[anchor detached rev-parse HEAD valuable preserve])"
+    },
+    {
+      "text": "output_contains{any:[worktree remove before removal after anchoring checkout removal]}",
+      "passed": true,
+      "evidence": "output satisfies all contains checks (any:[worktree remove before removal after anchoring checkout removal])"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1
+  }
+}

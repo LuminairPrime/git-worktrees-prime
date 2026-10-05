@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "expect.must_contain",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "expect.must_not_contain",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "output_contains.any: [do not assume starting commit task branch detached]",
+      "passed": false,
+      "evidence": "output does not contain any of [do not assume starting commit task branch detached]"
+    },
+    {
+      "text": "output_contains.any: [detached HEAD detached anchor checkout protection checked out elsewhere]",
+      "passed": false,
+      "evidence": "output does not contain any of [detached HEAD detached anchor checkout protection checked out elsewhere]"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  }
+}

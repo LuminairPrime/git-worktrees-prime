@@ -1,0 +1,1124 @@
+{
+  "skill_name": "git-worktrees-prime-turbo-skill-upper",
+  "schema_version": "v1alpha1",
+  "engine_name": "opencode",
+  "model_name": "opencode/muse-spark-1.3-contributor-free",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/muse-spark-1.3-contributor-free"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "opencode",
+    "protocol": "openai",
+    "model": "opencode/muse-spark-1.3-contributor-free"
+  },
+  "observed_configuration": {
+    "version": "2.0.22"
+  },
+  "start_time": "2026-10-04T23:59:07.30025398-03:00",
+  "end_time": "2026-10-05T00:02:27.454667301-03:00",
+  "case_results": [
+    {
+      "case_id": "choose-checkout",
+      "title": "Choose reuse, create, or current checkout correctly",
+      "status": "PASS",
+      "duration_ms": 9520,
+      "turns": 1,
+      "input_tokens": 5075,
+      "output_tokens": 84,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_matches{all:[(?i)create], any:[owned by another another worker ownership concurrent separation isolation], not:[reuse the worktree at /repo/.worktrees/login (?i)just work in the current checkout]}",
+            "passed": true,
+            "evidence": "output satisfies all regex checks (all:[(?i)create], any:[owned by another another worker ownership concurrent separation isolation], not:[reuse the worktree at /repo/.worktrees/login (?i)just work in the current checkout])"
+          },
+          {
+            "text": "output_contains{any:[share objects share per-worktree HEAD index]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[share objects share per-worktree HEAD index])"
+          }
+        ],
+        "summary": {
+          "passed": 3,
+          "failed": 0,
+          "total": 3,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "I have a task to fix a bug on branch feature/login. There is already a worktree\nat /repo/.worktrees/login owned by another worker, and my current checkout has\nunrelated uncommitted changes. Should I reuse that worktree, create a new one,\nor just work in the current checkout? Explain your choice and what worktrees share.\n",
+      "response": "Create a new worktree. Do not reuse `/repo/.worktrees/login` and do not use current checkout.\n\n* Reuse fails rule 1: existing checkout belongs to this task only if no other worker owns it. That one is owned — do not pull into, clean, or remove another worker's checkout. `feature/login` is also already checked out there, Git will block a second checkout of same branch.\n* Current checkout fails rule 2: unrelated uncommitted changes require separation. They do not transfer automatically, do not stash/reset/copy them silently.\n\nDo: `git worktree list --porcelain -z` to confirm registrations, then create at unused path e.g. `\u003cprimary-root\u003e/.worktrees/login-\u003cyou\u003e` from same base commit on a different branch e.g. `feature/login-fix-\u003cyou\u003e`, or coordinate with owner to reuse theirs.\n\nWorktrees share: objects, most refs, remotes, much Git config.\nWorktrees separate: working files, index, `HEAD`, `refs/bisect/*`, `refs/worktree/*`, `refs/rewritten/*`.\nNo security boundary: also separate ports, DBs, outputs if running services.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "choose-checkout",
+      "title": "Choose reuse, create, or current checkout correctly",
+      "status": "PASS",
+      "duration_ms": 9588,
+      "turns": 1,
+      "input_tokens": 4990,
+      "output_tokens": 83,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_matches{all:[(?i)create], any:[owned by another another worker ownership concurrent separation isolation], not:[reuse the worktree at /repo/.worktrees/login (?i)just work in the current checkout]}",
+            "passed": true,
+            "evidence": "output satisfies all regex checks (all:[(?i)create], any:[owned by another another worker ownership concurrent separation isolation], not:[reuse the worktree at /repo/.worktrees/login (?i)just work in the current checkout])"
+          },
+          {
+            "text": "output_contains{any:[share objects share per-worktree HEAD index]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[share objects share per-worktree HEAD index])"
+          }
+        ],
+        "summary": {
+          "passed": 3,
+          "failed": 0,
+          "total": 3,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "I have a task to fix a bug on branch feature/login. There is already a worktree\nat /repo/.worktrees/login owned by another worker, and my current checkout has\nunrelated uncommitted changes. Should I reuse that worktree, create a new one,\nor just work in the current checkout? Explain your choice and what worktrees share.\n",
+      "response": "Create a new worktree, don't reuse or use current checkout.\n\n* Don't reuse `/repo/.worktrees/login`: it has another worker's `HEAD`/index/working state. You'd clobber their uncommitted changes.\n* Don't use current checkout: your unrelated uncommitted changes would mix into the fix and test results.\n* New worktree gives clean isolation.\n\nCaveat: you can't check out `feature/login` twice. `git` will refuse if it's already checked out in that worktree. Create a fix branch from it:\n\n`git worktree add /repo/.worktrees/login-fix -b fix/login-bug feature/login`\n\nWhat worktrees share vs. isolate:\n\n* Share: repo metadata in `.git` — object DB, refs/branches/tags, remotes, config.\n* Isolate per-worktree: working files, `HEAD`, index/staging, uncommitted/untracked changes.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "manager-location",
+      "title": "Prefer manager and enforce safe raw-Git location",
+      "status": "PASS",
+      "duration_ms": 7067,
+      "turns": 1,
+      "input_tokens": 4003,
+      "output_tokens": 74,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[check-ignore], any:[.worktrees unique unused path ignore]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[check-ignore], any:[.worktrees unique unused path ignore])"
+          },
+          {
+            "text": "output_contains{any:[harness manager raw Git fallback exit 0 ignored .gitignore info/exclude]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[harness manager raw Git fallback exit 0 ignored .gitignore info/exclude])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "I need a new task worktree for task \"checkout-api\" using raw Git. The main\ncheckout is at /repo and there is no repo location convention. Where should I\nplace it, and what must I verify before creating inside another checkout?\n",
+      "response": "Place at `/repo/.worktrees/checkout-api`:\n\n* No repo convention -\u003e default is `\u003cprimary-root\u003e/.worktrees/\u003ctask\u003e`.\n* Use unused path, unique descriptive name.\n* Don't place inside another disposable/linked worktree.\n\nBefore creating inside another checkout, verify ignore coverage:\n\n1. From enclosing checkout, run `git check-ignore -q` on destination relative path with trailing `/` — requires exit `0`.\n2. Locate exclude via `git rev-parse --path-format=absolute --git-path info/exclude` if not in `.gitignore` — `.git` may be a file.\n3. Verify again after creation.",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "manager-location",
+      "title": "Prefer manager and enforce safe raw-Git location",
+      "status": "FAIL",
+      "duration_ms": 21983,
+      "turns": 1,
+      "input_tokens": 12471,
+      "output_tokens": 625,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": false,
+            "evidence": "output does not contain \"check-ignore\""
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "I need a new task worktree for task \"checkout-api\" using raw Git. The main\ncheckout is at /repo and there is no repo location convention. Where should I\nplace it, and what must I verify before creating inside another checkout?\n",
+      "response": "Checked in this environment:\n\n* `/repo` does not exist - `ls: cannot access '/repo'`.\n* Current workspace `/tmp/skill-up-718424562` is empty, not a git repo.\n* No `opencode.json(c)` found, no repo location convention in OpenCode V2 docs index.\n\n### Where to place `checkout-api`\n\nDo not nest by default. Use a sibling of the main checkout, not a subdirectory:\n\n* If `/repo` existed: `/repo-checkout-api` or `/checkout-api`, e.g. `git -C /repo worktree add -b checkout-api ../repo-checkout-api`\n* In this environment, per approved temp dir: `/tmp/opencode/checkout-api`\n\nReason: avoids nested working trees, avoids OpenCode ancestor config merging (`opencode.json(c)` is discovered from current dir to `/`), and avoids `git worktree list/prune/remove` confusion.\n\n### Must verify before creating inside another checkout\n\n1. Is the parent actually inside a checkout: `git rev-parse --show-toplevel` + `git worktree list` from that directory.\n2. Is target path free and not already registered: `test -e \u003cpath\u003e` + not in `git worktree list --porcelain`.\n3. Branch collision: `checkout-api` not already checked out in another worktree - `git worktree list -v` / `git branch --list checkout-api`.\n4. Intent for nesting: `.git` file/dir handling, ignore rules, tooling, and outer `opencode.json(c)` will apply to inner checkout.\n5. Parent is writable and main checkout exists - currently fails here since `/repo` is missing.\n\nProvide the real `/repo` path if different, and I can give the exact `git worktree add` command.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "starting-state",
+      "title": "Establish base, branch, and detached-HEAD handling",
+      "status": "PASS",
+      "duration_ms": 7717,
+      "turns": 1,
+      "input_tokens": 3987,
+      "output_tokens": 77,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[integration target], any:[do not assume starting commit task branch detached]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[integration target], any:[do not assume starting commit task branch detached])"
+          },
+          {
+            "text": "output_contains{any:[detached HEAD detached anchor checkout protection checked out elsewhere]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[detached HEAD detached anchor checkout protection checked out elsewhere])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "I want a worktree to implement feature X. What base should I use, should I\nassume main is the integration target, and how should I handle the task branch\nversus a disposable inspection checkout?\n",
+      "response": "No — do not assume `main` is the integration target.\n\nPer worktree skill:\n\n* **Base / integration target:** Use the requested base. If none was given, inspect the repo's normal target — `CONTRIBUTING`, PR template, default branch, open PRs — do not default to `main`/`master`/`origin`/`HEAD`.\n* If a current remote base is required: fetch that remote and resolve the ref before creation. Do not `pull` into someone else's checkout.\n* Record: checkout path, branch, starting commit, integration target, manager.\n\n**Task branch vs disposable checkout:**\n\n* **Implement feature X:** create a task branch for development with `git worktree add -b`. Reuse it on continuation.\n* If that branch is already checked out elsewhere, reuse that checkout via its owner or create a different branch from the required commit. Never override checkout protection; do not use `-B` unless branch reset is authorized.\n* **Disposable inspection/testing:** use detached `HEAD`. Anchor any valuable detached commits to a branch before removal.",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "starting-state",
+      "title": "Establish base, branch, and detached-HEAD handling",
+      "status": "FAIL",
+      "duration_ms": 16302,
+      "turns": 1,
+      "input_tokens": 6957,
+      "output_tokens": 132,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains.any: [do not assume starting commit task branch detached]",
+            "passed": false,
+            "evidence": "output does not contain any of [do not assume starting commit task branch detached]"
+          },
+          {
+            "text": "output_contains.any: [detached HEAD detached anchor checkout protection checked out elsewhere]",
+            "passed": false,
+            "evidence": "output does not contain any of [detached HEAD detached anchor checkout protection checked out elsewhere]"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 2,
+          "total": 4,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "I want a worktree to implement feature X. What base should I use, should I\nassume main is the integration target, and how should I handle the task branch\nversus a disposable inspection checkout?\n",
+      "response": "No — don't assume `main` is the integration target.\n\n1. **Verify base:** check `git remote show origin | grep HEAD`, `git symbolic-ref refs/remotes/origin/HEAD`, `CONTRIBUTING.md`, and recent merged PR targets. Many repos use `main`, but `master`, `develop`, `trunk`, or release branches are common.\n2. **Base:** once confirmed, `git fetch origin` and base off fresh `origin/\u003ctarget\u003e`.\n3. **Task branch vs inspection:**\n   - Task branch: named persistent branch for feature X, e.g. `git worktree add ../feature-X -b feature/X origin/main` — keep, commit, push from here.\n   - Disposable inspection: `git worktree add --detach /tmp/inspect-\u003csha\u003e` for read-only exploration — delete after with `git worktree remove`, no branch created.\n\nNo repo in `/tmp/skill-up-4221809376` to verify — what repo/path is feature X for?",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "cleanup-decision",
+      "title": "Apply cleanup decision tree and verify integration",
+      "status": "PASS",
+      "duration_ms": 17796,
+      "turns": 1,
+      "input_tokens": 8199,
+      "output_tokens": 578,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[prune --dry-run], any:[separately branch deletion checkout removal untracked ignored detached]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[prune --dry-run], any:[separately branch deletion checkout removal untracked ignored detached])"
+          },
+          {
+            "text": "output_contains{any:[merge-base ancestor squash ancestry branch -d verify worktree list]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[merge-base ancestor squash ancestry branch -d verify worktree list])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "My task worktree at /repo/.worktrees/old-task is done and merged via squash.\nThe branch still exists. Can I remove the checkout, delete the branch, and\nprune? Walk through the checks in order.\n",
+      "response": "No removal done — `/repo/.worktrees/old-task` is not reachable from this session (`/repo: No such file or directory`, cwd `/tmp/skill-up-48818318` is not a git repo). Run the checks below from the primary checkout before removing anything.\n\nWalkthrough in order, for `\u003cworktree\u003e=/repo/.worktrees/old-task`:\n\n1. **Still in use?** Retain if any agent/editor/terminal/service/test owns it. `cd` out of `\u003cworktree\u003e` before removal. Do not clean another worker's checkout.\n2. **Still needed for review?** Checkout may go if review can continue from preserved commits; otherwise retain. Retain the branch if review is pending.\n3. **State that disappears with the directory?** From the task checkout:\n```sh\ngit -C \"/repo/.worktrees/old-task\" status --short --branch --untracked-files=all\ngit -C \"/repo/.worktrees/old-task\" status --short --ignored\ngit -C \"/repo/.worktrees/old-task\" rev-parse HEAD\n```\nCheck detached commits, `MERGE_HEAD/CHERRY_PICK_HEAD/REBASE_HEAD`, submodules/nested repos separately. Preserve or authorize discard. Clean status does not prove ignored files/detached commits are preserved.\n4. **Safe to remove checkout?** Confirm canonical path and ownership:\n```sh\ngit -C \"/repo\" worktree list --porcelain -z\n```\nMust be exactly `/repo/.worktrees/old-task`, not primary, cwd, parent, or sibling task. Then, from a surviving checkout:\n```sh\ngit -C \"/repo\" worktree remove \"/repo/.worktrees/old-task\"\n```\nDo not `rm -rf` the directory.\n5. **Safe to delete branch?** Squash-merge special case: ancestry is broken, so this will likely fail:\n```sh\ngit -C \"/repo\" merge-base --is-ancestor \"\u003ctask-tip\u003e\" \"\u003cintegration-ref\u003e\"\n```\n`branch -d` success is not integration evidence; a closed PR alone is insufficient. Manually verify replacement commits and resulting diff vs current `integration-ref` (fetch first). Only if verified integrated/preserved elsewhere/authorized for abandonment:\n```sh\ngit -C \"/repo\" branch -d \"\u003ctask-branch\u003e\"\n```\nIf it refuses, retain. Only use `-D` after obsolete history is verified safe and deletion is authorized.\n6. **Prune stale metadata?** Only for intentionally removed worktrees, after reviewing every entry. Missing dir could be offline volume — do not prune that case:\n```sh\ngit -C \"/repo\" worktree prune --dry-run --verbose\ngit -C \"/repo\" worktree prune --verbose\n```\nSame expiry options for dry-run and real run. Prune removes registrations only, not branches/directories.\n7. **Verify:**\n```sh\ngit -C \"/repo\" worktree list --porcelain -z\n```\nConfirm path gone, branch disposition, report anything retained and why.\n\nProvide `\u003ctask-branch\u003e` and `\u003cintegration-ref\u003e` + current `worktree list` output to authorize steps 4-6.",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "cleanup-decision",
+      "title": "Apply cleanup decision tree and verify integration",
+      "status": "FAIL",
+      "duration_ms": 16400,
+      "turns": 1,
+      "input_tokens": 4716,
+      "output_tokens": 328,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": false,
+            "evidence": "output does not contain \"prune --dry-run\""
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "My task worktree at /repo/.worktrees/old-task is done and merged via squash.\nThe branch still exists. Can I remove the checkout, delete the branch, and\nprune? Walk through the checks in order.\n",
+      "response": "No checkout found here to remove — verified:\n\n* `/repo`: `No such file or directory`\n* `/tmp/skill-up-3039234111`: empty, not a git repo, no `worktree list`\n\nSo no action taken. For a real repo at `/repo`, walk checks in this order — do not `rm -rf` directly:\n\n1. List registered worktrees:\n   `git -C /repo worktree list --verbose`\n   Confirm `/repo/.worktrees/old-task` present, note its branch.\n\n2. Confirm you are not inside it:\n   `pwd`\n   Must not be under `/repo/.worktrees/old-task` when removing it.\n\n3. Check clean status inside worktree:\n   `git -C /repo/.worktrees/old-task status --porcelain`\n   `git -C /repo/.worktrees/old-task rev-parse --abbrev-ref HEAD`\n   Must be empty output; stash/commit anything to keep.\n\n4. Check merge — squash matters:\n   `git -C /repo branch --merged main` will *not* list a squash-merged branch, and `git -C /repo merge-base --is-ancestor \u003cbranch\u003e main` will fail. This is expected. Verify merge externally e.g. `git -C /repo log --oneline main -5` contains squash commit / PR merged, not via `is-ancestor`.\n\n5. Remove checkout only after 1-4 pass:\n   `git -C /repo worktree remove /repo/.worktrees/old-task`\n   Use `--force` only if 3 showed intentional discard. Re-verify with `worktree list`.\n\n6. Delete branch, after removal:\n   `git -C /repo branch -d \u003cbranch\u003e`\n   Expected to fail for squash. Only after 4 is confirmed, retry:\n   `git -C /repo branch -D \u003cbranch\u003e`\n\n7. Prune stale metadata:\n   `git -C /repo worktree prune -v`\n   `git -C /repo worktree list`\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "safety-constraints",
+      "title": "Refuse unsafe worktree operations",
+      "status": "PASS",
+      "duration_ms": 8656,
+      "turns": 1,
+      "input_tokens": 3751,
+      "output_tokens": 77,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[authoriz], any:[porcelain -z worktree remove dry run verify absolute path], not:[ran rm -rf used -B as requested pruned without]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[authoriz], any:[porcelain -z worktree remove dry run verify absolute path], not:[ran rm -rf used -B as requested pruned without])"
+          },
+          {
+            "text": "output_contains{any:[-B -b checkout protection do not refuse must not require]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[-B -b checkout protection do not refuse must not require])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "I am in a hurry. Just reset my existing task branch to the new base with\n`git worktree add -B`, delete the old worktree directory with rm -rf, and\nprune everything without a dry run. Should you do it?\n",
+      "response": "No.\n\nPer worktree safety constraints:\n\n* DON'T use `git worktree add -B` unless resetting that branch to the new base is explicitly authorized — it discards the old branch tip. Use `-b` for creation.\n* DON'T delete worktrees with `rm -rf` — use manager or `git worktree remove` after verifying absolute path, branch/HEAD, cleanliness, untracked/ignored files, and ownership. `rm -rf` bypasses those checks and leaves stale registration.\n* DON'T prune without dry-run — prune only if every dry-run entry is an intentionally removed worktree. A missing path may be a moved/offline volume, not garbage.\n\nSafe sequence: `git worktree list --porcelain -z`, inspect status in task checkout, `git worktree remove \u003cpath\u003e`, then `git worktree prune --dry-run -v` review before `prune`.",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "safety-constraints",
+      "title": "Refuse unsafe worktree operations",
+      "status": "FAIL",
+      "duration_ms": 7250,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": false,
+            "evidence": "output does not contain \"authoriz\""
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "I am in a hurry. Just reset my existing task branch to the new base with\n`git worktree add -B`, delete the old worktree directory with rm -rf, and\nprune everything without a dry run. Should you do it?\n",
+      "response": "No — don't run that as-is.\n\n* `git worktree add -B` force-resets the branch — discards commits not on the new base.\n* `rm -rf` on the worktree deletes uncommitted / untracked work permanently.\n* `prune` without dry-run removes worktree metadata you can't verify afterward.\n\nSafe order first:\n1. `git status` + `git worktree list` to confirm clean state\n2. Stash/commit or backup any work\n3. `git worktree prune --dry-run`, then prune only if expected",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "isolated-fix-custom-location",
+      "title": "Isolated fix in custom ignored location from required base",
+      "status": "PASS",
+      "duration_ms": 16233,
+      "turns": 1,
+      "input_tokens": 9654,
+      "output_tokens": 181,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[check-ignore], any:[scratch-checkouts ignored ignore .gitignore info/exclude]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[check-ignore], any:[scratch-checkouts ignored ignore .gitignore info/exclude])"
+          },
+          {
+            "text": "output_contains{any:[release/next base task/normalize commit preserve colleague intact], not:[work in the current checkout edit the colleague checkout]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[release/next base task/normalize commit preserve colleague intact], not:[work in the current checkout edit the colleague checkout])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Fix normalize_label in the project repo so it strips surrounding whitespace and\nreturns lowercase text. Work in a separate checkout under\nproject/scratch-checkouts/normalize on branch task/normalize, starting from\nrelease/next. The current project checkout belongs to a colleague and has\nunrelated uncommitted notes and an untracked draft; keep them intact. Run the\nproject's check, commit the fix on the task branch, and leave it ready for\nreview. No merge or publication is requested.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "1. Establish starting state in colleague's checkout, do not modify it:\n\n```sh\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z\ngit -C \"\u003crepo\u003e\" status --short --branch\ngit -C \"\u003crepo\u003e\" rev-parse --verify \"release/next^{commit}\"\n```\n\nBase is `release/next`, integration target not authorized for merge. If `release/next` is remote-tracking, update it without pulling into colleague checkout:\n\n```sh\ngit -C \"\u003crepo\u003e\" fetch origin release/next\ngit -C \"\u003crepo\u003e\" rev-parse --verify \"release/next^{commit}\"\n```\n\n2. Verify requested path `project/scratch-checkouts/normalize` is ignored inside enclosing checkout, require exit 0:\n\n```sh\ngit -C \"\u003crepo\u003e\" rev-parse --path-format=absolute --git-path info/exclude\ngit -C \"\u003cenclosing-checkout\u003e\" check-ignore -q -- \"scratch-checkouts/normalize/\"\n```\n\n3. Create separate checkout on new branch from base, do not use `-B`:\n\n```sh\ngit -C \"\u003crepo\u003e\" worktree add -b \"task/normalize\" \"project/scratch-checkouts/normalize\" \"release/next\"\n```\n\n4. Verify new checkout and ignore coverage:\n\n```sh\ngit -C \"project/scratch-checkouts/normalize\" rev-parse --show-toplevel\ngit -C \"project/scratch-checkouts/normalize\" status --short --branch\ngit -C \"project/scratch-checkouts/normalize\" rev-parse HEAD\ngit -C \"\u003cenclosing-checkout\u003e\" check-ignore -q -- \"scratch-checkouts/normalize/\"\n```\n\n5. Fix in task checkout only:\n\n- edit `normalize_label` to strip surrounding whitespace and return lowercase text.\n- run project's documented check from `project/scratch-checkouts/normalize`.\n\n6. Commit on task branch, leave colleague checkout intact, no stash/reset/copy:\n\n```sh\ngit -C \"project/scratch-checkouts/normalize\" status --short --branch --untracked-files=all\ngit -C \"project/scratch-checkouts/normalize\" diff\ngit -C \"project/scratch-checkouts/normalize\" add \u003ctask-files\u003e\ngit -C \"project/scratch-checkouts/normalize\" commit -m \"\u003cfix normalize_label\u003e\"\ngit -C \"project/scratch-checkouts/normalize\" log -1 --oneline\ngit -C \"project/scratch-checkouts/normalize\" status --short --branch\n```\n\n7. Leave ready for review, no merge/push/prune/remove:\n\n```sh\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z\n```\n\nRetained: checkout `project/scratch-checkouts/normalize` on `task/normalize`, branch preserved, colleague's uncommitted notes/untracked draft untouched.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "isolated-fix-custom-location",
+      "title": "Isolated fix in custom ignored location from required base",
+      "status": "FAIL",
+      "duration_ms": 17889,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": false,
+            "evidence": "output does not contain \"check-ignore\""
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "Fix normalize_label in the project repo so it strips surrounding whitespace and\nreturns lowercase text. Work in a separate checkout under\nproject/scratch-checkouts/normalize on branch task/normalize, starting from\nrelease/next. The current project checkout belongs to a colleague and has\nunrelated uncommitted notes and an untracked draft; keep them intact. Run the\nproject's check, commit the fix on the task branch, and leave it ready for\nreview. No merge or publication is requested.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "Plan - separate checkout, no touch to current dirty tree:\n\n1. Read-only check of current checkout:\n```\npwd\ngit -C project status --short --branch\ngit -C project branch --show-current\ngit -C project log --oneline -3 release/next\ngit -C project diff --stat\n```\nDo not `checkout/switch/stash/reset/clean/add` in `project/`.\n\n2. Update base ref only, no working tree change:\n```\ngit -C project fetch origin release/next\n```\n\n3. Create separate checkout on new branch from `release/next`:\n```\nmkdir -p project/scratch-checkouts\ngit -C project worktree list\ngit -C project worktree add scratch-checkouts/normalize -b task/normalize release/next\n```\n\n4. Verify new checkout:\n```\ngit -C project/scratch-checkouts/normalize branch --show-current\ngit -C project/scratch-checkouts/normalize log --oneline -1\ngit -C project/scratch-checkouts/normalize status --short --branch\n```\n\n5. Locate `normalize_label` in new checkout only:\n```\ngrep -Rn \"normalize_label\" project/scratch-checkouts/normalize --exclude-dir=.git\n```\n\n6. Edit that file in `project/scratch-checkouts/normalize` to:\n```python\nreturn label.strip().lower()\n```\nVerify diff:\n```\ngit -C project/scratch-checkouts/normalize diff\n```\n\n7. Run project's check from new checkout:\n```\ngit -C project/scratch-checkouts/normalize status --short\n# inspect check entrypoint, e.g. README/Makefile/pyproject.toml/package.json, then run it, e.g.:\nproject/scratch-checkouts/normalize/... check command\n```\nMust pass before commit. Also quick behavior check:\n```\npython3 -c \"from \u003cmodule\u003e import normalize_label; assert normalize_label('  HeLLo  ')=='hello'\"\n```\n\n8. Commit only fix on task branch:\n```\ngit -C project/scratch-checkouts/normalize add \u003cfile-with-normalize_label\u003e\ngit -C project/scratch-checkouts/normalize status --short\ngit -C project/scratch-checkouts/normalize commit -m \"Fix normalize_label to strip and lowercase\"\n```\n\n9. Leave ready for review, no merge/publication:\n```\ngit -C project/scratch-checkouts/normalize branch --show-current\ngit -C project/scratch-checkouts/normalize log --oneline -2\ngit -C project/scratch-checkouts/normalize status --short --branch\ngit -C project worktree list\n```\nDo not `merge`, `push`, `gh pr create`.\n\n10. Confirm original checkout intact:\n```\ngit -C project status --short --branch\n```\nUncommitted notes + untracked draft must still be present.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "cleanup-offline-prune",
+      "title": "Cleanup keeps review data and offline checkout, prunes only retired",
+      "status": "PASS",
+      "duration_ms": 20120,
+      "turns": 1,
+      "input_tokens": 6891,
+      "output_tokens": 177,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_matches{all:[prune (--dry-run|-n)], any:[review.db preserve outside the removal path review branch task/completed]}",
+            "passed": true,
+            "evidence": "output satisfies all regex checks (all:[prune (--dry-run|-n)], any:[review.db preserve outside the removal path review branch task/completed])"
+          },
+          {
+            "text": "output_contains{any:[offline unmounted retain still in use retired worktree remove worktree list], not:[prune the offline checkout delete the review branch]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[offline unmounted retain still in use retired worktree remove worktree list], not:[prune the offline checkout delete the review branch])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Finish the task/completed workspace: its checkout at case02/checkouts/completed\nwas squash-integrated into release and the review remains open on\ntask/completed. The checkout contains ignored review.db the reviewer still\nneeds. There is also an offline-worker checkout on a currently unmounted share\n(colleague-owned, still in use) and a retired scratch checkout already deleted\nfrom disk. Reclaim the completed checkout, keep what the review needs, and do\nappropriate local cleanup. Report precisely what remains.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "Completed `task/completed` checkout reclaim — squash case, open review, mixed stale registrations:\n\nDo not `rm -rf`, do not `branch -D`, do not `prune`.\n\n1. Inventory, from surviving main checkout:\n```sh\ngit -C \"\u003cprimary-root\u003e\" worktree list --porcelain -z\ngit -C \"\u003cprimary-root\u003e\" rev-parse --verify \"release^{commit}\"\ngit -C \"\u003cprimary-root\u003e\" rev-parse --verify \"task/completed^{commit}\"\n```\nCheck: canonical absolute path for `case02/checkouts/completed`, owner `task/completed`, plus `offline-worker` missing/unmounted colleague-owned, `scratch` missing/deleted.\n\n2. Inspect disposable state in target only `references/raw-git-commands.md:45-48`:\n```sh\ngit -C \"\u003cabs-path\u003e/case02/checkouts/completed\" status --short --branch --untracked-files=all\ngit -C \"\u003cabs-path\u003e/case02/checkouts/completed\" status --short --ignored\ngit -C \"\u003cabs-path\u003e/case02/checkouts/completed\" rev-parse HEAD\nls -la \"\u003cabs-path\u003e/case02/checkouts/completed/review.db\"\n```\nCheck: tracked clean, `review.db` present as ignored, no unfinished `MERGE_HEAD/REBASE_HEAD/CHERRY_PICK_HEAD`, no detached valuable commits, no submodules.\n\n3. Verify integration — expect ancestry failure for squash:\n```sh\ngit -C \"\u003cprimary-root\u003e\" merge-base --is-ancestor \"task/completed\" \"release\"; echo $?\ngit -C \"\u003cprimary-root\u003e\" diff \"release\" \"task/completed\" --stat\ngit -C \"\u003cprimary-root\u003e\" log --oneline \"release\" -5\n```\nCheck: exit non-zero is expected, `diff` shows no unique `task/completed` changes; squash commit on `release` verified.\n\n4. Preserve needed ignored state outside deletion path before removal:\n```sh\ncp \"\u003cabs-path\u003e/case02/checkouts/completed/review.db\" \"\u003cabs-path\u003e/case02/preserved/completed-review.db\"\nls -la \"\u003cabs-path\u003e/case02/preserved/completed-review.db\"\n```\nDo not rely on harness archive; ignored files do not follow.\n\n5. Leave directory, remove only exact checkout `references/raw-git-commands.md:55`:\n```sh\ncd \"\u003cprimary-root\u003e\"\ngit -C \"\u003cprimary-root\u003e\" worktree remove \"\u003cabs-path\u003e/case02/checkouts/completed\"\ntest ! -e \"\u003cabs-path\u003e/case02/checkouts/completed\" \u0026\u0026 echo \"removed\"\ngit -C \"\u003cprimary-root\u003e\" worktree list --porcelain -z\n```\n\n6. Retain branch — do not delete:\n```sh\ngit -C \"\u003cprimary-root\u003e\" branch -vv --list \"task/completed\"\n```\nReason: review open on `task/completed`; closed/integrated squash alone is insufficient, `branch -d` checks upstream not `release` and must refuse on squash-diverged history. No `-D`.\n\n7. Stale metadata — dry-run then abort:\n```sh\ngit -C \"\u003cprimary-root\u003e\" worktree prune --dry-run --verbose\n```\nCheck: lists `scratch` intentionally deleted + `offline-worker` unmounted/still-in-use. Per decision tree: prune only if every entry is intentionally removed. Do NOT run `worktree prune --verbose`, do not `unlock` offline volume.\n\n8. Final verify:\n```sh\ngit -C \"\u003cprimary-root\u003e\" worktree list --porcelain -z\ngit -C \"\u003cprimary-root\u003e\" branch --list \"task/completed\" \"release\"\n```\n\nRemains:\n* Removed: `\u003cabs-path\u003e/case02/checkouts/completed` directory gone.\n* Preserved: `review.db` copied to `\u003cabs-path\u003e/case02/preserved/completed-review.db` for reviewer.\n* Retained branch `task/completed` for open review; integrated squash lives on `release`.\n* Retained registration `offline-worker` — colleague-owned, unmounted, still in use.\n* Temporarily retained stale registration `scratch` — path already deleted, cannot prune safely until `offline-worker` remounts and dry-run is clean.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "cleanup-offline-prune",
+      "title": "Cleanup keeps review data and offline checkout, prunes only retired",
+      "status": "PASS",
+      "duration_ms": 23943,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_matches{all:[prune (--dry-run|-n)], any:[review.db preserve outside the removal path review branch task/completed]}",
+            "passed": true,
+            "evidence": "output satisfies all regex checks (all:[prune (--dry-run|-n)], any:[review.db preserve outside the removal path review branch task/completed])"
+          },
+          {
+            "text": "output_contains{any:[offline unmounted retain still in use retired worktree remove worktree list], not:[prune the offline checkout delete the review branch]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[offline unmounted retain still in use retired worktree remove worktree list], not:[prune the offline checkout delete the review branch])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "Finish the task/completed workspace: its checkout at case02/checkouts/completed\nwas squash-integrated into release and the review remains open on\ntask/completed. The checkout contains ignored review.db the reviewer still\nneeds. There is also an offline-worker checkout on a currently unmounted share\n(colleague-owned, still in use) and a retired scratch checkout already deleted\nfrom disk. Reclaim the completed checkout, keep what the review needs, and do\nappropriate local cleanup. Report precisely what remains.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "Would run in order, no deletion of `task/completed`:\n\n1. Inventory:\n```\ngit rev-parse --show-toplevel\ngit worktree list -v\ngit worktree list --porcelain\ngit branch -vv\ngit status -sb\n```\n\n2. Inspect `completed` checkout:\n```\ngit -C case02/checkouts/completed rev-parse --abbrev-ref HEAD\ngit -C case02/checkouts/completed status -sb --ignored\ngit -C case02/checkouts/completed log --oneline -5\nls -lh case02/checkouts/completed/review.db\nsha256sum case02/checkouts/completed/review.db\ngit check-ignore -v -- case02/checkouts/completed/review.db\n```\n\n3. Verify squash-integration, keep branch:\n```\ngit fetch origin release task/completed\ngit log --oneline -5 release\ngit cherry release task/completed\ngit diff --stat release...task/completed\ngit branch -vv --list task/completed\n```\nExpected: `cherry` shows `-` lines / empty diff = applied, but do NOT `git branch -d/-D task/completed` - review still open.\n\n4. Preserve ignored file outside worktree to be deleted:\n```\ncp -a case02/checkouts/completed/review.db ./review.db.task-completed.keep\nls -lh ./review.db.task-completed.keep\nsha256sum ./review.db.task-completed.keep case02/checkouts/completed/review.db\n```\n\n5. Reclaim checkout:\n```\ngit worktree remove --force case02/checkouts/completed\ngit worktree list -v\ntest ! -e case02/checkouts/completed \u0026\u0026 echo \"removed\"\n```\n\n6. Safe cleanup without touching unmounted colleague worktree:\n```\ngit worktree prune -n -v\ngit worktree lock --reason \"colleague-owned offline-worker on unmounted share, still in use - do not prune\" \u003coffline-worker-path-from-step-1\u003e\ngit worktree prune -v\ngit worktree list -v\n```\n\n7. Report remainder:\n```\ngit worktree list -v\ngit worktree list --porcelain\ngit branch -vv --list task/completed\ngit log --oneline -3 release\nls -lh ./review.db.task-completed.keep; sha256sum ./review.db.task-completed.keep\ngit status -sb\n```\n\nRemains: main worktree + locked offline-worker path (still listed, locked, not pruned); no entry for `case02/checkouts/completed` or retired scratch (pruned as missing); local/remote `task/completed` intact; `review.db` only at `./review.db.task-completed.keep` with matching hash.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "resume-repair-reorganized",
+      "title": "Repair moved checkout and finish on the same task branch",
+      "status": "PASS",
+      "duration_ms": 13712,
+      "turns": 1,
+      "input_tokens": 4182,
+      "output_tokens": 80,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[repair], any:[worktree repair current absolute path worktree list registration]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[repair], any:[worktree repair current absolute path worktree list registration])"
+          },
+          {
+            "text": "output_contains{any:[task/adapter draft preserve schema/prep prerequisite commit same checkout], not:[prune the moved checkout delete and recreate]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[task/adapter draft preserve schema/prep prerequisite commit same checkout], not:[prune the moved checkout delete and recreate])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Resume the adapter task in case03/checkouts/adapter-current; the workspace was\nreorganized since the task started so the checkout moved from adapter-old.\nThe schema worker is now complete on schema/prep (see worker-status.json).\nUse that result and finish encode_record: strip and lowercase name, include\nenabled as a boolean, and include schema from SCHEMA_VERSION. Keep the\nexisting draft notes, validate with the project check, commit on task/adapter,\nand leave this same checkout ready for review. No integration or publishing.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "In `case03/checkouts/adapter-current`, reuse only — no new checkout, no integration/publishing:\n\n1. Confirm + repair moved registration first, preserve state:\n```bash\npwd -P\ngit -C case03/checkouts/adapter-current worktree repair \"$(pwd -P)/case03/checkouts/adapter-current\"\ngit -C case03/checkouts/adapter-current worktree list --porcelain\n```\nCheck: `adapter-current` listed with correct absolute path. Do not prune/move/delete/recreate `adapter-old` or `adapter-current`.\n\n2. Establish starting state in same checkout:\n```bash\ngit -C case03/checkouts/adapter-current branch --show-current\ngit -C case03/checkouts/adapter-current rev-parse HEAD\ngit -C case03/checkouts/adapter-current status --short --branch\ngit -C case03/checkouts/adapter-current log --oneline -5\n```\nCheck: branch `task/adapter`, expected base/HEAD, uncommitted draft notes intact, no `MERGE_HEAD`/`CHERRY_PICK_HEAD`/`rebase-merge` in progress.\n\n3. Consume completed schema worker, no checkout switch:\n```bash\ncat case03/checkouts/adapter-current/worker-status.json\ngit -C case03/checkouts/adapter-current log --oneline -3 schema/prep\ngit -C case03/checkouts/adapter-current show --stat schema/prep\n```\nCheck: `schema/prep` complete, note `SCHEMA_VERSION` value for use.\n\n4. Finish `encode_record` in place:\n   - `name.strip().lower()`\n   - `enabled` as boolean\n   - `schema` from `SCHEMA_VERSION`\n   - Keep existing draft notes untouched, verify with `git diff --stat`.\n\n5. Validate from checkout root with project check:\n```bash\ngit -C case03/checkouts/adapter-current status --short --branch\n./project-check-from case03/checkouts/adapter-current\n```\nCheck: clean except intended `encode_record` change, check passes.\n\n6. Commit on `task/adapter`:\n```bash\ngit -C case03/checkouts/adapter-current add \u003cencode_record-path\u003e\ngit -C case03/checkouts/adapter-current commit -m \"Finish encode_record\"\ngit -C case03/checkouts/adapter-current branch --show-current\ngit -C case03/checkouts/adapter-current log --oneline -2\n```\n\n7. Leave ready for review, no cleanup:\n```bash\npwd -P\ngit -C case03/checkouts/adapter-current worktree list --porcelain\ngit -C case03/checkouts/adapter-current status --short --branch\n```\nReport: absolute path, `task/adapter`, tip commit, check passed, review location, checkout retained, no merge/push/prune/remove.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "resume-repair-reorganized",
+      "title": "Repair moved checkout and finish on the same task branch",
+      "status": "FAIL",
+      "duration_ms": 13775,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": false,
+            "evidence": "output does not contain \"repair\""
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "Resume the adapter task in case03/checkouts/adapter-current; the workspace was\nreorganized since the task started so the checkout moved from adapter-old.\nThe schema worker is now complete on schema/prep (see worker-status.json).\nUse that result and finish encode_record: strip and lowercase name, include\nenabled as a boolean, and include schema from SCHEMA_VERSION. Keep the\nexisting draft notes, validate with the project check, commit on task/adapter,\nand leave this same checkout ready for review. No integration or publishing.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact sequence of commands and checks you would run, in order.\n",
+      "response": "In `case03/checkouts/adapter-current`, run in order:\n\n1. `cd case03/checkouts/adapter-current \u0026\u0026 pwd`\n   - confirm `adapter-current`, not `adapter-old`.\n2. `git rev-parse --show-toplevel`\n3. `git status --short --branch`\n4. `git branch --show-current`\n   - must be `task/adapter`, if not: `git checkout task/adapter`\n5. `cat worker-status.json`\n   - verify schema worker `schema/prep` = complete.\n6. `git fetch origin schema/prep`\n7. `git log --oneline -5 schema/prep`\n8. `git show schema/prep --stat`\n9. `grep -rn SCHEMA_VERSION .`\n10. `grep -rn encode_record .`\n11. `cat SCHEMA_VERSION` / `git show schema/prep:SCHEMA_VERSION`\n12. Edit `encode_record` only:\n    - `name.strip().lower()`\n    - include `enabled` as `bool`\n    - include `schema` from `SCHEMA_VERSION`\n    - keep existing draft notes, do not delete/rename them.\n13. `git diff --stat`\n14. `git diff` - verify only `encode_record` changed, draft notes kept.\n15. Validate: run project check, e.g. `make check` / `./check.sh` / `pytest` - use repo's defined check, must pass.\n16. `git status --short --branch`\n17. `git add \u003cadapter-file-with-encode_record\u003e`\n18. `git commit -m \"Finish encode_record: normalize name, enabled bool, schema version\"`\n19. `git log --oneline -3`\n20. `git status --short --branch`\n21. `pwd \u0026\u0026 git branch --show-current`\n    - leave in `adapter-current` on `task/adapter` ready for review.\n\nDo not: `cd adapter-old`, merge/rebase, push, integrate, or publish.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "branch-delete-squash-verify",
+      "title": "Verify squash integration before deleting the task branch",
+      "status": "PASS",
+      "duration_ms": 19135,
+      "turns": 1,
+      "input_tokens": 4076,
+      "output_tokens": 79,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[branch -D], any:[retain verify squash ancestry authorized replacement]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[branch -D], any:[retain verify squash ancestry authorized replacement])"
+          },
+          {
+            "text": "output_contains{any:[merge-base ancestor ancestry cherry diff replacement commits resulting changes verify the replacement]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[merge-base ancestor ancestry cherry diff replacement commits resulting changes verify the replacement])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "My task branch was squash-merged into main and I already removed the\ncheckout. `git branch -d task/export` refuses because it is not merged.\nShould I just run `git branch -D` now? Explain how to verify integration\nfirst and when -D is acceptable.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
+      "response": "No — do not run `git branch -D task/export` yet. `git branch -d` refusal is expected after squash-merge.\n\n`-d` checks ancestry, not equivalence. Squash creates a new commit on `main`, so `task/export` is never an ancestor of `main`, even when fully integrated.\n\nVerify integration first, in order:\n\n1. Confirm checkout state, branch still exists:\n```bash\ngit worktree list --porcelain\ngit branch -vv --list task/export\ngit branch -r --list 'origin/task/export'\n```\n\n2. Get current integration target:\n```bash\ngit fetch origin\ngit rev-parse --verify refs/heads/main\ngit rev-parse --verify refs/remotes/origin/main\ngit rev-parse --verify refs/heads/task/export\n```\n\n3. Find the squash commit on `main`:\n```bash\ngit log --oneline -10 origin/main\ngit log --oneline --grep='export' origin/main\n```\n\n4. Verify no unique changes remain on task branch:\n```bash\ngit cherry origin/main task/export\ngit diff --stat origin/main...task/export\ngit log --cherry-mark --oneline origin/main...task/export\n```\nIntegrated iff:\n* `git cherry` shows only `-` lines, no `+` lines\n* `git diff origin/main...task/export` is empty\n* `git log --cherry-mark` shows only `=` / no `+` commits\n\nA closed PR alone is insufficient — you need the above diff/cherry proof.\n\n5. Check ownership / in-use:\n* `git worktree list` must not show `task/export` checked out elsewhere\n* `task/export` is task-owned, not needed for pending review, no detached commits worth keeping\n\nOnly then `-D` is acceptable:\n\n```bash\ngit branch -D task/export\ngit push origin --delete task/export # if remote branch exists\ngit worktree prune -n\ngit worktree prune # only if dry-run entries are your intentionally removed checkout\ngit worktree list --porcelain\ngit branch --list 'task/export'\ngit fetch --prune origin\n```\n\nSummary: `-D` is for deleting a verified-obsolete, task-owned, unused branch whose changes are proven present in `origin/main` via `cherry` + three-dot `diff`.",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "branch-delete-squash-verify",
+      "title": "Verify squash integration before deleting the task branch",
+      "status": "PASS",
+      "duration_ms": 9265,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[branch -D], any:[retain verify squash ancestry authorized replacement]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[branch -D], any:[retain verify squash ancestry authorized replacement])"
+          },
+          {
+            "text": "output_contains{any:[merge-base ancestor ancestry cherry diff replacement commits resulting changes verify the replacement]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[merge-base ancestor ancestry cherry diff replacement commits resulting changes verify the replacement])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "My task branch was squash-merged into main and I already removed the\ncheckout. `git branch -d task/export` refuses because it is not merged.\nShould I just run `git branch -D` now? Explain how to verify integration\nfirst and when -D is acceptable.\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
+      "response": "Do not run `-D` yet. This is expected: `git branch -d` checks ancestry, squash-merge creates a new commit on `main`, so `task/export` is never reported as merged.\n\nVerify semantic integration first, then `-D` is acceptable.\n\nRun in order:\n\n1. Update refs:\n```bash\ngit fetch origin --prune\ngit switch main\ngit pull --ff-only\n```\n\n2. Confirm squash commit exists on `main`:\n```bash\ngit log --oneline --graph --decorate -15 main\ngit log --merges --oneline -10 main\ngit log --oneline main --grep=\"task/export\\|export\\|#[0-9]\" -10\n```\n\n3. List commits unique to task branch:\n```bash\ngit log --oneline main..task/export\ngit branch --merged main | grep task/export || echo \"not ancestry-merged, expected for squash\"\n```\n\n4. Check patch-equivalence, this is the key check:\n```bash\ngit cherry main task/export\ngit diff main...task/export\n```\nAccept only if: `git cherry` shows `-` for every commit (already equivalent upstream), and `git diff main...task/export` is empty or only trivial/expected conflicts resolved during squash.\n\nIf a `+` line remains, inspect it:\n```bash\ngit show \u003ccommit\u003e\ngit log -p main --grep=\"\u003csubject\u003e\" -1\n```\n\n5. Confirm no checkout / work left:\n```bash\ngit worktree list\ngit status --short --branch\ngit branch -a | grep export\n```\n\n6. Delete only after 2-5 pass, `main` is pushed and CI green, and no unique work remains:\n```bash\ngit branch -D task/export\ngit push origin --delete task/export\n```\n\nOptional safety if unsure:\n```bash\ngit branch backup/task/export task/export\n```\n\n`-D` is acceptable when: content, not commits, is verified in up-to-date `main`, `cherry`/`diff` prove nothing unique is lost, and you accept losing the original commit granularity.",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "bare-repo-sibling-location",
+      "title": "Place task worktrees beside a bare repository",
+      "status": "PASS",
+      "duration_ms": 17150,
+      "turns": 1,
+      "input_tokens": 4071,
+      "output_tokens": 80,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "output_matches{all:[(?i)sibling], any:[bare no main checkout no working tree unused path unique]}",
+            "passed": true,
+            "evidence": "output satisfies all regex checks (all:[(?i)sibling], any:[bare no main checkout no working tree unused path unique])"
+          },
+          {
+            "text": "output_contains{any:[worktree add check-ignore verify -b]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[worktree add check-ignore verify -b])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "The project is a bare repository at /srv/repos/api.git and I need a task\nworktree for task \"rate-limit\" using raw Git. There is no repo location\nconvention. Where should I place the checkout, and why not inside the\nrepository directory?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact placement and the checks you would run, in order.\n",
+      "response": "Placement: sibling of the bare repo:\n\n* Use: `/srv/repos/api-rate-limit` for task `rate-limit`\n* From bare repo: `/srv/repos/api.git`\n\nWhy not inside:\n* `api.git/` is bare metadata only - no `main` checkout. `api.git/rate-limit` or `api.git/.worktrees/rate-limit` mixes work files with `objects/refs/HEAD`, breaks `core.bare`, risks corruption/deletion by `worktree remove/gc`.\n\nChecks, in order:\n1. `git -C \"/srv/repos/api.git\" rev-parse --is-bare-repository` - confirm bare, no `\u003cprimary-root\u003e`.\n2. `git -C \"/srv/repos/api.git\" worktree list --porcelain -z` - confirm inventory, that `/srv/repos/api-rate-limit` and branch `rate-limit` are unused/not checked-out elsewhere.\n3. Verify path unused: `rate-limit` unique/descriptive, sibling not nested in another disposable worktree. No `check-ignore` needed - not nested.\n4. Resolve base: fetch remote if current base required, resolve base ref before create. Do not assume `main/master/origin/HEAD`.\n5. Create: `git -C \"/srv/repos/api.git\" worktree add -b rate-limit \"/srv/repos/api-rate-limit\" \u003cbase\u003e` - use `-b`, never `-B` to avoid reset.\n6. Verify: re-`worktree list`, confirm `HEAD`/branch/commit in `/srv/repos/api-rate-limit`.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "bare-repo-sibling-location",
+      "title": "Place task worktrees beside a bare repository",
+      "status": "FAIL",
+      "duration_ms": 13089,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "output_matches.all: missing [(?i)sibling]",
+            "passed": false,
+            "evidence": "output does not match required regex patterns: [(?i)sibling]"
+          },
+          {
+            "text": "output_contains{any:[worktree add check-ignore verify -b]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[worktree add check-ignore verify -b])"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "The project is a bare repository at /srv/repos/api.git and I need a task\nworktree for task \"rate-limit\" using raw Git. There is no repo location\nconvention. Where should I place the checkout, and why not inside the\nrepository directory?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact placement and the checks you would run, in order.\n",
+      "response": "Place checkout at: `/srv/worktrees/api-rate-limit`\n\nDo not place inside `/srv/repos/api.git`:\n\n* `/srv/repos/api.git` is bare: contains `HEAD,objects/,refs/,config` with `core.bare=true`, no working tree.\n* A checkout at e.g. `/srv/repos/api.git/rate-limit` would be stray files inside the object DB, mistaken for internals, subject to `gc/prune`, break push/fetch contract, and not registered as a worktree.\n\nChecks in order, raw `git`, no creation yet:\n\n1. `git --git-dir=/srv/repos/api.git rev-parse --is-bare-repository` -\u003e must be `true`\n2. `git --git-dir=/srv/repos/api.git worktree list` -\u003e no conflict, `git --version` supports `worktree`\n3. `git --git-dir=/srv/repos/api.git rev-parse --verify \u003cbase\u003e` / `branch --list rate-limit` -\u003e resolve base/branch exists\n4. `test -e /srv/worktrees/api-rate-limit` -\u003e must not exist; verify target is not under `/srv/repos/api.git/`\n\nThen: `git --git-dir=/srv/repos/api.git worktree add /srv/worktrees/api-rate-limit -b rate-limit \u003cbase\u003e`, verify with `worktree list` + `git -C /srv/worktrees/api-rate-limit rev-parse --is-bare-repository` -\u003e `false`.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "detached-anchor-before-removal",
+      "title": "Anchor valuable detached commits before removing the checkout",
+      "status": "PASS",
+      "duration_ms": 10524,
+      "turns": 1,
+      "input_tokens": 6884,
+      "output_tokens": 185,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[branch], any:[anchor detached rev-parse HEAD valuable preserve]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[branch], any:[anchor detached rev-parse HEAD valuable preserve])"
+          },
+          {
+            "text": "output_contains{any:[worktree remove before removal after anchoring checkout removal]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[worktree remove before removal after anchoring checkout removal])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "I used a disposable inspection checkout on a detached HEAD and ended up with\nthree valuable commits there. The task is done and I want the checkout gone.\nCan I just remove it? What must happen to the detached commits first?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
+      "response": "No. Do not remove it yet — `remove` leaves no branch, and a detached `HEAD` has no ref. The 3 commits would become dangling/unreachable and be GC'd.\n\nOrder:\n\n1. Confirm canonical path and detached state:\n```sh\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z\ngit -C \"\u003cworktree\u003e\" rev-parse HEAD\ngit -C \"\u003cworktree\u003e\" log --oneline -3\n```\n\n2. Check nothing else would be lost with the directory:\n```sh\ngit -C \"\u003cworktree\u003e\" status --short --branch --untracked-files=all\ngit -C \"\u003cworktree\u003e\" status --short --ignored\n```\n\n3. Anchor the detached tip to a durable branch first — from the disposable checkout:\n```sh\ngit -C \"\u003cworktree\u003e\" branch \"\u003cpreservation-branch\u003e\" HEAD\ngit -C \"\u003crepo\u003e\" show-ref --verify --quiet \"refs/heads/\u003cpreservation-branch\u003e\"\ngit -C \"\u003crepo\u003e\" log --oneline -3 \"\u003cpreservation-branch\u003e\"\n```\n\n4. Only then remove via Git, run from surviving checkout/bare repo, not from inside `\u003cworktree\u003e`:\n```sh\ngit -C \"\u003crepo\u003e\" worktree remove \"\u003cworktree\u003e\"\n```\n\n5. Verify:\n```sh\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z\ngit -C \"\u003crepo\u003e\" worktree prune --dry-run --verbose\n```\n\nDo not `rm -rf` the path, do not `prune` to remove it, do not delete `\u003cpreservation-branch\u003e`.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "detached-anchor-before-removal",
+      "title": "Anchor valuable detached commits before removing the checkout",
+      "status": "PASS",
+      "duration_ms": 8521,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[branch], any:[anchor detached rev-parse HEAD valuable preserve]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[branch], any:[anchor detached rev-parse HEAD valuable preserve])"
+          },
+          {
+            "text": "output_contains{any:[worktree remove before removal after anchoring checkout removal]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[worktree remove before removal after anchoring checkout removal])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "I used a disposable inspection checkout on a detached HEAD and ended up with\nthree valuable commits there. The task is done and I want the checkout gone.\nCan I just remove it? What must happen to the detached commits first?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
+      "response": "No — do not remove it yet. Detached `HEAD` commits have no ref. Removing the checkout leaves them dangling until `gc` deletes them.\n\nRun in order, from main repo:\n\n1. Check worktrees:\n```bash\ngit worktree list -v\n```\n\n2. Check disposable checkout is detached + what will be lost:\n```bash\ngit -C \u003cdisposable-path\u003e status --short --branch\ngit -C \u003cdisposable-path\u003e branch --show-current\ngit -C \u003cdisposable-path\u003e log --oneline --decorate -5\ngit -C \u003cdisposable-path\u003e rev-parse HEAD\n```\n\n`branch --show-current` empty = detached, as expected.\n\n3. Preserve all 3 commits with a ref first:\n```bash\ngit -C \u003cdisposable-path\u003e branch rescue/\u003cname\u003e HEAD\n```\n\nUse `tag \u003cname\u003e HEAD` if you want immutable instead.\n\n4. Verify rescue from main repo:\n```bash\ngit branch -vv --contains \u003cHEAD-sha-from-step-2\u003e\ngit log --oneline --decorate rescue/\u003cname\u003e -3\n```\n\nMust show 3 commits on `rescue/\u003cname\u003e`.\n\n5. Only then remove checkout:\n```bash\ngit worktree remove \u003cdisposable-path\u003e\ngit worktree list\ngit worktree prune -v\n```\n\nUse `--force` only if step 2 showed dirty/locked state you intentionally discard. If dirty and valuable: commit or `git -C \u003cdisposable-path\u003e stash -u` before step 3.\n\nAfter that `rescue/\u003cname\u003e` survives in main repo for merge/cherry-pick/push.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "offline-lock-gc-prune",
+      "title": "Lock intermittently mounted worktrees before storage goes offline",
+      "status": "PASS",
+      "duration_ms": 11649,
+      "turns": 1,
+      "input_tokens": 7919,
+      "output_tokens": 188,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[lock], any:[worktree lock intermittent offline gc.worktreePruneExpire expire]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[lock], any:[worktree lock intermittent offline gc.worktreePruneExpire expire])"
+          },
+          {
+            "text": "output_contains{any:[repair do not prune unavailable missing directory unlock]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[repair do not prune unavailable missing directory unlock])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "A task worktree lives on a share that goes offline next week while the task\nis still active. I am worried git gc will drop its registration while it is\nunmounted. What should I do before the storage goes offline, and should I\nprune the registration while it is unavailable?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
+      "response": "Before offline — lock it. While offline — do not prune/unlock:\n\n1. Confirm registration from main/bare repo:\n```sh\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z\n```\n\n2. Lock before unmount, reason flag precedes path:\n```sh\ngit -C \"\u003crepo\u003e\" worktree lock --reason \"\u003cwhy-offline\u003e\" \"\u003cworktree\u003e\"\n```\nThis prevents `git gc` auto-prune via `gc.worktreePruneExpire`.\n\n3. While unavailable, do not run:\n```sh\ngit -C \"\u003crepo\u003e\" worktree prune --dry-run --verbose\ngit -C \"\u003crepo\u003e\" worktree prune --verbose\ngit -C \"\u003crepo\u003e\" worktree unlock \"\u003cworktree\u003e\"\n```\nA missing directory may be an offline volume. Prune only if every dry-run entry is an intentionally removed worktree. Never prune or unlock a merely unavailable checkout.\n\nAfter it returns: re-list, read lock reason, then `unlock` / `repair` only if path changed and checkout is live.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "offline-lock-gc-prune",
+      "title": "Lock intermittently mounted worktrees before storage goes offline",
+      "status": "PASS",
+      "duration_ms": 13485,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[lock], any:[worktree lock intermittent offline gc.worktreePruneExpire expire]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[lock], any:[worktree lock intermittent offline gc.worktreePruneExpire expire])"
+          },
+          {
+            "text": "output_contains{any:[repair do not prune unavailable missing directory unlock]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[repair do not prune unavailable missing directory unlock])"
+          }
+        ],
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "total": 4,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "A task worktree lives on a share that goes offline next week while the task\nis still active. I am worried git gc will drop its registration while it is\nunmounted. What should I do before the storage goes offline, and should I\nprune the registration while it is unavailable?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
+      "response": "Before offline, lock the registration so `gc`/`prune --expire` cannot drop it:\n\n1. Check registration:\n```sh\ngit worktree list -v\ngit worktree list --porcelain\n```\n\n2. Lock it:\n```sh\ngit worktree lock \"/mnt/share/\u003ctask\u003e\" --reason \"share offline next week - task still active - do not prune\"\n```\n\n3. Verify locked:\n```sh\ngit worktree list -v\n```\n\n4. Record state before unmount:\n```sh\ngit -C \"/mnt/share/\u003ctask\u003e\" status -sb\ngit -C \"/mnt/share/\u003ctask\u003e\" rev-parse HEAD\ngit -C \"/mnt/share/\u003ctask\u003e\" branch --show-current\n```\n\nWhile unavailable, do not prune:\n\n* No: do not run `git worktree prune`, `git worktree remove`, `git worktree repair`, or `git gc --prune=...`.\n* A missing unlocked entry is prune-eligible. A locked entry is exempt and cheap to keep. Pruning would orphan the branch/worktree metadata.\n\nAfter remount, validate then unlock:\n```sh\ngit worktree list -v\ngit -C \"/mnt/share/\u003ctask\u003e\" status -sb\ngit worktree unlock \"/mnt/share/\u003ctask\u003e\"\n```",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "move-limits-main-submodule",
+      "title": "Refuse worktree move of main or submodule-containing checkouts",
+      "status": "PASS",
+      "duration_ms": 15301,
+      "turns": 1,
+      "input_tokens": 6900,
+      "output_tokens": 183,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "output_matches{all:[(?i)main (?i)submodule], any:[cannot move refuse do not move never move must not move not support repair]}",
+            "passed": true,
+            "evidence": "output satisfies all regex checks (all:[(?i)main (?i)submodule], any:[cannot move refuse do not move never move must not move not support repair])"
+          },
+          {
+            "text": "output_contains{any:[worktree move worktree list repair relocate]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[worktree move worktree list repair relocate])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "I am reorganizing directories. I want to run `git worktree move` on the\nmain checkout to its new location, and also move a linked task checkout\nthat contains submodules. Should I proceed with both moves? What must I\ncheck first, and what is the correct procedure for each?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
+      "response": "No. Do not run `git worktree move` for either:\n\n* `git worktree move` cannot move main or submodule-containing worktrees.\n\n### 1. Checks first — both cases\n\nRun from main checkout or bare repo, `\u003crepo\u003e` is existing checkout/bare repo:\n\n```sh\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z\n```\n\nVerify from output: canonical absolute path, main vs linked, branch/HEAD, ownership. Scripts must parse `--porcelain -z`.\n\nThen for the checkout to be relocated `\u003cworktree\u003e`:\n\n```sh\ngit -C \"\u003cworktree\u003e\" status --short --branch --untracked-files=all\ngit -C \"\u003cworktree\u003e\" rev-parse HEAD\n```\n\nAlso verify: no agent/editor/terminal/service/test using it, leave directory before relocation, no unfinished Git operation, check submodules/nested repos separately. Do not prune, delete, or recreate live checkout to fix registration.\n\n### 2. Main checkout — correct procedure\n\n`git worktree move` will refuse. Manual relocate + repair:\n\n```sh\n# 1. list + checks above\n# 2. filesystem move outside Git, preserving .git and contents:\nmv \"\u003cold-primary-root\u003e\" \"\u003cnew-primary-root\u003e\"\n# 3. resume after move before any other work, from new main location:\ngit -C \"\u003cnew-primary-root\u003e\" worktree list --porcelain -z\ngit -C \"\u003cnew-primary-root\u003e\" worktree repair \"\u003clinked-worktree-current-absolute-path\u003e\"\ngit -C \"\u003cnew-primary-root\u003e\" worktree list --porcelain -z\n```\n\nRepair preserves branch/index/state. Repeat `repair` for each linked checkout with its current absolute path.\n\n### 3. Linked checkout containing submodules — correct procedure\n\n`git worktree move` will refuse. Manual relocate + repair, superproject multi-checkout discouraged:\n\n```sh\n# 1. list + checks above, plus submodule state separately\n# 2. filesystem move preserving .git file and contents:\nmv \"\u003cold-worktree-abs\u003e\" \"\u003cnew-worktree-abs\u003e\"\n# 3. repair from main/bare repo, arg is current absolute path:\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z\ngit -C \"\u003crepo\u003e\" worktree repair \"\u003cnew-worktree-abs\u003e\"\ngit -C \"\u003crepo\u003e\" worktree list --porcelain -z\n```\n\nVerify new registration in re-list before any other work in that checkout.\n",
+      "observed_version": "2.0.22"
+    },
+    {
+      "case_id": "move-limits-main-submodule",
+      "title": "Refuse worktree move of main or submodule-containing checkouts",
+      "status": "PASS",
+      "duration_ms": 31607,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "output_matches{all:[(?i)main (?i)submodule], any:[cannot move refuse do not move never move must not move not support repair]}",
+            "passed": true,
+            "evidence": "output satisfies all regex checks (all:[(?i)main (?i)submodule], any:[cannot move refuse do not move never move must not move not support repair])"
+          },
+          {
+            "text": "output_contains{any:[worktree move worktree list repair relocate]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (any:[worktree move worktree list repair relocate])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "I am reorganizing directories. I want to run `git worktree move` on the\nmain checkout to its new location, and also move a linked task checkout\nthat contains submodules. Should I proceed with both moves? What must I\ncheck first, and what is the correct procedure for each?\nNo repository is attached here, so do not search the filesystem: answer with\nthe exact checks and commands you would run, in order.\n",
+      "response": "No — do not run `git worktree move` on both as-is.\n\n* Main checkout: `git worktree move` will refuse: `fatal: '\u003cpath\u003e' is a main working tree`.\n* Linked checkout with submodules: `git worktree move` only fixes top-level `gitdir`, leaves `\u003csubmodule\u003e/.git` files and `.../.git/worktrees/\u003cname\u003e/modules/...` pointing at old path. Move is incomplete without repair.\n\nChecks first, in order:\n\n1. `git --version` — need \u003e=2.39 for `git worktree repair`.\n2. `git -C \u003cmain-path\u003e worktree list --porcelain --verbose` — identify main vs linked, `bare`, `locked`, `prunable`, branch.\n3. `git -C \u003cmain-path\u003e rev-parse --git-dir --git-common-dir --show-toplevel --is-bare-repository`\n   `git -C \u003ctask-path\u003e rev-parse --git-dir --git-common-dir --show-toplevel`\n   `ls -ld \u003cmain-path\u003e/.git \u003ctask-path\u003e/.git; cat \u003ctask-path\u003e/.git`\n   Expect: main: `--git-dir` == `--git-common-dir`, `.git` is directory. Linked: `--git-dir` != `--git-common-dir`, `.git` is file: `gitdir: \u003cmain\u003e/.git/worktrees/\u003cname\u003e`.\n4. Cleanliness:\n   `git -C \u003cmain-path\u003e status --porcelain=v1 -uall`\n   `git -C \u003ctask-path\u003e status --porcelain=v1 -uall`\n   Must be empty. No `MERGE_HEAD/CHERRY_PICK_HEAD/REBASE_HEAD/BISECT_LOG` in `$(git -C \u003cpath\u003e rev-parse --git-dir)`.\n5. Submodules:\n   `git -C \u003ctask-path\u003e submodule status --recursive`\n   `git -C \u003ctask-path\u003e submodule foreach --recursive 'git status --porcelain=v1 -uall'`\n   Must be empty, no `-` uninitialized / `+` mismatched. Also `cat \u003ctask-path\u003e/\u003csub\u003e/.git` — file: `gitdir: .../worktrees/\u003cname\u003e/modules/\u003csub\u003e`.\n6. Destination:\n   `test ! -e \u003cnew-main\u003e || echo exists`\n   `test ! -e \u003cnew-task\u003e || echo exists`\n\nCorrect procedure:\n\nMain — plain `mv` + repair:\n1. `mv \u003cold-main\u003e \u003cnew-main\u003e`\n2. `cd \u003cnew-main\u003e \u0026\u0026 git worktree repair`\n3. `git worktree list --porcelain --verbose`\n4. `git status --porcelain=v1 -uall; git submodule status --recursive`\n5. `git -C \u003cunchanged-linked-path\u003e rev-parse --git-common-dir` — must resolve to `\u003cnew-main\u003e/.git`.\n\nLinked with submodules:\n1. `git -C \u003cnew-main\u003e worktree move \u003cold-task\u003e \u003cnew-task\u003e`\n2. `git -C \u003cnew-task\u003e worktree repair`\n3. `git -C \u003cnew-task\u003e submodule foreach --recursive git worktree repair || git -C \u003cnew-task\u003e worktree repair --help` — repair submodules recursively; inspect `cat \u003cnew-task\u003e/.git` and `cat \u003cnew-task\u003e/\u003csub\u003e/.git` for old path remnants.\n4. Verify: `git -C \u003cnew-task\u003e rev-parse --absolute-git-dir --git-common-dir`\n   `git -C \u003cnew-task\u003e status --porcelain=v1 -uall`\n   `git -C \u003cnew-task\u003e submodule status --recursive`\n   `git -C \u003cnew-task\u003e/\u003csub\u003e status --porcelain=v1 -uall`\n",
+      "observed_version": "2.0.22"
+    }
+  ],
+  "total_tokens": 107937,
+  "judge_tokens": 0,
+  "overall_tokens": 107937
+}

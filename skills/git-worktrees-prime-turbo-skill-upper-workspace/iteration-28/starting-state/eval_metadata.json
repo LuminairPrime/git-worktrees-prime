@@ -1,0 +1,11 @@
+{
+  "eval_id": 0,
+  "eval_name": "Establish base, branch, and detached-HEAD handling",
+  "prompt": "I want a worktree to implement feature X. What base should I use, should I\nassume main is the integration target, and how should I handle the task branch\nversus a disposable inspection checkout?\n",
+  "assertions": [
+    "expect.must_contain",
+    "expect.must_not_contain",
+    "output_contains.any: [do not assume starting commit task branch detached]",
+    "output_contains.any: [detached HEAD detached anchor checkout protection checked out elsewhere]"
+  ]
+}
